@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getModuleSlugs, getLessonSlugs, getLesson, getAllLessons } from '@/lib/content'
 import LessonRenderer from '@/components/LessonRenderer'
 import CourseNavigation from '@/components/CourseNavigation'
+import ReadingProgressBar from '@/components/ReadingProgressBar'
 import courseData from '@/content/courses/hcai-foundations/_course.json'
 
 interface PageProps {
@@ -96,6 +97,7 @@ export default async function LessonPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-8 items-start">
+      <ReadingProgressBar />
       
       {/* Mobile Breadcrumbs & Navigation Header */}
       <div className="w-full md:hidden mb-4 border-b border-slate-200 pb-4">
@@ -168,8 +170,8 @@ export default async function LessonPage({ params }: PageProps) {
       <main className="flex-1 w-full max-w-3xl border border-slate-200/60 bg-white rounded-2xl p-6 sm:p-10 shadow-sm min-h-[50vh]">
         {/* Lesson Metadata Header */}
         <div className="border-b border-slate-100 pb-6 mb-8">
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 uppercase tracking-widest mb-3">
-            Modul 0{currentLesson.frontmatter.module} · Lesson 0{currentLesson.frontmatter.lesson}
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 tracking-wider mb-3">
+            Module {String(currentLesson.frontmatter.module).padStart(2, '0')} › Lesson {String(currentLesson.frontmatter.lesson).padStart(2, '0')}
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight mb-4">
             {currentLesson.frontmatter.title}

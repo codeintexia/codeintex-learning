@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   experimental: {
     mdxRs: true,
   },
+  devIndicators: false,
 }
 
 export default withMDX(nextConfig)

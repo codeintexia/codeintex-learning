@@ -42,10 +42,6 @@ export default function RootLayout({
               >
                 Mulai Belajar
               </a>
-              <span className="h-4 w-px bg-slate-200" />
-              <span className="rounded-full bg-teal-50/60 px-3 py-1 text-xs font-semibold text-teal-700 border border-teal-100">
-                Phase 1: Local MD
-              </span>
             </nav>
           </div>
         </header>
