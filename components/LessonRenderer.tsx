@@ -8,7 +8,8 @@ interface LessonRendererProps {
 
 export default function LessonRenderer({ content }: LessonRendererProps) {
   // Suppress/remove the first H1 element (the lesson title) to fix the double title bug
-  const contentWithoutFirstH1 = content.replace(/^#\s+[^\r\n]*\r?\n?/m, '');
+  // This matches the first line starting with '# ' and strips it along with its trailing newline.
+  const contentWithoutFirstH1 = content.replace(/^#\s+.+\n?/m, '').trimStart();
 
   // Regex patterns
   // 1. Matches blockquotes starting with > **Quick Check** — Sebelum melanjutkan...
@@ -81,7 +82,7 @@ export default function LessonRenderer({ content }: LessonRendererProps) {
         elements.push(
           <ReactMarkdown
             key={`md-${i}`}
-            className="prose prose-teal max-w-none text-[18px] leading-[1.85] text-[#1a1a2e] prose-p:text-[18px] prose-p:leading-[1.85] prose-p:mb-[1.75rem] prose-p:mt-0 prose-p:text-[#1a1a2e] prose-headings:text-[#1a1a2e] prose-blockquote:text-[#1a1a2e] prose-li:text-[18px] prose-li:leading-[1.85] prose-li:text-[#1a1a2e] prose-blockquote:border-teal-500 prose-blockquote:bg-slate-50/50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg"
+            className="prose prose-teal max-w-none"
           >
             {part}
           </ReactMarkdown>
@@ -92,7 +93,7 @@ export default function LessonRenderer({ content }: LessonRendererProps) {
   }
 
   return (
-    <div className="space-y-6 max-w-[68ch] text-[18px] leading-[1.85] text-[#1a1a2e]">
+    <div className="space-y-6 max-w-[68ch]">
       {elements}
     </div>
   )

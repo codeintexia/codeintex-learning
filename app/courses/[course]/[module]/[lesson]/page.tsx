@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import { getModuleSlugs, getLessonSlugs, getLesson, getAllLessons } from '@/lib/content'
 import LessonRenderer from '@/components/LessonRenderer'
 import CourseNavigation from '@/components/CourseNavigation'
-import ReadingProgressBar from '@/components/ReadingProgressBar'
+// Import the client-side ReadingProgress component for tracking page scroll
+import { ReadingProgress } from '@/components/ReadingProgressBar'
 import courseData from '@/content/courses/hcai-foundations/_course.json'
 
 interface PageProps {
@@ -96,65 +97,73 @@ export default async function LessonPage({ params }: PageProps) {
   })
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row gap-8 items-start">
-      <ReadingProgressBar />
+    <div className="w-full bg-[#ffffff] flex min-h-screen relative">
+      {/* Scroll indicator bar at the top of the viewport */}
+      <ReadingProgress />
       
       {/* Mobile Breadcrumbs & Navigation Header */}
-      <div className="w-full md:hidden mb-4 border-b border-slate-200 pb-4">
-        <nav className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          <Link href={`/courses/${resolvedParams.course}`} className="hover:text-teal-600">
-            {courseData.title}
+      <div className="w-full md:hidden mb-4 border-b border-[#e2e8f0] pb-4 px-4">
+        <nav className="mb-2 flex items-center gap-1.5 text-[11px] text-[#94a3b8]">
+          <Link href={`/courses/${resolvedParams.course}`} className="hover:text-[#0f172a] transition-colors">
+            Module {String(currentLesson.frontmatter.module).padStart(2, '0')}
           </Link>
-          <span>/</span>
-          <span className="text-slate-500 line-clamp-1">
-            Modul {currentLesson.frontmatter.module}
+          <span>›</span>
+          <span className="text-[#0f172a] font-medium line-clamp-1">
+            Lesson {String(currentLesson.frontmatter.lesson).padStart(2, '0')}
           </span>
         </nav>
-        <h2 className="text-sm font-bold text-slate-800 line-clamp-1">
+        <h2 className="text-sm font-bold text-[#0f172a] line-clamp-1">
           Lesson {currentLesson.frontmatter.lesson}: {currentLesson.frontmatter.title}
         </h2>
       </div>
 
-      {/* Desktop Sidebar (Sticky left) */}
-      <aside className="hidden md:block w-72 shrink-0 sticky top-20 max-h-[calc(100vh-7rem)] overflow-y-auto border border-slate-200 bg-white rounded-2xl p-4 shadow-sm select-none">
-        <div className="border-b border-slate-100 pb-3 mb-4">
+      {/* Desktop Sidebar (Sticky left) - Width: 300px, Padding: 20px 0 */}
+      <aside className="hidden md:block w-[300px] shrink-0 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto border-r border-[#e2e8f0] bg-[#f8fafc] py-5 select-none">
+        {/* Course title at the top of the sidebar with a teal dot prefix */}
+        <div className="px-[16px] pt-0 pb-[16px] border-b border-[#e2e8f0]">
           <Link
             href={`/courses/${resolvedParams.course}`}
-            className="text-[10px] font-extrabold text-teal-600 uppercase tracking-widest hover:text-teal-700 block mb-1"
+            className="text-[10px] font-extrabold text-[#0d9488] uppercase tracking-widest hover:text-[#0f766e] block mb-2"
           >
             ← Kembali ke Silabus
           </Link>
-          <h3 className="text-xs font-black text-slate-900 tracking-tight line-clamp-2 leading-tight">
-            {courseData.title}
-          </h3>
+          <div className="flex items-center gap-[8px]">
+            <span className="w-[6px] h-[6px] bg-[#0d9488] rounded-full shrink-0" />
+            <h3 className="text-[13px] font-bold text-[#0f172a]">
+              HCAI Foundations
+            </h3>
+          </div>
         </div>
         
+        {/* Sidebar list items */}
         <div className="space-y-6">
           {sidebarModules.map((mod) => (
             <div key={mod.number} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-400">
+              {/* Module header group label */}
+              <div className="flex items-center justify-between pt-[16px] px-[16px] pb-[6px]">
+                <h4 className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#94a3b8]">
                   Modul 0{mod.number}
                 </h4>
-                {mod.isCurrentModule && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
-                )}
               </div>
-              <ul className="space-y-1 pl-1">
+              <ul className="space-y-1">
                 {mod.lessons.map((les) => (
                   <li key={les.slug}>
                     <Link
                       href={`/courses/${resolvedParams.course}/${mod.dirSlug}/${les.slug}`}
-                      className={`block rounded-lg px-3 py-2 text-xs font-semibold leading-relaxed transition-all duration-200 border ${
+                      className={`block text-[13px] leading-[1.4] py-[7px] pr-[16px] border-l-[3px] cursor-pointer transition-all duration-200 ${
                         les.isActive
-                          ? 'bg-teal-50/70 border-teal-500/20 text-teal-700 shadow-sm shadow-teal-500/[0.02]'
-                          : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                          ? 'bg-[#f0fdfa] text-[#0d9488] font-bold border-l-[#0d9488] pl-[13px]'
+                          : 'border-l-transparent pl-[13px] text-[#64748b] hover:bg-[#f8fafc] hover:text-[#334155] hover:border-l-[#e2e8f0]'
                       }`}
                     >
                       <span className="inline-block w-4 font-bold text-[10px] opacity-65">
                         {les.lessonNumber}.
                       </span>
                       <span className="line-clamp-2 inline-block align-top max-w-[85%]">
+                        {/* Render a small teal dot before the active lesson title (FIX 2) */}
+                        {les.isActive && (
+                          <span className="inline-block w-[6px] h-[6px] bg-[#0d9488] rounded-full mr-[8px] align-middle mb-[2px]" />
+                        )}
                         {les.title}
                       </span>
                     </Link>
@@ -166,24 +175,44 @@ export default async function LessonPage({ params }: PageProps) {
         </div>
       </aside>
 
-      {/* Lesson Content Area */}
-      <main className="flex-1 w-full max-w-3xl border border-slate-200/60 bg-white rounded-2xl p-6 sm:p-10 shadow-sm min-h-[50vh]">
-        {/* Lesson Metadata Header */}
-        <div className="border-b border-slate-100 pb-6 mb-8">
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 tracking-wider mb-3">
-            Module {String(currentLesson.frontmatter.module).padStart(2, '0')} › Lesson {String(currentLesson.frontmatter.lesson).padStart(2, '0')}
+      {/* Lesson Content Area - Max width: 720px, responsive padding */}
+      <main className="flex-1 py-[24px] px-[20px] md:py-[48px] md:px-[64px] max-w-[720px] mx-auto min-h-[50vh] w-full">
+        {/* Lesson Breadcrumb */}
+        <nav className="flex items-center gap-2 text-[13px] text-[#94a3b8] pb-[24px] border-b border-[#e2e8f0] mb-[32px]">
+          <Link href={`/courses/${resolvedParams.course}`} className="hover:text-[#0f172a] transition-colors">
+            Module {String(currentLesson.frontmatter.module).padStart(2, '0')}
+          </Link>
+          <span>›</span>
+          <span className="text-[#0f172a] font-medium">
+            Lesson {String(currentLesson.frontmatter.lesson).padStart(2, '0')}
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight mb-4">
+        </nav>
+
+        {/* Lesson Header */}
+        <div className="mb-8">
+          <h1 className="text-[32px] font-bold text-[#0f172a] leading-[1.25] mb-[16px]">
             {currentLesson.frontmatter.title}
           </h1>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-slate-400">
-            <span className="flex items-center gap-1">
-              ⏱️ Waktu baca: {currentLesson.frontmatter.duration_minutes} menit
+          
+          {/* Individual styled chips/badges for lesson metadata (FIX 1) */}
+          <div className="flex flex-wrap gap-[8px] mb-[32px]">
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium">
+              Modul {String(currentLesson.frontmatter.module).padStart(2, '0')}
             </span>
-            <span className="hidden sm:inline">•</span>
-            <span className="flex items-center gap-1 uppercase">
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium">
+              Lesson {String(currentLesson.frontmatter.lesson).padStart(2, '0')}
+            </span>
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium">
+              ⏱️ {currentLesson.frontmatter.duration_minutes} Menit
+            </span>
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium uppercase">
               🎯 Level: {currentLesson.frontmatter.bloom_level}
             </span>
+            {(currentLesson.frontmatter as any).prerequisites && (
+              <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium">
+                Prasyarat: {(currentLesson.frontmatter as any).prerequisites}
+              </span>
+            )}
           </div>
         </div>
 

@@ -20,25 +20,34 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${inter.variable} scroll-smooth`}>
-      <body className="font-sans min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-teal-500/10 selection:text-teal-900">
-        <header className="sticky top-0 z-40 w-full border-b border-slate-200/60 bg-white/85 backdrop-blur-md">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-sans min-h-screen flex flex-col bg-[#ffffff] text-[#0f172a] selection:bg-teal-500/10 selection:text-teal-900">
+        <header className="sticky top-0 z-50 w-full border-b border-[#e2e8f0] bg-[#ffffff] h-16 flex items-center">
+          <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 flex h-full items-center justify-between">
             <div className="flex items-center gap-6">
               <a href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600 text-white font-black text-lg tracking-wider shadow-sm shadow-teal-600/20">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1e3a8a] text-white font-black text-lg tracking-wider shadow-sm shadow-[#1e3a8a]/20">
                   CX
                 </span>
                 <div>
-                  <span className="block text-sm font-bold text-slate-900 tracking-tight leading-none">CodeinteX</span>
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Learning</span>
+                  <span className="block text-sm font-bold text-[#0f172a] tracking-tight leading-none">CodeinteX</span>
+                  <span className="block text-[10px] font-bold text-[#475569] uppercase tracking-widest mt-1">Learning</span>
                 </div>
               </a>
             </div>
             
-            <nav className="flex items-center gap-4">
+            <nav className="flex items-center gap-6">
               <a
                 href="/courses/hcai-foundations"
-                className="text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-teal-600 transition-colors"
+                className="text-sm font-medium text-[#475569] hover:text-[#0f172a] transition-colors"
+              >
+                Kursus
+              </a>
+              <a
+                href="/courses/hcai-foundations"
+                className="inline-flex items-center justify-center rounded-[6px] bg-[#1e3a8a] text-white text-xs font-semibold px-4 py-2 hover:bg-[#1e3a8a]/90 active:scale-[0.98] transition-all"
               >
                 Mulai Belajar
               </a>
@@ -50,9 +59,13 @@ export default function RootLayout({
           {children}
         </main>
 
-        <footer className="border-t border-slate-200/60 bg-white/50 py-8 text-center text-xs text-slate-400">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <footer className="border-t border-[#e2e8f0] bg-[#f8fafc] py-8 text-center text-[13px] text-[#64748b]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p>© {new Date().getFullYear()} CodeinteX. Hak Cipta Dilindungi. Kursus gratis untuk peningkatan kompetensi AI.</p>
+            <div className="flex gap-4">
+              <a href="/courses/hcai-foundations" className="text-[#64748b] hover:text-[#0f172a] transition-colors">Kursus</a>
+              <a href="/" className="text-[#64748b] hover:text-[#0f172a] transition-colors">Beranda</a>
+            </div>
           </div>
         </footer>
       </body>

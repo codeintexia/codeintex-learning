@@ -1,32 +1,34 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 
-export default function ReadingProgressBar() {
+// ReadingProgress client component renders a thin teal progress bar fixed at the top of the viewport
+export function ReadingProgress() {
   const [progress, setProgress] = useState(0)
-
+  
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
-      if (scrollHeight > 0) {
-        const scrolled = (window.scrollY / scrollHeight) * 100
-        setProgress(scrolled)
-      }
+    // Calculates scroll percentage as the user moves down the lesson page
+    const updateProgress = () => {
+      const scrollTop = window.scrollY
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progressVal = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
+      setProgress(progressVal)
     }
-
-    window.addEventListener('scroll', handleScroll)
-    // Run once on mount to handle initial state
-    handleScroll()
-
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', updateProgress)
+    return () => window.removeEventListener('scroll', updateProgress)
   }, [])
-
+  
   return (
-    <div className="fixed top-0 left-0 w-full h-[3px] bg-transparent z-50 pointer-events-none">
-      <div
-        className="h-full bg-teal-600 transition-all duration-75 ease-out"
-        style={{ width: `${progress}%` }}
-      />
-    </div>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        height: '3px',
+        width: `${progress}%`,
+        backgroundColor: '#0d9488',
+        zIndex: 100,
+        transition: 'width 100ms linear',
+      }}
+    />
   )
 }

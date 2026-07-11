@@ -10,27 +10,33 @@ export default function QuickCheck({ question }: QuickCheckProps) {
   const [checked, setChecked] = useState(false)
 
   return (
-    <div className="my-8 rounded-xl border border-teal-100 bg-teal-50/50 p-6 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-teal-200">
-      <div className="mb-2 flex items-center gap-2">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-teal-600 text-[10px] font-bold text-white">
-          ?
-        </span>
-        <p className="text-xs font-semibold uppercase tracking-wider text-teal-700">
+    <div className="my-[48px] bg-gradient-to-br from-[#f0fdfa] to-[#e6fffa] border-[1.5px] border-[#5eead4] rounded-[12px] p-[28px] relative overflow-hidden shadow-none">
+      {/* Decorative shape in the top-right corner */}
+      <div className="absolute -top-[20px] -right-[20px] w-[80px] h-[80px] bg-[radial-gradient(circle,rgba(13,148,136,0.08)_0%,transparent_70%)] rounded-full pointer-events-none" />
+      
+      {/* Quick Check Label with lightning bolt emoji */}
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-[14px]">⚡</span>
+        <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#0d9488]">
           Quick Check
         </p>
       </div>
-      <p className="mb-4 text-base text-slate-700 leading-relaxed font-medium">{question}</p>
+      
+      {/* Question Text */}
+      <p className="text-[16px] leading-[1.65] font-medium text-[#0f172a] mb-5">{question}</p>
+      
       {!checked ? (
         <button
           onClick={() => setChecked(true)}
-          className="inline-flex items-center justify-center rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-teal-700 hover:shadow-teal-100 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 active:scale-95"
+          className="inline-flex items-center justify-center rounded-[8px] bg-[#0d9488] text-white px-5 py-2.5 text-[14px] font-semibold border-none cursor-pointer transition-colors duration-150 hover:bg-[#0f766e] focus:outline-none"
         >
           Saya sudah memikirkannya →
         </button>
       ) : (
-        <div className="inline-flex items-center gap-2 text-sm font-semibold text-teal-700 bg-teal-100/60 px-4 py-2 rounded-lg border border-teal-200/50 animate-fade-in">
+        /* Checked State Message */
+        <div className="flex items-center gap-2 text-[14px] font-semibold text-[#0f766e]">
           <span>✓</span>
-          <span>Bagus. Lanjutkan ke analisis kasus di bawah.</span>
+          <span>Bagus — lanjutkan ke analisis kasus.</span>
         </div>
       )}
     </div>
