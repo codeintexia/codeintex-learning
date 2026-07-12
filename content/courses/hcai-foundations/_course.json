@@ -1,0 +1,17 @@
+{
+  "slug": "hcai-foundations",
+  "title": "Human-Centered AI — Foundations",
+  "subtitle": "Merancang sistem AI yang benar-benar bekerja untuk manusia",
+  "language": "id",
+  "level": "foundational",
+  "duration_hours": 6,
+  "is_free": true,
+  "modules": [
+    { "number": 1, "slug": "m1-what-is-hcai", "title": "What Is Human-Centered AI?", "lessons": 4 },
+    { "number": 2, "slug": "m2-how-people-think", "title": "How People Think About and Trust AI", "lessons": 4 },
+    { "number": 3, "slug": "m3-the-four-principles", "title": "The Four Principles — What HCAI Demands", "lessons": 5 },
+    { "number": 4, "slug": "m4-explainability-fairness", "title": "Explainability and Fairness in Practice", "lessons": 4 },
+    { "number": 5, "slug": "m5-designing-with-iframe", "title": "Designing Human-Centered AI with IFRAME", "lessons": 4 },
+    { "number": 6, "slug": "m6-evaluating-hcai", "title": "Evaluating and Improving HCAI Systems", "lessons": 4 }
+  ]
+}
