@@ -41,13 +41,13 @@ export default function RootLayout({
             <nav className="flex items-center gap-6">
               <a
                 href="/courses/hcai-foundations"
-                className="text-sm font-medium text-[#475569] hover:text-[#0f172a] transition-colors"
+                className="text-sm font-medium text-[#475569] hover:text-[#0f172a] transition-colors duration-150"
               >
                 Kursus
               </a>
               <a
                 href="/courses/hcai-foundations"
-                className="inline-flex items-center justify-center rounded-[6px] bg-[#1e3a8a] text-white text-xs font-semibold px-4 py-2 hover:bg-[#1e3a8a]/90 active:scale-[0.98] transition-all"
+                className="inline-flex items-center justify-center rounded-[6px] bg-[#1e3a8a] text-white text-xs font-semibold px-4 py-2 hover:bg-[#1e3a8a]/90 active:scale-[0.98] transition-all duration-150 hover:scale-[1.01]"
               >
                 Mulai Belajar
               </a>
@@ -61,10 +61,11 @@ export default function RootLayout({
 
         <footer className="border-t border-[#e2e8f0] bg-[#f8fafc] py-8 text-center text-[13px] text-[#64748b]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p>© {new Date().getFullYear()} CodeinteX. Hak Cipta Dilindungi. Kursus gratis untuk peningkatan kompetensi AI.</p>
+            {/* Attribution copyright line updated to institutional trust styling (FIX 6) */}
+            <p>© 2026 CodeinteX. Kursus ini diproduksi sebagai bagian dari inisiatif pendidikan AI CodeinteX.</p>
             <div className="flex gap-4">
-              <a href="/courses/hcai-foundations" className="text-[#64748b] hover:text-[#0f172a] transition-colors">Kursus</a>
-              <a href="/" className="text-[#64748b] hover:text-[#0f172a] transition-colors">Beranda</a>
+              <a href="/courses/hcai-foundations" className="text-[#64748b] hover:text-[#0f172a] transition-colors duration-150">Kursus</a>
+              <a href="/" className="text-[#64748b] hover:text-[#0f172a] transition-colors duration-150">Beranda</a>
             </div>
           </div>
         </footer>

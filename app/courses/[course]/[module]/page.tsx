@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getModuleSlugs, getLessonSlugs, getLesson } from '@/lib/content'
-import courseData from '@/content/courses/hcai-foundations/_course.json'
+import { getModuleSlugs, getLessonSlugs, getLesson, getCourse, getAllCourseSlugs } from '@/lib/content'
 
 interface PageProps {
   params: Promise<{
@@ -11,20 +10,29 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const courseSlug = 'hcai-foundations'
-  const moduleSlugs = getModuleSlugs(courseSlug)
-  return moduleSlugs.map((moduleSlug) => ({
-    course: courseSlug,
-    module: moduleSlug,
-  }))
+  const courseSlugs = getAllCourseSlugs()
+  const paths = []
+
+  for (const courseSlug of courseSlugs) {
+    const moduleSlugs = getModuleSlugs(courseSlug)
+    for (const moduleSlug of moduleSlugs) {
+      paths.push({
+        course: courseSlug,
+        module: moduleSlug,
+      })
+    }
+  }
+
+  return paths
 }
 
 export const dynamicParams = false
 
 export default async function ModulePage({ params }: PageProps) {
   const resolvedParams = await params
+  const courseData = getCourse(resolvedParams.course)
   
-  if (resolvedParams.course !== 'hcai-foundations') {
+  if (!courseData) {
     return notFound()
   }
 
@@ -59,9 +67,9 @@ export default async function ModulePage({ params }: PageProps) {
         
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-          <Link href="/" className="hover:text-[#0d9488] transition-colors">Home</Link>
+          <Link href="/" className="hover:text-[#0d9488] transition-colors duration-150">Home</Link>
           <span>/</span>
-          <Link href={`/courses/${resolvedParams.course}`} className="hover:text-[#0d9488] transition-colors">
+          <Link href={`/courses/${resolvedParams.course}`} className="hover:text-[#0d9488] transition-colors duration-150">
             {courseData.title}
           </Link>
           <span>/</span>

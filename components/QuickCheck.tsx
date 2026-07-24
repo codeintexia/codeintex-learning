@@ -4,9 +4,10 @@ import { useState } from 'react'
 
 interface QuickCheckProps {
   question: string
+  answer?: string
 }
 
-export default function QuickCheck({ question }: QuickCheckProps) {
+export default function QuickCheck({ question, answer }: QuickCheckProps) {
   const [checked, setChecked] = useState(false)
 
   return (
@@ -30,13 +31,20 @@ export default function QuickCheck({ question }: QuickCheckProps) {
           onClick={() => setChecked(true)}
           className="inline-flex items-center justify-center rounded-[8px] bg-[#0d9488] text-white px-5 py-2.5 text-[14px] font-semibold border-none cursor-pointer transition-colors duration-150 hover:bg-[#0f766e] focus:outline-none"
         >
-          Saya sudah memikirkannya →
+          Lihat Jawaban →
         </button>
       ) : (
-        /* Checked State Message */
-        <div className="flex items-center gap-2 text-[14px] font-semibold text-[#0f766e]">
-          <span>✓</span>
-          <span>Bagus — lanjutkan ke analisis kasus.</span>
+        /* Checked State Message & Answer Reveal */
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-[14px] font-semibold text-[#0f766e]">
+            <span>✓</span>
+            <span>{answer ? 'Jawaban & Pembahasan:' : 'Bagus — lanjutkan ke analisis kasus.'}</span>
+          </div>
+          {answer && (
+            <div className="bg-white/80 border border-[#99f6e4] rounded-[8px] p-4 text-[14px] leading-[1.65] text-[#334155] whitespace-pre-line">
+              {answer}
+            </div>
+          )}
         </div>
       )}
     </div>

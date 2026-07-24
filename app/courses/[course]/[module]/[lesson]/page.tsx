@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getModuleSlugs, getLessonSlugs, getLesson, getAllLessons } from '@/lib/content'
+import { getModuleSlugs, getLessonSlugs, getLesson, getAllLessons, getCourse, getAllCourseSlugs } from '@/lib/content'
 import LessonRenderer from '@/components/LessonRenderer'
 import CourseNavigation from '@/components/CourseNavigation'
 // Import the client-side ReadingProgress component for tracking page scroll
 import { ReadingProgress } from '@/components/ReadingProgressBar'
-import courseData from '@/content/courses/hcai-foundations/_course.json'
 
 interface PageProps {
   params: Promise<{
@@ -16,18 +15,20 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const courseSlug = 'hcai-foundations'
-  const moduleSlugs = getModuleSlugs(courseSlug)
+  const courseSlugs = getAllCourseSlugs()
   const paths = []
 
-  for (const moduleSlug of moduleSlugs) {
-    const lessonSlugs = getLessonSlugs(courseSlug, moduleSlug)
-    for (const lessonSlug of lessonSlugs) {
-      paths.push({
-        course: courseSlug,
-        module: moduleSlug,
-        lesson: lessonSlug,
-      })
+  for (const courseSlug of courseSlugs) {
+    const moduleSlugs = getModuleSlugs(courseSlug)
+    for (const moduleSlug of moduleSlugs) {
+      const lessonSlugs = getLessonSlugs(courseSlug, moduleSlug)
+      for (const lessonSlug of lessonSlugs) {
+        paths.push({
+          course: courseSlug,
+          module: moduleSlug,
+          lesson: lessonSlug,
+        })
+      }
     }
   }
 
@@ -38,8 +39,9 @@ export const dynamicParams = false
 
 export default async function LessonPage({ params }: PageProps) {
   const resolvedParams = await params
+  const courseData = getCourse(resolvedParams.course)
   
-  if (resolvedParams.course !== 'hcai-foundations') {
+  if (!courseData) {
     return notFound()
   }
 
@@ -58,6 +60,10 @@ export default async function LessonPage({ params }: PageProps) {
   const currentLesson = allLessons[currentLessonIndex]
   const prevLesson = currentLessonIndex > 0 ? allLessons[currentLessonIndex - 1] : undefined
   const nextLesson = currentLessonIndex < allLessons.length - 1 ? allLessons[currentLessonIndex + 1] : undefined
+
+  // Calculate the total number of lessons in the current module to show position badges (FIX 1)
+  const currentModuleLessons = allLessons.filter((l) => l.moduleSlug === resolvedParams.module)
+  const totalLessonsInModule = currentModuleLessons.length
 
   // Prepare navigation link props
   const prevLessonProps = prevLesson
@@ -150,7 +156,7 @@ export default async function LessonPage({ params }: PageProps) {
                   <li key={les.slug}>
                     <Link
                       href={`/courses/${resolvedParams.course}/${mod.dirSlug}/${les.slug}`}
-                      className={`block text-[13px] leading-[1.4] py-[7px] pr-[16px] border-l-[3px] cursor-pointer transition-all duration-200 ${
+                      className={`block text-[13px] leading-[1.4] py-[7px] pr-[16px] border-l-[3px] cursor-pointer transition-all duration-150 ${
                         les.isActive
                           ? 'bg-[#f0fdfa] text-[#0d9488] font-bold border-l-[#0d9488] pl-[13px]'
                           : 'border-l-transparent pl-[13px] text-[#64748b] hover:bg-[#f8fafc] hover:text-[#334155] hover:border-l-[#e2e8f0]'
@@ -179,7 +185,7 @@ export default async function LessonPage({ params }: PageProps) {
       <main className="flex-1 py-[24px] px-[20px] md:py-[48px] md:px-[64px] max-w-[720px] mx-auto min-h-[50vh] w-full">
         {/* Lesson Breadcrumb */}
         <nav className="flex items-center gap-2 text-[13px] text-[#94a3b8] pb-[24px] border-b border-[#e2e8f0] mb-[32px]">
-          <Link href={`/courses/${resolvedParams.course}`} className="hover:text-[#0f172a] transition-colors">
+          <Link href={`/courses/${resolvedParams.course}`} className="hover:text-[#0f172a] transition-colors duration-150">
             Module {String(currentLesson.frontmatter.module).padStart(2, '0')}
           </Link>
           <span>›</span>
@@ -196,23 +202,21 @@ export default async function LessonPage({ params }: PageProps) {
           
           {/* Individual styled chips/badges for lesson metadata (FIX 1) */}
           <div className="flex flex-wrap gap-[8px] mb-[32px]">
-            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium">
-              Modul {String(currentLesson.frontmatter.module).padStart(2, '0')}
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[12px] rounded-full font-medium">
+              Modul {currentLesson.frontmatter.module} &middot; {currentLesson.frontmatter.module_title}
             </span>
-            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium">
-              Lesson {String(currentLesson.frontmatter.lesson).padStart(2, '0')}
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[12px] rounded-full font-medium">
+              Lesson {currentLesson.frontmatter.lesson} dari {totalLessonsInModule}
             </span>
-            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium">
-              ⏱️ {currentLesson.frontmatter.duration_minutes} Menit
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[12px] rounded-full font-medium">
+              ⏱ {currentLesson.frontmatter.duration_minutes} menit
             </span>
-            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium uppercase">
-              🎯 Level: {currentLesson.frontmatter.bloom_level}
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[12px] rounded-full font-medium">
+              Foundational
             </span>
-            {(currentLesson.frontmatter as any).prerequisites && (
-              <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[10px] rounded-full font-medium">
-                Prasyarat: {(currentLesson.frontmatter as any).prerequisites}
-              </span>
-            )}
+            <span className="bg-[#f1f5f9] text-[#475569] text-[12px] py-[3px] px-[12px] rounded-full font-medium capitalize">
+              {currentLesson.frontmatter.bloom_level}
+            </span>
           </div>
         </div>
 
