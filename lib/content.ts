@@ -77,3 +77,44 @@ export function getAllLessons(courseSlug: string): LessonData[] {
 
   return lessons
 }
+
+export function getAllCourseSlugs(): string[] {
+  if (!fs.existsSync(contentDir)) return []
+  return fs
+    .readdirSync(contentDir)
+    .filter((f) => {
+      const fullPath = path.join(contentDir, f)
+      return fs.statSync(fullPath).isDirectory() && fs.existsSync(path.join(fullPath, '_course.json'))
+    })
+    .sort()
+}
+
+export interface CourseModule {
+  number: number
+  slug: string
+  title: string
+  lessons: number
+}
+
+export interface CourseData {
+  slug: string
+  title: string
+  subtitle: string
+  language: string
+  level: string
+  duration_hours: number
+  is_free: boolean
+  modules: CourseModule[]
+  kategori?: string
+  domain_tags?: string[]
+  harga?: string
+  status?: string
+}
+
+export function getCourse(courseSlug: string): CourseData | null {
+  const filePath = path.join(contentDir, courseSlug, '_course.json')
+  if (!fs.existsSync(filePath)) return null
+  const raw = fs.readFileSync(filePath, 'utf-8')
+  return JSON.parse(raw) as CourseData
+}
+

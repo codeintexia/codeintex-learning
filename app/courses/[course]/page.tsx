@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getModuleSlugs, getLessonSlugs, getLesson } from '@/lib/content'
-import courseData from '@/content/courses/hcai-foundations/_course.json'
+import { getModuleSlugs, getLessonSlugs, getLesson, getCourse, getAllCourseSlugs } from '@/lib/content'
 
 interface PageProps {
   params: Promise<{
@@ -10,16 +9,19 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return [
-    { course: 'hcai-foundations' }
-  ]
+  const courseSlugs = getAllCourseSlugs()
+  return courseSlugs.map((slug) => ({
+    course: slug,
+  }))
 }
 
 export const dynamicParams = false
 
 export default async function CoursePage({ params }: PageProps) {
   const resolvedParams = await params
-  if (resolvedParams.course !== 'hcai-foundations') {
+  const courseData = getCourse(resolvedParams.course)
+  
+  if (!courseData) {
     return notFound()
   }
 
@@ -62,9 +64,13 @@ export default async function CoursePage({ params }: PageProps) {
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f0fdfa] px-2.5 py-1 text-xs font-bold text-[#0d9488] border border-[#99f6e4] mb-4 uppercase tracking-wider">
             {courseData.level}
           </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
             {courseData.title}
           </h1>
+          {/* Subtle one-line attribution for institutional framing */}
+          <div className="text-[#64748b] text-[13px] mt-2 mb-4 font-normal">
+            Diproduksi oleh CodeinteX &middot; Bahasa Indonesia &middot; {courseData.is_free ? 'Tersedia gratis' : 'Akses berbayar B2B'}
+          </div>
           <p className="text-slate-600 leading-relaxed mb-6">
             {courseData.subtitle}. Kursus ini dirancang untuk mendemistifikasi kecerdasan buatan dari sudut pandang interaksi manusia-komputer dan etika pengembangan produk.
           </p>

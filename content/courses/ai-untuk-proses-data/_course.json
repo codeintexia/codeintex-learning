@@ -1,0 +1,94 @@
+{
+  "slug": "ai-untuk-proses-data",
+  "title": "AI untuk Proses Data",
+  "subtitle": "Kompetensi terverifikasi untuk mengintegrasikan, memasang, merawat, dan mengelola data bagi Solusi AI",
+  "language": "id",
+  "level": "foundational",
+  "duration_hours": 13,
+  "is_free": false,
+  "kategori": "Competency",
+  "domain_tags": ["AI & Kecerdasan Buatan", "Data & Analitik"],
+  "harga": "Berbayar B2B",
+  "status": "Dalam Pengembangan",
+  "modules": [
+    {
+      "number": 1,
+      "slug": "m1-fondasi-pemasukan-validitas-data",
+      "title": "Fondasi Pemasukan & Validitas Data",
+      "lessons": 6
+    },
+    {
+      "number": 2,
+      "slug": "m2-integrasi-komponen-solusi-ai",
+      "title": "Integrasi Komponen Solusi AI",
+      "lessons": 4
+    },
+    {
+      "number": 3,
+      "slug": "m3-deployment-solusi-ai",
+      "title": "Deployment Solusi AI",
+      "lessons": 5
+    },
+    {
+      "number": 4,
+      "slug": "m4-merencanakan-perawatan-solusi-ai",
+      "title": "Merencanakan Perawatan Solusi AI",
+      "lessons": 4
+    },
+    {
+      "number": 5,
+      "slug": "m5-merawat-solusi-ai",
+      "title": "Merawat Solusi AI",
+      "lessons": 3
+    },
+    {
+      "number": 6,
+      "slug": "m6-audit-siklus-hidup",
+      "title": "Audit Siklus Hidup & Evaluasi Terintegrasi",
+      "lessons": 3
+    }
+  ],
+  "unit_kompetensi": [
+    {
+      "kode": "J.63OPR00.014.2",
+      "nama": "Melakukan Pemasukan Data",
+      "modul": 1
+    },
+    {
+      "kode": "J.63OPR00.015.2",
+      "nama": "Memastikan Validitas Data",
+      "modul": 1
+    },
+    {
+      "kode": "J.62AIN00.014.1",
+      "nama": "Mengintegrasikan Komponen Solusi AI",
+      "modul": 2
+    },
+    {
+      "kode": "J.62AIN00.015.1",
+      "nama": "Memasang Solusi AI",
+      "modul": 3
+    },
+    {
+      "kode": "J.62AIN00.016.1",
+      "nama": "Merencanakan Perawatan Solusi AI",
+      "modul": 4
+    },
+    {
+      "kode": "J.62AIN00.017.1",
+      "nama": "Merawat Solusi AI",
+      "modul": 5
+    }
+  ],
+  "stats": {
+    "total_modules": 6,
+    "total_lessons": 25,
+    "total_duration_minutes": 777,
+    "total_duration_hours_display": "~13 Jam"
+  },
+  "studi_kasus": {
+    "audience_id": "bank",
+    "organisasi_fiktif": "Bank Nusantara Sejahtera",
+    "solusi_ai_fiktif": "SPKO (Sistem Penilaian Kredit Otomatis)"
+  }
+}
