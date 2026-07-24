@@ -67,9 +67,9 @@ export default async function CoursePage({ params }: PageProps) {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
             {courseData.title}
           </h1>
-          {/* Subtle one-line attribution for institutional framing (FIX 7) */}
+          {/* Subtle one-line attribution for institutional framing */}
           <div className="text-[#64748b] text-[13px] mt-2 mb-4 font-normal">
-            Diproduksi oleh CodeinteX &middot; Bahasa Indonesia &middot; Tersedia gratis
+            Diproduksi oleh CodeinteX &middot; Bahasa Indonesia &middot; {courseData.is_free ? 'Tersedia gratis' : 'Akses berbayar B2B'}
           </div>
           <p className="text-slate-600 leading-relaxed mb-6">
             {courseData.subtitle}. Kursus ini dirancang untuk mendemistifikasi kecerdasan buatan dari sudut pandang interaksi manusia-komputer dan etika pengembangan produk.
