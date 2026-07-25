@@ -92,7 +92,7 @@ export default function HomePage() {
     <div className="flex flex-col items-stretch bg-[#ffffff]">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-[#ffffff] border-b border-[#e2e8f0]">
-        <div className="mx-auto max-w-[1200px] px-[40px] py-[80px] pb-[72px] grid grid-cols-1 md:grid-cols-2 gap-[80px] items-center bg-[#ffffff]">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 md:px-[40px] py-12 sm:py-16 md:py-[80px] pb-10 sm:pb-[72px] grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-[80px] items-center bg-[#ffffff]">
           
           {/* Left column: platform messaging */}
           <div>
@@ -102,18 +102,18 @@ export default function HomePage() {
             </span>
             
             {/* Heading H1 (FIX 3) */}
-            <h1 className="text-[32px] md:text-[38px] font-bold tracking-tight text-[#0f172a] leading-[1.15] mb-5">
-              Kuasai AI yang <br />
+            <h1 className="text-[28px] sm:text-[34px] md:text-[38px] font-bold tracking-tight text-[#0f172a] leading-[1.18] mb-5">
+              Kuasai AI yang <br className="hidden sm:inline" />
               Berpusat pada Manusia
             </h1>
             
             {/* Subheading */}
-            <p className="text-[17px] text-[#475569] leading-[1.7] max-w-[480px] mb-8">
+            <p className="text-base sm:text-[17px] text-[#475569] leading-[1.7] max-w-[480px] mb-8">
               Kursus berbasis penelitian akademis untuk profesional yang ingin merancang, mengevaluasi, dan mengaudit sistem AI secara bertanggung jawab.
             </p>
             
-            {/* Three proof points (FIX 1) */}
-            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '16px', alignItems: 'center', marginBottom: '28px' }}>
+            {/* Three proof points */}
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-4 items-start sm:items-center mb-[28px]">
               <span className="flex items-center gap-1.5 text-[13px] text-[#64748b] font-medium">
                 ✓ Referensi akademis terverifikasi
               </span>
@@ -126,52 +126,52 @@ export default function HomePage() {
             </div>
             
             {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
               <Link
                 href="/courses/hcai-foundations"
-                className="inline-flex items-center justify-center rounded-[8px] bg-[#1e3a8a] text-white px-[24px] py-[12px] text-[15px] font-semibold transition-colors duration-150 hover:bg-[#1e40af]"
+                className="inline-flex items-center justify-center rounded-[8px] bg-[#1e3a8a] text-white px-[24px] py-[12px] text-[15px] font-semibold transition-colors duration-150 hover:bg-[#1e40af] text-center w-full sm:w-auto"
               >
                 Mulai Belajar — Gratis
               </Link>
               <button
                 onClick={() => document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' })}
-                className="inline-flex items-center justify-center rounded-[8px] border-[1.5px] border-[#1e3a8a] bg-transparent text-[#1e3a8a] px-[24px] py-[12px] text-[15px] font-semibold cursor-pointer transition-colors duration-150 hover:bg-[#f8fafc]"
+                className="inline-flex items-center justify-center rounded-[8px] border-[1.5px] border-[#1e3a8a] bg-transparent text-[#1e3a8a] px-[24px] py-[12px] text-[15px] font-semibold cursor-pointer transition-colors duration-150 hover:bg-[#f8fafc] text-center w-full sm:w-auto"
               >
                 Lihat Semua Kursus
               </button>
             </div>
           </div>
           
-          {/* Right column: stacked course cards visual (hidden on mobile < 768px) (FIX 2) */}
-          <div className="hidden md:block" style={{ width: '100%' }}>
+          {/* Right column: stacked course cards visual (hidden on mobile < 768px) */}
+          <div className="hidden md:block w-full">
             <div style={{ position: 'relative', height: '300px', width: '100%' }}>
               
               {/* Card 3: back */}
               <div style={{
                 position: 'absolute',
-                top: '28px',
-                left: '16px',
-                right: '-8px',
+                top: '24px',
+                left: '12px',
+                right: '12px',
                 height: '200px',
-                background: '#e2e8f0',
+                background: '#cbd5e1',
                 borderRadius: '12px',
-                transform: 'rotate(3deg)',
-                opacity: 0.45,
+                transform: 'rotate(2.5deg)',
+                opacity: 0.5,
                 zIndex: 1,
               }}></div>
 
               {/* Card 2: middle */}
               <div style={{
                 position: 'absolute',
-                top: '14px',
-                left: '8px',
-                right: '-4px',
+                top: '12px',
+                left: '6px',
+                right: '6px',
                 height: '210px',
                 background: '#f1f5f9',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #cbd5e1',
                 borderRadius: '12px',
-                transform: 'rotate(1.5deg)',
-                opacity: 0.7,
+                transform: 'rotate(1.2deg)',
+                opacity: 0.8,
                 zIndex: 2,
               }}></div>
 
