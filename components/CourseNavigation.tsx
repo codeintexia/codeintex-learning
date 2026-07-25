@@ -10,7 +10,7 @@ export default function CourseNavigation({ prevLesson, nextLesson }: CourseNavig
       {prevLesson ? (
         <Link
           href={prevLesson.href}
-          className="block border border-[#e2e8f0] rounded-[8px] p-[16px_20px] cursor-pointer transition-colors duration-200 hover:border-[#0d9488]"
+          className="block border border-[#e2e8f0] rounded-[8px] p-[16px_20px] cursor-pointer transition-all duration-200 ease-in-out hover:border-[#0d9488] hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
         >
           <span className="block text-[12px] font-medium text-[#94a3b8] mb-[4px]">
             ← Sebelumnya
@@ -26,7 +26,7 @@ export default function CourseNavigation({ prevLesson, nextLesson }: CourseNavig
       {nextLesson ? (
         <Link
           href={nextLesson.href}
-          className="block border border-[#e2e8f0] rounded-[8px] p-[16px_20px] cursor-pointer text-right transition-colors duration-200 hover:border-[#0d9488] bg-[#f8fafc]"
+          className="block border border-[#e2e8f0] rounded-[8px] p-[16px_20px] cursor-pointer text-right transition-all duration-200 ease-in-out hover:border-[#0d9488] bg-[#f8fafc] hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
         >
           <span className="block text-[12px] font-medium text-[#0d9488] mb-[4px]">
             Berikutnya →
