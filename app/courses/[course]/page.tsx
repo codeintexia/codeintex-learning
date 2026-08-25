@@ -60,22 +60,22 @@ export default async function CoursePage({ params }: PageProps) {
         </nav>
 
         {/* Course Header Card */}
-        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-none mb-12">
+        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-5 sm:p-8 shadow-none mb-12">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f0fdfa] px-2.5 py-1 text-xs font-bold text-[#0d9488] border border-[#99f6e4] mb-4 uppercase tracking-wider">
             {courseData.level}
           </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
             {courseData.title}
           </h1>
           {/* Subtle one-line attribution for institutional framing */}
           <div className="text-[#64748b] text-[13px] mt-2 mb-4 font-normal">
             Diproduksi oleh CodeinteX &middot; Bahasa Indonesia &middot; {courseData.is_free ? 'Tersedia gratis' : 'Akses berbayar B2B'}
           </div>
-          <p className="text-slate-600 leading-relaxed mb-6">
+          <p className="text-slate-600 leading-relaxed mb-6 text-sm sm:text-base">
             {courseData.subtitle}. Kursus ini dirancang untuk mendemistifikasi kecerdasan buatan dari sudut pandang interaksi manusia-komputer dan etika pengembangan produk.
           </p>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-slate-100 pt-6 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 border-t border-slate-100 pt-6 text-sm">
             <div>
               <span className="block text-slate-400 font-medium text-xs uppercase tracking-wider">Durasi</span>
               <span className="font-bold text-slate-800">{courseData.duration_hours} Jam</span>
@@ -102,16 +102,16 @@ export default async function CoursePage({ params }: PageProps) {
               className="rounded-2xl border border-[#e2e8f0] bg-white shadow-none overflow-hidden scroll-mt-20"
             >
               {/* Module header */}
-              <div className="border-b border-[#e2e8f0] bg-[#f8fafc] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="border-b border-[#e2e8f0] bg-[#f8fafc] p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <span className="block text-xs font-bold text-[#0d9488] uppercase tracking-widest mb-1">
                     Modul 0{mod.number}
                   </span>
-                  <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
                     {mod.title}
                   </h3>
                 </div>
-                <span className="shrink-0 rounded-full bg-slate-200/60 px-3 py-1 text-xs font-semibold text-slate-600">
+                <span className="shrink-0 self-start sm:self-center rounded-full bg-slate-200/60 px-3 py-1 text-xs font-semibold text-slate-600">
                   {mod.lessons.length} Lessons
                 </span>
               </div>
@@ -122,7 +122,7 @@ export default async function CoursePage({ params }: PageProps) {
                   <Link
                     key={lesson.slug}
                     href={`/courses/${resolvedParams.course}/${mod.dirSlug}/${lesson.slug}`}
-                    className="flex items-center justify-between p-6 hover:bg-[#f8fafc] transition-colors group"
+                    className="flex items-center justify-between p-4 sm:p-6 hover:bg-[#f8fafc] transition-colors group"
                   >
                     <div className="flex items-start gap-4">
                       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#f0fdfa] text-xs font-bold text-[#0d9488] transition-colors group-hover:bg-[#0d9488] group-hover:text-white">

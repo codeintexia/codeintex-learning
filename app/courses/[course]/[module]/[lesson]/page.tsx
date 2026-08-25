@@ -106,22 +106,6 @@ export default async function LessonPage({ params }: PageProps) {
     <div className="w-full bg-[#ffffff] flex min-h-screen relative">
       {/* Scroll indicator bar at the top of the viewport */}
       <ReadingProgress />
-      
-      {/* Mobile Breadcrumbs & Navigation Header */}
-      <div className="w-full md:hidden mb-4 border-b border-[#e2e8f0] pb-4 px-4">
-        <nav className="mb-2 flex items-center gap-1.5 text-[11px] text-[#94a3b8]">
-          <Link href={`/courses/${resolvedParams.course}`} className="hover:text-[#0f172a] transition-colors">
-            Module {String(currentLesson.frontmatter.module).padStart(2, '0')}
-          </Link>
-          <span>›</span>
-          <span className="text-[#0f172a] font-medium line-clamp-1">
-            Lesson {String(currentLesson.frontmatter.lesson).padStart(2, '0')}
-          </span>
-        </nav>
-        <h2 className="text-sm font-bold text-[#0f172a] line-clamp-1">
-          Lesson {currentLesson.frontmatter.lesson}: {currentLesson.frontmatter.title}
-        </h2>
-      </div>
 
       {/* Desktop Sidebar (Sticky left) - Width: 300px, Padding: 20px 0 */}
       <aside className="hidden md:block w-[300px] shrink-0 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto border-r border-[#e2e8f0] bg-[#f8fafc] py-5 select-none">
@@ -135,8 +119,8 @@ export default async function LessonPage({ params }: PageProps) {
           </Link>
           <div className="flex items-center gap-[8px]">
             <span className="w-[6px] h-[6px] bg-[#0d9488] rounded-full shrink-0" />
-            <h3 className="text-[13px] font-bold text-[#0f172a]">
-              HCAI Foundations
+            <h3 className="text-[13px] font-bold text-[#0f172a] line-clamp-1">
+              {courseData.title}
             </h3>
           </div>
         </div>
@@ -166,7 +150,7 @@ export default async function LessonPage({ params }: PageProps) {
                         {les.lessonNumber}.
                       </span>
                       <span className="line-clamp-2 inline-block align-top max-w-[85%]">
-                        {/* Render a small teal dot before the active lesson title (FIX 2) */}
+                        {/* Render a small teal dot before the active lesson title */}
                         {les.isActive && (
                           <span className="inline-block w-[6px] h-[6px] bg-[#0d9488] rounded-full mr-[8px] align-middle mb-[2px]" />
                         )}
@@ -182,9 +166,9 @@ export default async function LessonPage({ params }: PageProps) {
       </aside>
 
       {/* Lesson Content Area - Max width: 720px, responsive padding */}
-      <main className="flex-1 py-[24px] px-[20px] md:py-[48px] md:px-[64px] max-w-[720px] mx-auto min-h-[50vh] w-full">
+      <main className="flex-1 py-6 px-4 sm:px-6 md:py-12 md:px-16 max-w-[720px] mx-auto min-h-[50vh] w-full">
         {/* Lesson Breadcrumb */}
-        <nav className="flex items-center gap-2 text-[13px] text-[#94a3b8] pb-[24px] border-b border-[#e2e8f0] mb-[32px]">
+        <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-[13px] text-[#94a3b8] pb-4 sm:pb-[24px] border-b border-[#e2e8f0] mb-6 sm:mb-[32px] flex-wrap">
           <Link href={`/courses/${resolvedParams.course}`} className="hover:text-[#0f172a] transition-colors duration-150">
             Module {String(currentLesson.frontmatter.module).padStart(2, '0')}
           </Link>
