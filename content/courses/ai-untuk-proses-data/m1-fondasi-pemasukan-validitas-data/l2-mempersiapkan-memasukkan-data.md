@@ -16,7 +16,7 @@ durasi_menit: 30
 durasi_baca_menit: 15
 durasi_latihan_menit: 15
 bahasa: Indonesia
-duration_minutes: 15
+duration_minutes: 30
 keywords: []
 is_free: false
 status: published
