@@ -1,4 +1,12 @@
 name = "codeintex-learning"
+main = ".open-next/worker.js"
 compatibility_date = "2026-06-16"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".open-next"
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "NEXT_INC_CACHE_KV"
+id = "005d6989e1f34b4c882be4fd347394a4"
