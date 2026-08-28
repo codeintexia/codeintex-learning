@@ -310,11 +310,14 @@ export default function HomePage() {
           
           {/* Grid list of outcome items */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Outcome Card 1 - hover: translateY(-2px), shadow, 200ms duration (FIX 4) */}
-            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-3 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f0fdfa] border border-[#99f6e4] text-[10px] font-bold text-[#0d9488] mt-0.5">
-                ✓
-              </span>
+            {/* Outcome Card 1 — Evaluasi sistem AI: magnifying glass / search icon */}
+            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-4 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+              <div className="flex-shrink-0 flex items-center justify-center w-[40px] h-[40px] rounded-[10px] bg-[#0d9488]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </svg>
+              </div>
               <div>
                 <h4 className="text-[15px] font-semibold text-[#0f172a] mb-1">
                   Evaluasi sistem AI
@@ -325,11 +328,15 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Outcome Card 2 */}
-            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-3 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f0fdfa] border border-[#99f6e4] text-[10px] font-bold text-[#0d9488] mt-0.5">
-                ✓
-              </span>
+            {/* Outcome Card 2 — Desain dengan IFRAME: layout / grid icon */}
+            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-4 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+              <div className="flex-shrink-0 flex items-center justify-center w-[40px] h-[40px] rounded-[10px] bg-[#0d9488]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <path d="M3 9h18"/>
+                  <path d="M9 21V9"/>
+                </svg>
+              </div>
               <div>
                 <h4 className="text-[15px] font-semibold text-[#0f172a] mb-1">
                   Desain dengan IFRAME
@@ -340,11 +347,15 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Outcome Card 3 */}
-            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-3 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f0fdfa] border border-[#99f6e4] text-[10px] font-bold text-[#0d9488] mt-0.5">
-                ✓
-              </span>
+            {/* Outcome Card 3 — Deteksi dan tangani bias: shield / alert icon */}
+            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-4 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+              <div className="flex-shrink-0 flex items-center justify-center w-[40px] h-[40px] rounded-[10px] bg-[#0d9488]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="M12 8v4"/>
+                  <path d="M12 16h.01"/>
+                </svg>
+              </div>
               <div>
                 <h4 className="text-[15px] font-semibold text-[#0f172a] mb-1">
                   Deteksi dan tangani bias
@@ -355,11 +366,15 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Outcome Card 4 */}
-            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-3 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#f0fdfa] border border-[#99f6e4] text-[10px] font-bold text-[#0d9488] mt-0.5">
-                ✓
-              </span>
+            {/* Outcome Card 4 — Audit produk AI nyata: clipboard-check icon */}
+            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-4 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+              <div className="flex-shrink-0 flex items-center justify-center w-[40px] h-[40px] rounded-[10px] bg-[#0d9488]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                  <rect x="9" y="3" width="6" height="4" rx="1"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+              </div>
               <div>
                 <h4 className="text-[15px] font-semibold text-[#0f172a] mb-1">
                   Audit produk AI nyata
@@ -373,38 +388,38 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Institutional Trust Block Section (FIX 5) */}
-      <section className="bg-white py-[20px]">
+      {/* Institutional Trust Block Section — DARK navy background for visual rhythm */}
+      <section className="bg-[#0f172a] py-[64px]">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-[12px] p-6 md:p-[32px_40px] flex flex-col md:flex-row items-center gap-6 md:gap-[40px] my-10 shadow-none">
-            {/* Left side — CodeinteX logo mark */}
-            <div className="flex-shrink-0 bg-white border border-[#e2e8f0] rounded-[10px] p-[10px] flex items-center justify-center w-[68px] h-[68px]">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1e3a8a] text-white font-black text-xl tracking-wider">
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-[48px]">
+            {/* Left side — CodeinteX logo mark on dark bg */}
+            <div className="flex-shrink-0 flex items-center justify-center w-[80px] h-[80px] rounded-[16px] bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)]">
+              <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#1e3a8a] text-white font-black text-2xl tracking-wider shadow-[0_0_0_2px_rgba(255,255,255,0.15)]">
                 CX
               </span>
             </div>
             
             {/* Right side — texts and institutional badges */}
             <div className="flex-grow text-center md:text-left">
-              <span className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#0d9488] mb-[6px]">
+              <span className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#2dd4bf] mb-[8px]">
                 TENTANG KURSUS INI
               </span>
-              <h3 className="text-[17px] font-bold text-[#0f172a] mb-[8px]">
+              <h3 className="text-[20px] font-bold text-[#f8fafc] mb-[10px]">
                 Dikembangkan oleh CodeinteX
               </h3>
-              <p className="text-[14px] leading-[1.6] text-[#64748b] mb-[16px]">
+              <p className="text-[14px] leading-[1.7] text-[#94a3b8] mb-[20px] max-w-[560px]">
                 Kursus ini dirancang dan diproduksi oleh CodeinteX — sebuah firma pengetahuan dan rekayasa yang berfokus pada sistem AI yang berpusat pada manusia dan dapat dijelaskan. Seluruh konten berbasis penelitian akademis terverifikasi dan metodologi IFRAME eksklusif CodeinteX.
               </p>
               
-              {/* Badges row */}
-              <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                <span className="bg-white border border-[#e2e8f0] text-[#475569] text-[12px] py-[4px] px-[12px] rounded-full font-medium">
+              {/* Badges row — high contrast for dark bg */}
+              <div className="flex flex-wrap justify-center md:justify-start gap-3">
+                <span className="bg-[rgba(13,148,136,0.15)] border border-[rgba(45,212,191,0.35)] text-[#2dd4bf] text-[12px] py-[5px] px-[14px] rounded-full font-medium">
                   📚 Referensi akademis terverifikasi
                 </span>
-                <span className="bg-[#ffffff] border border-[#e2e8f0] text-[#475569] text-[12px] py-[4px] px-[12px] rounded-full font-medium">
+                <span className="bg-[rgba(13,148,136,0.15)] border border-[rgba(45,212,191,0.35)] text-[#2dd4bf] text-[12px] py-[5px] px-[14px] rounded-full font-medium">
                   ⚙️ Metodologi IFRAME eksklusif
                 </span>
-                <span className="bg-[#ffffff] border border-[#e2e8f0] text-[#475569] text-[12px] py-[4px] px-[12px] rounded-full font-medium">
+                <span className="bg-[rgba(13,148,136,0.15)] border border-[rgba(45,212,191,0.35)] text-[#2dd4bf] text-[12px] py-[5px] px-[14px] rounded-full font-medium">
                   ✓ 100% gratis &amp; terbuka
                 </span>
               </div>
