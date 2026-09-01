@@ -91,7 +91,6 @@ Tidak seperti software biasa yang punya "benar" atau "salah" yang jelas, Solusi 
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO melaporkan model mencapai akurasi 96%. Kenapa angka ini saja tidak cukup untuk menyimpulkan model bekerja baik untuk mendeteksi nasabah berisiko tinggi?**
 

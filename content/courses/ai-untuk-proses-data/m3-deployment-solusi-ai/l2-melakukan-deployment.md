@@ -84,7 +84,6 @@ Deployment software biasa yang gagal biasanya menghasilkan error yang jelas (apl
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO melakukan deployment model versi baru langsung ke 100% traffic (semua pengajuan kredit) tanpa tahap bertahap, karena model ini sudah "lolos pengujian" di Modul 2. Apa risiko dari pendekatan ini?**
 

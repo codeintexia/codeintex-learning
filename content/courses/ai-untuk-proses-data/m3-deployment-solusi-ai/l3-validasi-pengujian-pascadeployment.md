@@ -71,7 +71,6 @@ Poin utama dari konsep silent schema drift adalah: **sistem yang "terlihat berja
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Seminggu setelah deployment, SPKO tidak menunjukkan error apa pun — semua pengajuan kredit diproses lancar. Apakah ini cukup untuk menyimpulkan deployment berhasil sepenuhnya? Jawab 1-2 kalimat.**
 

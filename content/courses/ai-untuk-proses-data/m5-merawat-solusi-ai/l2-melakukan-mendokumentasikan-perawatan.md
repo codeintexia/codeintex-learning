@@ -69,7 +69,6 @@ Ingat prinsip yang berulang di kursus ini sejak Modul 1: sistem yang "terlihat b
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO menyelesaikan retraining model dan mencatat di dokumentasi: "Retraining selesai pada [tanggal], model baru sudah menggantikan versi lama." Apa yang kurang dari dokumentasi ini?**
 

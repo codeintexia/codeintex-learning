@@ -76,7 +76,6 @@ Berdasarkan rencana perawatan dari M4-L4 (mengatasi penurunan recall dan F1-Scor
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Rencana perawatan SPKO disusun berdasarkan data Bulan 3, tapi karena keterbatasan sumber daya, eksekusinya baru bisa dimulai di Bulan 5. Apa yang harus dilakukan sebelum melanjutkan eksekusi berdasarkan rencana lama tersebut?**
 

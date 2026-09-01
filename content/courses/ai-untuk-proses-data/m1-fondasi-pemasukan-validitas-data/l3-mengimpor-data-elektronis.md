@@ -94,7 +94,6 @@ Berbeda dari sistem pelaporan biasa yang mungkin sekadar menampilkan data ke lay
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Setelah mengimpor file CSV berisi 500 data nasabah ke SPKO, sistem menunjukkan "Impor berhasil" tanpa pesan error. Apakah ini cukup untuk memastikan data sudah benar? Jawab dalam 1-2 kalimat.**
 

@@ -76,7 +76,6 @@ Sistem otomatis bisa mendeteksi pola dan bahkan merekomendasikan tindakan — se
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Sistem monitoring otomatis SPKO merekomendasikan "tidak perlu tindakan" karena semua metrik dalam batas normal. Apakah rekomendasi ini bisa langsung diterima tanpa evaluasi tambahan? Jawab 1-2 kalimat.**
 

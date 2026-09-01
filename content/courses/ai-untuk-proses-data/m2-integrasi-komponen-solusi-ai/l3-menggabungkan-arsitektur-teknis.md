@@ -75,7 +75,6 @@ Bayangkan model credit scoring SPKO memperbarui skor seorang nasabah, tapi karen
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO menambahkan fitur baru: notifikasi otomatis ke petugas kredit saat skor nasabah berubah signifikan. Berdasarkan hook di atas, apa risiko utama yang perlu diwaspadai saat menambahkan fitur ini?**
 

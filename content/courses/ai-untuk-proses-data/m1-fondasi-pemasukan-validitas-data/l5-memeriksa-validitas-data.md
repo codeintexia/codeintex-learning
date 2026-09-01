@@ -80,7 +80,6 @@ Inilah kenapa pemeriksaan validitas aktif — bukan cuma format, tapi akurasi da
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Sebuah slip gaji yang diunggah nasabah terlihat rapi, lengkap, dan formatnya sesuai standar perusahaan. Apakah ini otomatis berarti data tersebut valid? Jawab dalam 1-2 kalimat.**
 

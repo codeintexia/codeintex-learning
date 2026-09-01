@@ -81,7 +81,6 @@ Berdasarkan temuan L2 (F1-Score turun ke 0.79, di bawah target 0.85):
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO menyusun rencana perawatan yang hanya berisi "perbaiki F1-Score" tanpa menyebutkan akar masalah, tindakan spesifik, atau kriteria sukses. Apa yang kurang dari rencana ini?**
 

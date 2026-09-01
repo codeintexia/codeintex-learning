@@ -83,7 +83,6 @@ Bagi model SPKO, kode referensi adalah **kategori numerik atau simbolik yang dip
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Seorang petugas menemukan bahwa kode wilayah domisili di formulir pengajuan kredit adalah kode versi lama yang sudah tidak dipakai organisasi sejak setahun lalu, meski secara format terlihat valid (angka 4 digit, sesuai pola). Apakah ini masalah, dan mengapa?**
 

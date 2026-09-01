@@ -83,7 +83,6 @@ Software biasa umumnya diuji dengan logika "jika input X, maka output harus Y" â
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO menguji sistem hanya dengan data nasabah yang "normal" (lengkap, penghasilan wajar, riwayat kredit baik) dan mendapati akurasi 95%. Apakah ini cukup untuk menyimpulkan sistem siap dipasang? Jawab 1-2 kalimat.**
 

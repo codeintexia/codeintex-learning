@@ -80,7 +80,6 @@ Solusi umum: memisahkan komponen berdasarkan sensitivitas datanya — komponen y
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO mempertimbangkan memindahkan sebagian pemrosesan model credit scoring ke cloud computing untuk mengurangi biaya infrastruktur. Pertanyaan apa yang HARUS dijawab lebih dulu sebelum keputusan biaya ini diambil?**
 
