@@ -75,7 +75,6 @@ Solusi AI seperti SPKO punya permukaan risiko keamanan yang lebih luas dibanding
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO menerapkan enkripsi data saat disimpan (at rest) di core banking, tapi belum menerapkan enkripsi saat data berpindah (in transit) melalui API ke model AI. Apakah ini sudah memenuhi KUK 4.1? Jawab 1-2 kalimat.**
 

@@ -80,7 +80,6 @@ Ini berbeda dari kesalahan input biasa (L2) atau data yang salah sejak awal (L5)
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Data penghasilan seorang nasabah di SPKO tercatat Rp 5 juta/bulan dari 3 tahun lalu, dan tidak pernah diperbarui sejak itu. Data ini valid secara format dan sumbernya jelas (slip gaji resmi saat itu). Apakah data ini masih bisa dianggap "baik" untuk dipakai model AI hari ini? Jawab 1-2 kalimat.**
 

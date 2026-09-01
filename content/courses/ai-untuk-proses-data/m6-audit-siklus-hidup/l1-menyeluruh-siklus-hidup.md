@@ -72,7 +72,6 @@ Pola-pola ini bukan kebetulan — mereka mencerminkan tantangan yang secara kons
 ---
 
 ## Quick Check
-**(Target: 3 menit)**
 
 **Sebutkan satu contoh konkret dari kursus ini di mana keputusan atau kesalahan di satu modul awal (M1-M2) berdampak langsung ke modul yang jauh lebih belakangan (M4-M5).**
 

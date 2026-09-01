@@ -96,7 +96,6 @@ Di Modul 1 (lesson berikutnya), kamu akan mulai dari titik paling dasar: memasuk
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Mengapa kualitas data pemasukan dianggap sebagai fondasi, bukan sekadar langkah administratif awal, dalam siklus hidup Solusi AI perbankan? Jawab dalam 2-3 kalimat.**
 

@@ -90,7 +90,6 @@ Ketiganya akan dihubungkan memakai **REST API** sebagai teknologi integrasi utam
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Kenapa arsitektur mikroservis umumnya lebih cocok untuk Solusi AI dibanding arsitektur monolitik? Jawab dalam 1-2 kalimat.**
 

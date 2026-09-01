@@ -75,7 +75,6 @@ Ingat kembali prinsip yang berulang di kursus ini: sistem yang "terlihat berjala
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO mencatat log aktivitas sistem, tapi log tersebut tersebar di server yang berbeda-beda (log model di satu server, log core banking di server lain, log dashboard di server lain lagi), tanpa sistem terpusat yang menggabungkannya. Apa risiko dari kondisi ini?**
 

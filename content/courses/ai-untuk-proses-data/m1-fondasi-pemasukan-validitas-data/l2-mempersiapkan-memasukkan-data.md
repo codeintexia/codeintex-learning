@@ -95,7 +95,6 @@ Dokumen fisik yang perlu dipindai: **formulir pengajuan kredit** dan **salinan K
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Seorang petugas menerima formulir pengajuan kredit dengan kolom "status pekerjaan" kosong. Formulir itu sudah ditandatangani nasabah dan tampak lengkap secara visual. Apa yang seharusnya dilakukan petugas SEBELUM memasukkan data ini ke SPKO? Jawab dalam 1-2 kalimat.**
 

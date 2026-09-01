@@ -80,7 +80,6 @@ Berdasarkan dokumentasi arsitektur SPKO (dari L1), komponen yang perlu diintegra
 ---
 
 ## Quick Check
-**(Target: 2 menit)**
 
 **Tim SPKO mempertimbangkan memakai gRPC untuk komunikasi antara model credit scoring dan dashboard petugas kredit, meski semua koneksi lain di SPKO memakai REST API. Apa risiko dari keputusan ini, terlepas dari performa teknisnya?**
 
