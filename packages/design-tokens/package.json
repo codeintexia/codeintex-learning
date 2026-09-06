@@ -1,0 +1,11 @@
+{
+  "name": "@codeintex/design-tokens",
+  "version": "0.2.0",
+  "private": true,
+  "sideEffects": [
+    "./src/index.css"
+  ],
+  "exports": {
+    "./styles.css": "./src/index.css"
+  }
+}

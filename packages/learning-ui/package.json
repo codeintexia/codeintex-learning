@@ -1,0 +1,14 @@
+{
+  "name": "@codeintex/learning-ui",
+  "version": "0.2.0",
+  "private": true,
+  "peerDependencies": {
+    "react": "^19.2.0"
+  },
+  "dependencies": {
+    "@codeintex/ui-primitives": "0.2.0"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}
