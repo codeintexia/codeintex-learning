@@ -20,38 +20,33 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${inter.variable} scroll-smooth`}>
-      <head>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-sans min-h-screen flex flex-col bg-[#ffffff] text-[#0f172a] selection:bg-teal-500/10 selection:text-teal-900">
-        <header className="sticky top-0 z-50 w-full border-b border-[#e2e8f0] bg-[#ffffff] h-16 flex items-center">
+      <body className="font-sans min-h-screen flex flex-col bg-[#ffffff] text-[#0A0E17]">
+        <header className="sticky top-0 z-50 w-full bg-[#02040B] h-16 flex items-center">
           <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 flex h-full items-center justify-between">
-            <div className="flex items-center gap-6">
-              <a href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-90">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1e3a8a] text-white font-black text-lg tracking-wider shadow-sm shadow-[#1e3a8a]/20">
+            <div className="flex items-center gap-8">
+              <a href="/" className="flex items-center gap-2.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-[4px] bg-[#02B3E4] text-[#02040B] font-black text-sm tracking-wider">
                   CX
                 </span>
-                <div>
-                  <span className="block text-sm font-bold text-[#0f172a] tracking-tight leading-none">CodeinteX</span>
-                  <span className="block text-[10px] font-bold text-[#475569] uppercase tracking-widest mt-1">Learning</span>
-                </div>
+                <span className="text-white font-bold text-[15px] tracking-tight">CodeinteX</span>
               </a>
+              <nav className="hidden md:flex items-center gap-6">
+                <a href="/#programs" className="text-[13px] font-medium text-[#B5BAC6] hover:text-white transition-colors">Program</a>
+                <a href="/#partners" className="text-[13px] font-medium text-[#B5BAC6] hover:text-white transition-colors">Untuk Bisnis</a>
+              </nav>
             </div>
-            
-            <nav className="flex items-center gap-6">
-              <a
-                href="/courses/hcai-foundations"
-                className="text-sm font-medium text-[#475569] hover:text-[#0f172a] transition-colors duration-150"
-              >
-                Kursus
+
+            <div className="flex items-center gap-4">
+              <a href="#login" className="hidden sm:block text-[13px] font-medium text-[#B5BAC6] hover:text-white transition-colors">
+                Masuk
               </a>
               <a
                 href="/courses/hcai-foundations"
-                className="inline-flex items-center justify-center rounded-[6px] bg-[#1e3a8a] text-white text-xs font-semibold px-4 py-2 hover:bg-[#1e3a8a]/90 active:scale-[0.98] transition-all duration-150 hover:scale-[1.01]"
+                className="inline-flex items-center justify-center rounded-[4px] bg-[#02B3E4] text-[#02040B] text-[13px] font-bold px-5 py-2.5 hover:bg-[#3ac4ec] transition-colors"
               >
                 Mulai Belajar
               </a>
-            </nav>
+            </div>
           </div>
         </header>
 
@@ -59,14 +54,39 @@ export default function RootLayout({
           {children}
         </main>
 
-        <footer className="border-t border-[#e2e8f0] bg-[#f8fafc] py-8 text-center text-[13px] text-[#64748b]">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Attribution copyright line updated to institutional trust styling (FIX 6) */}
-            <p>© 2026 CodeinteX. Kursus ini diproduksi sebagai bagian dari inisiatif pendidikan AI CodeinteX.</p>
-            <div className="flex gap-4">
-              <a href="/courses/hcai-foundations" className="text-[#64748b] hover:text-[#0f172a] transition-colors duration-150">Kursus</a>
-              <a href="/" className="text-[#64748b] hover:text-[#0f172a] transition-colors duration-150">Beranda</a>
+        <footer className="bg-[#02040B] pt-16 pb-10 text-[#8890A0]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pb-12 border-b border-white/10">
+              <div className="col-span-2 md:col-span-1">
+                <span className="flex h-8 w-8 items-center justify-center rounded-[4px] bg-[#02B3E4] text-[#02040B] font-black text-sm mb-4">
+                  CX
+                </span>
+                <p className="text-[13px] leading-relaxed max-w-[220px]">
+                  Otomasi riset & rekayasa AI untuk profesional dan peneliti.
+                </p>
+              </div>
+              <div>
+                <h4 className="text-white text-[13px] font-semibold mb-3">Program</h4>
+                <ul className="space-y-2 text-[13px]">
+                  <li><a href="/courses/hcai-foundations" className="hover:text-white transition-colors">Human-Centered AI</a></li>
+                  <li><a href="/#programs" className="hover:text-white transition-colors">Semua program</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white text-[13px] font-semibold mb-3">Perusahaan</h4>
+                <ul className="space-y-2 text-[13px]">
+                  <li><a href="/#partners" className="hover:text-white transition-colors">Untuk Bisnis</a></li>
+                  <li><a href="#booking" className="hover:text-white transition-colors">Konsultasi</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white text-[13px] font-semibold mb-3">Kontak</h4>
+                <ul className="space-y-2 text-[13px]">
+                  <li><a href="mailto:hello@codeintex.com" className="hover:text-white transition-colors">hello@codeintex.com</a></li>
+                </ul>
+              </div>
             </div>
+            <p className="text-[12px] pt-6">© 2026 CodeinteX. Seluruh hak cipta dilindungi.</p>
           </div>
         </footer>
       </body>

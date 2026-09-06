@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-// Course catalog database (FIX 1 & 4)
 const courses = [
   {
     id: 1,
@@ -14,7 +13,6 @@ const courses = [
     duration: "6 Jam",
     lessons: "25 Lesson",
     modules: "6 Modul",
-    domain: "AI & Kecerdasan Buatan",
     isLive: true,
     href: "/courses/hcai-foundations",
     statusText: "Tersedia Sekarang",
@@ -24,576 +22,231 @@ const courses = [
     title: "AI untuk Proses Data",
     category: "competency",
     categoryLabel: "Competency",
-    description: "Materi sedang dalam pengembangan. Daftarkan dirimu untuk mendapat notifikasi saat tersedia.",
-    domain: "AI & Kecerdasan Buatan",
+    description: "Membersihkan, memodelkan, dan mengevaluasi data riset dengan pendekatan AI.",
     isLive: false,
-    statusText: "Dalam Pengembangan",
+    statusText: "Segera Hadir",
   },
   {
     id: 3,
     title: "AI untuk Pengalaman Pelanggan",
     category: "competency",
     categoryLabel: "Competency",
-    description: "Materi sedang dalam pengembangan. Daftarkan dirimu untuk mendapat notifikasi saat tersedia.",
-    domain: "AI & Kecerdasan Buatan",
+    description: "Materi sedang dalam pengembangan.",
     isLive: false,
-    statusText: "Dalam Pengembangan",
+    statusText: "Segera Hadir",
   },
   {
     id: 4,
     title: "AI untuk Keamanan Informasi",
     category: "competency",
     categoryLabel: "Competency",
-    description: "Materi sedang dalam pengembangan. Daftarkan dirimu untuk mendapat notifikasi saat tersedia.",
-    domain: "AI & Kecerdasan Buatan",
+    description: "Materi sedang dalam pengembangan.",
     isLive: false,
-    statusText: "Dalam Pengembangan",
+    statusText: "Segera Hadir",
   },
-  {
-    id: 5,
-    title: "AI untuk Strategi Metode Pembelajaran",
-    category: "competency",
-    categoryLabel: "Competency",
-    description: "Materi sedang dalam pengembangan. Daftarkan dirimu untuk mendapat notifikasi saat tersedia.",
-    domain: "AI & Kecerdasan Buatan",
-    isLive: false,
-    statusText: "Dalam Pengembangan",
-  },
-  {
-    id: 6,
-    title: "AI untuk Pengelolaan Pelanggan",
-    category: "competency",
-    categoryLabel: "Competency",
-    description: "Materi sedang dalam pengembangan. Daftarkan dirimu untuk mendapat notifikasi saat tersedia.",
-    domain: "AI & Kecerdasan Buatan",
-    isLive: false,
-    statusText: "Dalam Pengembangan",
-  }
 ]
 
-// Tab buttons metadata (FIX 1)
 const tabs = [
-  { id: 'all', label: 'Semua', subtitle: 'Semua jalur pembelajaran' },
-  { id: 'literacy', label: 'Literacy', subtitle: 'Pemahaman konsep dan lanskap AI' },
-  { id: 'competency', label: 'Competency', subtitle: 'Kemampuan terverifikasi dan tersertifikasi' },
-  { id: 'specialization', label: 'Specialization', subtitle: 'Keahlian mendalam di domain spesifik' },
+  { id: 'all', label: 'Semua Program' },
+  { id: 'literacy', label: 'Literacy' },
+  { id: 'competency', label: 'Competency' },
 ]
+
+const partners = ['Universitas Indonesia', 'ITB', 'BRIN', 'Kemenristek', 'UGM', 'IPB']
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('all')
 
-  // Filter courses based on active tab selection (FIX 5)
-  const filteredCourses = courses.filter((course) => {
-    if (activeTab === 'all') return true
-    return course.category === activeTab
-  })
+  const filteredCourses = courses.filter((course) =>
+    activeTab === 'all' ? true : course.category === activeTab
+  )
 
   return (
-    <div className="flex flex-col items-stretch bg-[#ffffff]">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-[#ffffff] border-b border-[#e2e8f0]">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 md:px-[40px] py-12 sm:py-16 md:py-[80px] pb-10 sm:pb-[72px] grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-[80px] items-center bg-[#ffffff]">
-          
-          {/* Left column: platform messaging */}
-          <div>
-            {/* Pill badge (FIX 5) */}
-            <span className="inline-block bg-[#f0fdfa] text-[#0d9488] border border-[#99f6e4] text-[12px] font-medium px-[14px] py-[4px] rounded-full mb-6">
-              ✦ Kursus Baru &middot; Gratis &amp; Terbuka
-            </span>
-            
-            {/* Heading H1 (FIX 3) */}
-            <h1 className="text-[28px] sm:text-[34px] md:text-[38px] font-bold tracking-tight text-[#0f172a] leading-[1.18] mb-5">
-              Kuasai AI yang <br className="hidden sm:inline" />
-              Berpusat pada Manusia
-            </h1>
-            
-            {/* Subheading */}
-            <p className="text-base sm:text-[17px] text-[#475569] leading-[1.7] max-w-[480px] mb-8">
-              Kursus berbasis penelitian akademis untuk profesional yang ingin merancang, mengevaluasi, dan mengaudit sistem AI secara bertanggung jawab.
-            </p>
-            
-            {/* Three proof points */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-4 items-start sm:items-center mb-[28px]">
-              <span className="flex items-center gap-1.5 text-[13px] text-[#64748b] font-medium">
-                ✓ Referensi akademis terverifikasi
-              </span>
-              <span className="flex items-center gap-1.5 text-[13px] text-[#64748b] font-medium">
-                ✓ Metodologi IFRAME eksklusif
-              </span>
-              <span className="flex items-center gap-1.5 text-[13px] text-[#64748b] font-medium">
-                ✓ 100% gratis &amp; terbuka
-              </span>
-            </div>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-              <Link
-                href="/courses/hcai-foundations"
-                className="inline-flex items-center justify-center rounded-[8px] bg-[#1e3a8a] text-white px-[24px] py-[12px] text-[15px] font-semibold transition-colors duration-150 hover:bg-[#1e40af] text-center w-full sm:w-auto"
-              >
-                Mulai Belajar — Gratis
-              </Link>
-              <button
-                onClick={() => document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' })}
-                className="inline-flex items-center justify-center rounded-[8px] border-[1.5px] border-[#1e3a8a] bg-transparent text-[#1e3a8a] px-[24px] py-[12px] text-[15px] font-semibold cursor-pointer transition-colors duration-150 hover:bg-[#f8fafc] text-center w-full sm:w-auto"
-              >
-                Lihat Semua Kursus
-              </button>
-            </div>
+    <div className="flex flex-col items-stretch bg-white">
+      {/* Hero */}
+      <section className="relative bg-[#02040B] overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage:
+              'linear-gradient(#1a2233 1px, transparent 1px), linear-gradient(90deg, #1a2233 1px, transparent 1px)',
+            backgroundSize: '48px 48px',
+          }}
+        />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
+          <span className="inline-block text-[12px] font-semibold text-[#02B3E4] uppercase tracking-[0.12em] mb-5">
+            Program Bersertifikat
+          </span>
+          <h1 className="text-[36px] sm:text-[52px] font-extrabold tracking-tight text-white leading-[1.1] max-w-4xl mx-auto mb-6">
+            Kuasai AI yang benar-benar dipakai di dunia nyata
+          </h1>
+          <p className="text-[16px] sm:text-[18px] text-[#B5BAC6] max-w-2xl mx-auto leading-relaxed mb-10">
+            Kurikulum berbasis riset akademis, dibimbing praktisi, dirancang untuk hasil yang bisa langsung
+            diterapkan ke pekerjaan atau penelitian kamu.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/courses/hcai-foundations"
+              className="inline-flex items-center justify-center rounded-[4px] bg-[#02B3E4] text-[#02040B] px-8 py-4 text-[15px] font-bold hover:bg-[#3ac4ec] transition-colors w-full sm:w-auto"
+            >
+              Mulai Belajar Gratis
+            </Link>
+            <button
+              onClick={() => document.getElementById('programs')?.scrollIntoView({ behavior: 'smooth' })}
+              className="inline-flex items-center justify-center rounded-[4px] border border-white/20 text-white px-8 py-4 text-[15px] font-bold hover:bg-white/5 transition-colors w-full sm:w-auto"
+            >
+              Lihat Semua Program
+            </button>
           </div>
-          
-          {/* Right column: stacked course cards visual (hidden on mobile < 768px) */}
-          <div className="hidden md:block w-full">
-            <div style={{ position: 'relative', height: '300px', width: '100%' }}>
-              
-              {/* Card 3: back */}
-              <div style={{
-                position: 'absolute',
-                top: '24px',
-                left: '12px',
-                right: '12px',
-                height: '200px',
-                background: '#cbd5e1',
-                borderRadius: '12px',
-                transform: 'rotate(2.5deg)',
-                opacity: 0.5,
-                zIndex: 1,
-              }}></div>
-
-              {/* Card 2: middle */}
-              <div style={{
-                position: 'absolute',
-                top: '12px',
-                left: '6px',
-                right: '6px',
-                height: '210px',
-                background: '#f1f5f9',
-                border: '1px solid #cbd5e1',
-                borderRadius: '12px',
-                transform: 'rotate(1.2deg)',
-                opacity: 0.8,
-                zIndex: 2,
-              }}></div>
-
-              {/* Card 1: front — keep existing card content here */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                zIndex: 3,
-                background: 'white',
-                border: '1px solid #e2e8f0',
-                borderRadius: '12px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                overflow: 'hidden',
-              }}>
-                {/* Top teal bar */}
-                <div 
-                  className="h-[4px] w-full"
-                  style={{
-                    background: 'linear-gradient(90deg, #0d9488, #14b8a6)',
-                    borderRadius: '12px 12px 0 0'
-                  }}
-                />
-                
-                {/* Card content padding container */}
-                <div style={{ padding: '20px' }}>
-                  {/* Category badge */}
-                  <span className="inline-block bg-[#f0fdfa] text-[#0d9488] text-[10px] font-bold tracking-[0.08em] uppercase py-[2px] px-[8px] rounded-full mb-2">
-                    Literacy
-                  </span>
-                  
-                  {/* Course title */}
-                  <h4 className="text-[14px] font-bold text-[#0f172a] mb-2 leading-tight">
-                    Human-Centered AI — Foundations
-                  </h4>
-                  
-                  {/* Metadata row */}
-                  <div className="text-[12px] text-[#94a3b8] mb-3 font-medium">
-                    6 Modul &middot; 25 Lesson &middot; 6 Jam
-                  </div>
-                  
-                  {/* Three lesson preview items */}
-                  <div className="space-y-1.5">
-                    {/* Item 1 */}
-                    <div className="flex items-center gap-2">
-                      <span className="w-[18px] h-[18px] rounded-full bg-[#f0fdfa] text-[#0d9488] border border-[#99f6e4] text-[10px] font-bold flex items-center justify-center shrink-0">
-                        1
-                      </span>
-                      <span className="text-[12px] text-[#475569] leading-[1.3] truncate">
-                        Ketika AI Gagal Bukan Karena Bodoh...
-                      </span>
-                    </div>
-                    
-                    {/* Item 2 */}
-                    <div className="flex items-center gap-2 opacity-60">
-                      <span className="w-[18px] h-[18px] rounded-full bg-[#f0fdfa] text-[#0d9488] border border-[#99f6e4] text-[10px] font-bold flex items-center justify-center shrink-0">
-                        2
-                      </span>
-                      <span className="text-[12px] text-[#475569] leading-[1.3] truncate">
-                        Dari AI-Centered ke Human-Centered...
-                      </span>
-                    </div>
-                    
-                    {/* Item 3 */}
-                    <div className="flex items-center gap-2 opacity-40">
-                      <span className="w-[18px] h-[18px] rounded-full bg-[#f0fdfa] text-[#0d9488] border border-[#99f6e4] text-[10px] font-bold flex items-center justify-center shrink-0">
-                        3
-                      </span>
-                      <span className="text-[12px] text-[#475569] leading-[1.3] truncate">
-                        Dua Sumbu Shneiderman...
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Status badge at bottom */}
-                  <div className="mt-3">
-                    <span className="inline-block bg-[#f0fdfa] text-[#0d9488] text-[11px] font-semibold px-[10px] py-[3px] rounded-full">
-                      Tersedia Sekarang
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Label below */}
-              <div style={{
-                position: 'absolute',
-                bottom: '-24px',
-                left: 0,
-                right: 0,
-                textAlign: 'center',
-                fontSize: '12px',
-                color: '#94a3b8',
-              }}>6 kursus tersedia &middot; 5 dalam pengembangan</div>
-            </div>
-          </div>
-          
         </div>
-      </section>
 
-      {/* Stats Section */}
-      <section className="border-t border-b border-[#e2e8f0] bg-[#f8fafc] py-[40px]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="p-4">
-              <span className="block text-[32px] font-bold text-[#1e3a8a]">6</span>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#64748b] mt-1 block">Modul Pembelajaran</span>
+        {/* Stats bar */}
+        <div className="relative border-t border-white/10 bg-black/20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <span className="block text-[28px] font-extrabold text-white">6</span>
+              <span className="text-[12px] text-[#8890A0] uppercase tracking-wide">Modul</span>
             </div>
-            <div className="p-4">
-              <span className="block text-[32px] font-bold text-[#1e3a8a]">25</span>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#64748b] mt-1 block">Lesson Interaktif</span>
+            <div>
+              <span className="block text-[28px] font-extrabold text-white">25</span>
+              <span className="text-[12px] text-[#8890A0] uppercase tracking-wide">Lesson</span>
             </div>
-            <div className="p-4">
-              <span className="block text-[32px] font-bold text-[#1e3a8a]">6 Jam</span>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#64748b] mt-1 block">Estimasi Waktu Belajar</span>
+            <div>
+              <span className="block text-[28px] font-extrabold text-white">100%</span>
+              <span className="text-[12px] text-[#8890A0] uppercase tracking-wide">Gratis & Terbuka</span>
             </div>
-            <div className="p-4">
-              <span className="block text-[32px] font-bold text-[#1e3a8a]">100%</span>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-[#64748b] mt-1 block">Gratis & Terbuka</span>
+            <div>
+              <span className="block text-[28px] font-extrabold text-white">6 Jam</span>
+              <span className="text-[12px] text-[#8890A0] uppercase tracking-wide">Estimasi Belajar</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Learning Outcomes Section */}
-      <section className="bg-[#f8fafc] py-[64px] border-b border-[#e2e8f0]">
+      {/* Partner strip */}
+      <section id="partners" className="border-b border-[#EAEDF2] py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-10">
-            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#0d9488] mb-3 block">
-              LEARNING OUTCOMES
-            </span>
-            <h2 className="text-[28px] font-bold text-[#0f172a] text-center">
-              Yang akan kamu kuasai
+          <p className="text-center text-[11px] font-semibold text-[#8890A0] uppercase tracking-[0.1em] mb-6">
+            Dipercaya peneliti dari
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+            {partners.map((p) => (
+              <span key={p} className="text-[14px] font-semibold text-[#4A4F5A]">{p}</span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Programs */}
+      <section id="programs" className="py-20 bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-[32px] font-extrabold tracking-tight text-[#02040B] mb-4">
+              Pilih program yang sesuai tujuanmu
             </h2>
-          </div>
-          
-          {/* Grid list of outcome items */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Outcome Card 1 — Evaluasi sistem AI: magnifying glass / search icon */}
-            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-4 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-              <div className="flex-shrink-0 flex items-center justify-center w-[40px] h-[40px] rounded-[10px] bg-[#0d9488]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"/>
-                  <path d="m21 21-4.35-4.35"/>
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-[15px] font-semibold text-[#0f172a] mb-1">
-                  Evaluasi sistem AI
-                </h4>
-                <p className="text-[14px] leading-[1.5] text-[#64748b]">
-                  Menggunakan kerangka 4 prinsip HCAI untuk menilai kualitas interaksi AI.
-                </p>
-              </div>
-            </div>
-            
-            {/* Outcome Card 2 — Desain dengan IFRAME: layout / grid icon */}
-            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-4 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-              <div className="flex-shrink-0 flex items-center justify-center w-[40px] h-[40px] rounded-[10px] bg-[#0d9488]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2"/>
-                  <path d="M3 9h18"/>
-                  <path d="M9 21V9"/>
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-[15px] font-semibold text-[#0f172a] mb-1">
-                  Desain dengan IFRAME
-                </h4>
-                <p className="text-[14px] leading-[1.5] text-[#64748b]">
-                  Mengadopsi metodologi eksklusif CodeinteX dalam merancang antarmuka AI.
-                </p>
-              </div>
-            </div>
-            
-            {/* Outcome Card 3 — Deteksi dan tangani bias: shield / alert icon */}
-            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-4 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-              <div className="flex-shrink-0 flex items-center justify-center w-[40px] h-[40px] rounded-[10px] bg-[#0d9488]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  <path d="M12 8v4"/>
-                  <path d="M12 16h.01"/>
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-[15px] font-semibold text-[#0f172a] mb-1">
-                  Deteksi dan tangani bias
-                </h4>
-                <p className="text-[14px] leading-[1.5] text-[#64748b]">
-                  Memahami bias data dan algoritma dalam konteks sosial-budaya Asia Tenggara.
-                </p>
-              </div>
-            </div>
-            
-            {/* Outcome Card 4 — Audit produk AI nyata: clipboard-check icon */}
-            <div className="bg-white border border-[#e2e8f0] rounded-[8px] p-[20px_24px] flex items-start gap-4 shadow-none transition-all duration-200 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
-              <div className="flex-shrink-0 flex items-center justify-center w-[40px] h-[40px] rounded-[10px] bg-[#0d9488]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                  <rect x="9" y="3" width="6" height="4" rx="1"/>
-                  <path d="m9 12 2 2 4-4"/>
-                </svg>
-              </div>
-              <div>
-                <h4 className="text-[15px] font-semibold text-[#0f172a] mb-1">
-                  Audit produk AI nyata
-                </h4>
-                <p className="text-[14px] leading-[1.5] text-[#64748b]">
-                  Menggunakan checklist audit praktis yang bisa langsung diimplementasikan pada produk Anda.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Institutional Trust Block Section — DARK navy background for visual rhythm */}
-      <section className="bg-[#0f172a] py-[64px]">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-[48px]">
-            {/* Left side — CodeinteX logo mark on dark bg */}
-            <div className="flex-shrink-0 flex items-center justify-center w-[80px] h-[80px] rounded-[16px] bg-[rgba(255,255,255,0.08)] border border-[rgba(255,255,255,0.12)]">
-              <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#1e3a8a] text-white font-black text-2xl tracking-wider shadow-[0_0_0_2px_rgba(255,255,255,0.15)]">
-                CX
-              </span>
-            </div>
-            
-            {/* Right side — texts and institutional badges */}
-            <div className="flex-grow text-center md:text-left">
-              <span className="block text-[11px] font-bold uppercase tracking-[0.1em] text-[#2dd4bf] mb-[8px]">
-                TENTANG KURSUS INI
-              </span>
-              <h3 className="text-[20px] font-bold text-[#f8fafc] mb-[10px]">
-                Dikembangkan oleh CodeinteX
-              </h3>
-              <p className="text-[14px] leading-[1.7] text-[#94a3b8] mb-[20px] max-w-[560px]">
-                Kursus ini dirancang dan diproduksi oleh CodeinteX — sebuah firma pengetahuan dan rekayasa yang berfokus pada sistem AI yang berpusat pada manusia dan dapat dijelaskan. Seluruh konten berbasis penelitian akademis terverifikasi dan metodologi IFRAME eksklusif CodeinteX.
-              </p>
-              
-              {/* Badges row — high contrast for dark bg */}
-              <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                <span className="bg-[rgba(13,148,136,0.15)] border border-[rgba(45,212,191,0.35)] text-[#2dd4bf] text-[12px] py-[5px] px-[14px] rounded-full font-medium">
-                  📚 Referensi akademis terverifikasi
-                </span>
-                <span className="bg-[rgba(13,148,136,0.15)] border border-[rgba(45,212,191,0.35)] text-[#2dd4bf] text-[12px] py-[5px] px-[14px] rounded-full font-medium">
-                  ⚙️ Metodologi IFRAME eksklusif
-                </span>
-                <span className="bg-[rgba(13,148,136,0.15)] border border-[rgba(45,212,191,0.35)] text-[#2dd4bf] text-[12px] py-[5px] px-[14px] rounded-full font-medium">
-                  ✓ 100% gratis &amp; terbuka
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Multi-Course Grid Catalog Section (replaces old curriculum modules layout) */}
-      <section id="katalog" className="py-20 bg-[#ffffff] border-t border-[#e2e8f0]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          
-          {/* COMPONENT 1 — Category Navigation Tabs */}
-          <div className="text-center mb-[40px]">
-            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#0d9488] mb-[16px] block">
-              JALUR PEMBELAJARAN
-            </span>
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-[#0f172a] mb-[24px]">
-              Pilih jalur yang sesuai dengan tujuanmu
-            </h2>
-            
-            {/* Tabs container */}
-            <div className="inline-flex flex-wrap justify-center bg-[#f1f5f9] rounded-[12px] p-[4px] gap-[4px] mb-[48px] max-w-full">
+            <div className="inline-flex flex-wrap justify-center bg-[#F3F4F7] rounded-[8px] p-1 gap-1">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex flex-col items-center justify-center text-center px-[24px] py-[10px] rounded-[8px] cursor-pointer transition-all duration-150 ease-in-out select-none min-w-[150px] ${
+                  className={`px-5 py-2 rounded-[6px] text-[13px] font-semibold transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-white text-[#0f172a] font-semibold shadow-[0_1px_4px_rgba(0,0,0,0.1)]'
-                      : 'bg-transparent text-[#64748b] font-medium hover:text-[#0f172a]'
+                      ? 'bg-white text-[#02040B] shadow-sm'
+                      : 'text-[#6B7280] hover:text-[#02040B]'
                   }`}
                 >
-                  <span className="text-[14px] leading-tight block">{tab.label}</span>
-                  <span className={`text-[11px] font-normal mt-0.5 block leading-tight ${
-                    activeTab === tab.id ? 'text-[#94a3b8]' : 'text-[#a3b1c2]'
-                  }`}>
-                    {tab.subtitle}
-                  </span>
+                  {tab.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* COMPONENT 2 — Course Grid & COMPONENT 5 — Tab filtering behavior */}
-          {activeTab === 'specialization' ? (
-            <div className="py-16 text-center max-w-md mx-auto">
-              {/* Specialization pending feedback statement */}
-              <p className="text-[#64748b] text-[15px] font-medium leading-relaxed">
-                Jalur Spesialisasi sedang dalam pengembangan. <br />
-                Tersedia setelah kamu menyelesaikan jalur Competency.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px] pb-[64px]">
-              {filteredCourses.map((course) => {
-                if (course.isLive) {
-                  // COMPONENT 3 — Course Card (Live)
-                  return (
-                    <Link
-                      key={course.id}
-                      href={course.href || '#'}
-                      className="group relative flex flex-col justify-between overflow-hidden rounded-[12px] border border-[#e2e8f0] bg-white transition-all duration-200 ease-in-out hover:border-[#0d9488] hover:shadow-[0_8px_24px_rgba(0,0,0,0.1)] hover:-translate-y-[3px]"
-                    >
-                      {/* Top color bar */}
-                      <div 
-                        className="h-[4px] w-full"
-                        style={{ background: 'linear-gradient(90deg, #0d9488, #14b8a6)' }}
-                      />
-                      
-                      {/* Card body */}
-                      <div className="p-[20px] flex-grow flex flex-col justify-between">
-                        <div>
-                          {/* Category badge */}
-                          <span className="inline-block bg-[#f0fdfa] text-[#0d9488] text-[10px] font-bold tracking-[0.08em] uppercase py-[2px] px-[8px] rounded-full mb-3">
-                            {course.categoryLabel}
-                          </span>
-                          
-                          {/* Course title */}
-                          <h4 className="text-[16px] font-bold text-[#0f172a] mb-2 leading-[1.3] transition-colors duration-150 group-hover:text-[#0d9488]">
-                            {course.title}
-                          </h4>
-                          
-                          {/* Description */}
-                          <p className="text-[13px] leading-[1.5] text-[#64748b] mb-4">
-                            {course.description}
-                          </p>
-                          
-                          {/* Metadata row */}
-                          <div className="flex flex-wrap gap-[12px] mb-4">
-                            <span className="text-[12px] text-[#94a3b8] flex items-center gap-1 font-medium">
-                              📂 {course.modules}
-                            </span>
-                            <span className="text-[12px] text-[#94a3b8] flex items-center gap-1 font-medium">
-                              📖 {course.lessons}
-                            </span>
-                            <span className="text-[12px] text-[#94a3b8] flex items-center gap-1 font-medium">
-                              ⏱ {course.duration}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div>
-                          {/* Domain tag */}
-                          <span className="inline-block bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] text-[11px] py-[2px] px-[8px] rounded-[4px] mb-4 font-medium">
-                            {course.domain}
-                          </span>
-                          
-                          {/* Card footer */}
-                          <div className="flex items-center justify-between pt-4 border-t border-[#f1f5f9]">
-                            <span className="bg-[#f0fdfa] text-[#0d9488] text-[11px] font-semibold py-[3px] px-[10px] rounded-full">
-                              {course.statusText}
-                            </span>
-                            <span className="text-[#0d9488] text-[13px] font-semibold flex items-center gap-0.5">
-                              Mulai Belajar <span className="transition-transform duration-150 group-hover:translate-x-1">→</span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  )
-                } else {
-                  // COMPONENT 4 — Course Card (Placeholder)
-                  return (
-                    <div
-                      key={course.id}
-                      className="group relative flex flex-col justify-between overflow-hidden rounded-[12px] border border-[#e2e8f0] bg-[#fafafa] opacity-85 transition-all duration-200 ease-in-out"
-                    >
-                      {/* Top grey color bar */}
-                      <div className="h-[4px] w-full bg-[#e2e8f0]" />
-                      
-                      {/* Card body */}
-                      <div className="p-[20px] flex-grow flex flex-col justify-between">
-                        <div>
-                          {/* Category badge */}
-                          <span className="inline-block bg-[#f1f5f9] text-[#94a3b8] text-[10px] font-bold tracking-[0.08em] uppercase py-[2px] px-[8px] rounded-full mb-3">
-                            {course.categoryLabel}
-                          </span>
-                          
-                          {/* Course title */}
-                          <h4 className="text-[16px] font-bold text-[#334155] mb-2 leading-[1.3]">
-                            {course.title}
-                          </h4>
-                          
-                          {/* Description */}
-                          <p className="text-[13px] leading-[1.5] text-[#94a3b8] mb-4">
-                            {course.description}
-                          </p>
-                        </div>
-
-                        <div>
-                          {/* Domain tag */}
-                          <span className="inline-block bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] text-[11px] py-[2px] px-[8px] rounded-[4px] mb-4 font-medium">
-                            {course.domain}
-                          </span>
-                          
-                          {/* Card footer */}
-                          <div className="flex items-center justify-between pt-4 border-t border-[#f1f5f9]">
-                            <span className="bg-[#fef9c3] text-[#854d0e] text-[11px] font-semibold py-[3px] px-[10px] rounded-full">
-                              {course.statusText}
-                            </span>
-                            <span className="text-[#94a3b8] text-[13px] font-semibold">
-                              Segera Hadir
-                            </span>
-                          </div>
-                        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((course) =>
+              course.isLive ? (
+                <Link
+                  key={course.id}
+                  href={course.href || '#'}
+                  className="group flex flex-col justify-between rounded-[8px] border border-[#EAEDF2] bg-white overflow-hidden hover:shadow-[0_12px_32px_rgba(2,4,11,0.1)] hover:-translate-y-1 transition-all duration-200"
+                >
+                  <div className="h-1.5 w-full bg-[#02B3E4]" />
+                  <div className="p-6 flex-grow flex flex-col justify-between">
+                    <div>
+                      <span className="inline-block bg-[#E6F8FE] text-[#0284B8] text-[10px] font-bold uppercase tracking-wide py-1 px-2.5 rounded-full mb-3">
+                        {course.categoryLabel}
+                      </span>
+                      <h3 className="text-[17px] font-bold text-[#02040B] mb-2 leading-snug group-hover:text-[#02B3E4] transition-colors">
+                        {course.title}
+                      </h3>
+                      <p className="text-[13px] text-[#6B7280] leading-relaxed mb-4">{course.description}</p>
+                      <div className="flex flex-wrap gap-3 text-[12px] text-[#8890A0] font-medium">
+                        <span>{course.modules}</span>
+                        <span>{course.lessons}</span>
+                        <span>{course.duration}</span>
                       </div>
                     </div>
-                  )
-                }
-              })}
-            </div>
-          )}
+                    <div className="mt-6 pt-4 border-t border-[#F3F4F7] flex items-center justify-between">
+                      <span className="bg-[#E6F8FE] text-[#0284B8] text-[11px] font-bold py-1 px-3 rounded-full">
+                        {course.statusText}
+                      </span>
+                      <span className="text-[#02B3E4] text-[13px] font-bold">
+                        Mulai →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ) : (
+                <div
+                  key={course.id}
+                  className="flex flex-col justify-between rounded-[8px] border border-[#EAEDF2] bg-[#FAFAFB] opacity-80 overflow-hidden"
+                >
+                  <div className="h-1.5 w-full bg-[#D9DCE3]" />
+                  <div className="p-6 flex-grow flex flex-col justify-between">
+                    <div>
+                      <span className="inline-block bg-[#EEF0F3] text-[#8890A0] text-[10px] font-bold uppercase tracking-wide py-1 px-2.5 rounded-full mb-3">
+                        {course.categoryLabel}
+                      </span>
+                      <h3 className="text-[17px] font-bold text-[#4A4F5A] mb-2 leading-snug">{course.title}</h3>
+                      <p className="text-[13px] text-[#8890A0] leading-relaxed">{course.description}</p>
+                    </div>
+                    <div className="mt-6 pt-4 border-t border-[#F3F4F7] flex items-center justify-between">
+                      <span className="bg-[#FEF3C7] text-[#92700E] text-[11px] font-bold py-1 px-3 rounded-full">
+                        {course.statusText}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      </section>
 
+      {/* Testimonial */}
+      <section className="py-20 bg-[#02040B]">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-[22px] sm:text-[26px] font-medium text-white leading-relaxed mb-8">
+            "Kurikulumnya langsung bisa dipakai untuk audit sistem AI yang sedang saya kerjakan — bukan
+            teori kosong."
+          </p>
+          <p className="text-[14px] font-semibold text-white">Peneliti, Fakultas Ilmu Komputer</p>
+          <p className="text-[13px] text-[#8890A0]">Peserta Human-Centered AI — Foundations</p>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-20 bg-white">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center rounded-[12px] bg-[#F3F4F7] py-14 px-8">
+          <h2 className="text-[26px] font-extrabold text-[#02040B] mb-3">Siap mulai belajar?</h2>
+          <p className="text-[15px] text-[#6B7280] mb-8 max-w-md mx-auto">
+            Gratis, terbuka, dan bisa langsung diterapkan ke pekerjaan atau riset kamu hari ini.
+          </p>
+          <Link
+            href="/courses/hcai-foundations"
+            className="inline-flex items-center justify-center rounded-[4px] bg-[#02B3E4] text-[#02040B] px-8 py-4 text-[15px] font-bold hover:bg-[#3ac4ec] transition-colors"
+          >
+            Mulai Belajar Gratis
+          </Link>
         </div>
       </section>
     </div>
