@@ -9,7 +9,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
   padding-inline: var(--page-gutter);
   background: var(--surface-default);
   border-bottom: 1px solid var(--border-default);
@@ -38,10 +37,20 @@
   font-weight: 800;
 }
 
-.ml-topbar__context {
+.ml-topbar__context,
+.ml-kicker,
+.ml-resume-label,
+.ml-section__heading span,
+.ml-course__progress-meta {
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: var(--type-xs);
+}
+
+.ml-kicker,
+.ml-resume-label {
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .ml-shell {
@@ -57,15 +66,6 @@
   padding-block: clamp(4rem, 8vw, 7rem);
 }
 
-.ml-kicker,
-.ml-resume-label {
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
 .ml-intro h1 {
   margin: var(--space-3) 0 var(--space-5);
   font-size: clamp(2.5rem, 6vw, 4.25rem);
@@ -74,11 +74,11 @@
 }
 
 .ml-intro p {
-  max-width: 38rem;
+  max-width: 36rem;
   margin: 0;
   color: var(--text-secondary);
   font-size: var(--type-lg);
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 .ml-section {
@@ -87,26 +87,17 @@
 
 .ml-section__heading {
   display: flex;
-  align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-4);
+  align-items: baseline;
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--border-strong);
 }
 
 .ml-section__heading h2 {
   margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   font-size: var(--type-lg);
-}
-
-.ml-section__heading span {
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--type-xs);
-}
-
-.ml-course-list {
-  display: grid;
 }
 
 .ml-course {
@@ -122,7 +113,7 @@
 }
 
 .ml-course h3 {
-  margin: var(--space-3) 0 var(--space-3);
+  margin: var(--space-3) 0;
   font-size: clamp(1.5rem, 3vw, 2rem);
   line-height: 1.15;
   letter-spacing: -0.035em;
@@ -147,9 +138,6 @@
 .ml-course__progress-meta {
   display: block;
   margin-top: var(--space-2);
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--type-xs);
 }
 
 .ml-course__resume {
@@ -161,7 +149,6 @@
 .ml-course__resume strong {
   display: block;
   margin-top: var(--space-3);
-  font-size: var(--type-md);
   line-height: 1.4;
 }
 
@@ -225,23 +212,5 @@
     padding-left: 0;
     border-top: 1px solid var(--border-default);
     border-left: 0;
-  }
-
-  .ml-actions {
-    max-width: 24rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .ml-intro {
-    padding-block: var(--space-12);
-  }
-
-  .ml-topbar__context {
-    display: none;
-  }
-
-  .ml-actions {
-    max-width: none;
   }
 }

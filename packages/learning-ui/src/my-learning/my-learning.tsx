@@ -24,8 +24,7 @@ export function MyLearning({ learning }: MyLearningProps) {
           <div className="ml-kicker">LEARNER HOME</div>
           <h1>Continue where you left off.</h1>
           <p>
-            Your active courses, current position, and next action—without
-            dashboard noise.
+            Your active courses, current position, and next action.
           </p>
         </header>
 
@@ -46,7 +45,9 @@ export function MyLearning({ learning }: MyLearningProps) {
 
                   <h3>{course.title}</h3>
 
-                  <p className="ml-course__summary">{course.summary}</p>
+                  <p className="ml-course__summary">
+                    {course.summary}
+                  </p>
 
                   <div className="ml-course__progress">
                     <Progress
@@ -55,8 +56,7 @@ export function MyLearning({ learning }: MyLearningProps) {
                     />
 
                     <span className="ml-course__progress-meta">
-                      {course.completedItems} of {course.totalItems} lessons
-                      complete
+                      {course.completedItems} of {course.totalItems} lessons complete
                     </span>
                   </div>
                 </div>
