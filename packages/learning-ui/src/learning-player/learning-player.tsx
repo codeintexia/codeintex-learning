@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button, Progress } from "@codeintex/ui-primitives";
 import type {
   CourseReleaseView,
@@ -36,7 +36,7 @@ function ItemStatus({
 
   if (active) {
     return (
-      <span className="lp-status lp-status--current" aria-label="Current lesson">
+      <span className="lp-status lp-status--current" aria-label="Current item">
         ●
       </span>
     );
@@ -59,6 +59,7 @@ export function LearningPlayer({
   const [completedIds, setCompletedIds] = useState(
     new Set(allItems.filter((item) => item.completed).map((item) => item.id)),
   );
+  const mobileCurriculumRef = useRef<HTMLDetailsElement>(null);
 
   const currentIndex = Math.max(
     0,
@@ -71,6 +72,11 @@ export function LearningPlayer({
 
   function selectItem(itemId: string) {
     setCurrentItemId(itemId);
+
+    if (mobileCurriculumRef.current?.open) {
+      mobileCurriculumRef.current.open = false;
+    }
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -101,7 +107,7 @@ export function LearningPlayer({
             ←
           </a>
           <div>
-            <div className="lp-kicker">COURSE · RELEASE {release.release}</div>
+            <div className="lp-kicker">CODEINTEX LEARNING</div>
             <strong>{release.title}</strong>
           </div>
         </div>
@@ -111,9 +117,17 @@ export function LearningPlayer({
         </div>
       </header>
 
-      <details className="lp-mobile-curriculum">
+      <details
+        ref={mobileCurriculumRef}
+        className="lp-mobile-curriculum"
+      >
         <summary>
-          Curriculum <span>{progressPercent}% complete</span>
+          <span className="lp-mobile-curriculum__title">
+            Curriculum
+          </span>
+          <span className="lp-mobile-curriculum__progress">
+            {progressPercent}% complete
+          </span>
         </summary>
         <Curriculum
           release={release}
@@ -133,10 +147,28 @@ export function LearningPlayer({
           />
         </aside>
 
-        <main className="lp-main">
-          <article className="lp-lesson">
-            <div className="lp-lesson__eyebrow">{lesson.eyebrow}</div>
-            <h1>{lesson.title}</h1>
+        <main
+          id="lesson-content"
+          className="lp-main"
+          tabIndex={-1}
+        >
+          <article
+            className="lp-lesson"
+            aria-labelledby="lesson-title"
+          >
+            <div className="lp-lesson__header">
+              <div className="lp-lesson__eyebrow">
+                {lesson.eyebrow}
+              </div>
+              <div className="lp-lesson__position">
+                {currentIndex + 1} OF {allItems.length}
+                {current.durationMinutes
+                  ? ` · ${current.durationMinutes} MIN`
+                  : ""}
+              </div>
+            </div>
+
+            <h1 id="lesson-title">{lesson.title}</h1>
             <p className="lp-lesson__summary">{lesson.summary}</p>
 
             <div className="lp-divider" />
@@ -166,8 +198,13 @@ export function LearningPlayer({
               ← Previous
             </Button>
 
-            <div className="lp-footer__position">
-              {currentIndex + 1} of {allItems.length}
+            <div
+              className="lp-footer__position"
+              aria-label={`Item ${currentIndex + 1} of ${allItems.length}`}
+            >
+              {String(currentIndex + 1).padStart(2, "0")}
+              <span aria-hidden="true"> / </span>
+              {String(allItems.length).padStart(2, "0")}
             </div>
 
             <Button onClick={completeAndContinue}>

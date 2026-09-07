@@ -49,13 +49,6 @@ export const backendCourseRelease: CourseReleaseView = {
           durationMinutes: 15,
           completed: false,
         },
-        {
-          id: "quiz_auth",
-          kind: "quiz",
-          title: "Trust boundary checkpoint",
-          durationMinutes: 8,
-          completed: false,
-        },
       ],
     },
     {
@@ -69,12 +62,6 @@ export const backendCourseRelease: CourseReleaseView = {
           durationMinutes: 20,
           completed: false,
         },
-        {
-          id: "project_api",
-          kind: "project",
-          title: "Production API capstone",
-          completed: false,
-        },
       ],
     },
   ],
@@ -83,14 +70,6 @@ export const backendCourseRelease: CourseReleaseView = {
 export const backendInitialState: LearningPlayerState = {
   currentItemId: "lesson_auth",
 };
-
-const fallbackSections: LessonContentView["sections"] = [
-  {
-    heading: "Why this matters",
-    body:
-      "The fixture layer exists only at the data boundary. Product components consume a release-shaped contract so a real Django API can replace fixtures without rewriting the learner experience.",
-  },
-];
 
 export const backendLessons: Record<string, LessonContentView> = {
   lesson_http: {
@@ -168,14 +147,6 @@ export const backendLessons: Record<string, LessonContentView> = {
       },
     ],
   },
-  quiz_auth: {
-    itemId: "quiz_auth",
-    eyebrow: "MODULE 02 · CHECKPOINT",
-    title: "Trust boundary checkpoint",
-    summary:
-      "Validate the distinction between identity, authorization, session state, and server authority.",
-    sections: fallbackSections,
-  },
   lesson_testing: {
     itemId: "lesson_testing",
     eyebrow: "MODULE 03 · LESSON 01",
@@ -189,13 +160,5 @@ export const backendLessons: Record<string, LessonContentView> = {
           "A durable test asserts observable behavior and domain invariants, not every internal function call.",
       },
     ],
-  },
-  project_api: {
-    itemId: "project_api",
-    eyebrow: "MODULE 03 · PROJECT",
-    title: "Production API capstone",
-    summary:
-      "Apply the release contract, authorization boundary, and test discipline in one production-oriented project.",
-    sections: fallbackSections,
   },
 };

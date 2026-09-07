@@ -28,6 +28,7 @@
 
 .lp-header__course strong {
   display: block;
+  max-width: min(48vw, 36rem);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -81,13 +82,14 @@
 }
 
 .lp-module + .lp-module {
-  margin-top: var(--space-8);
+  margin-top: var(--space-6);
 }
 
 .lp-module h2 {
   margin: var(--space-2) var(--space-2) var(--space-3);
   font-size: var(--type-sm);
-  line-height: 1.4;
+  font-weight: 650;
+  letter-spacing: -0.01em;  line-height: 1.4;
 }
 
 .lp-module__label {
@@ -118,10 +120,23 @@
   background: var(--surface-default);
 }
 
+.lp-item:focus-visible {
+  position: relative;
+  z-index: 1;
+}
+
 .lp-item--active {
-  background: var(--surface-default);
-  border-color: var(--border-default);
-  box-shadow: 0 1px 2px rgb(31 35 40 / 0.05);
+  background: color-mix(
+    in srgb,
+    var(--action-primary) 6%,
+    var(--surface-default)
+  );
+  border-color: color-mix(
+    in srgb,
+    var(--action-primary) 18%,
+    var(--border-default)
+  );
+  box-shadow: inset 3px 0 0 var(--action-primary);
 }
 
 .lp-status {
@@ -142,7 +157,18 @@
 }
 
 .lp-status--current {
+  border-radius: var(--radius-pill);
+  background: color-mix(
+    in srgb,
+    var(--action-primary) 10%,
+    transparent
+  );
   color: var(--action-primary);
+  font-size: 0.55rem;
+}
+
+.lp-item--active .lp-item__title {
+  font-weight: 650;
 }
 
 .lp-item__body {
@@ -151,6 +177,7 @@
 
 .lp-item__title {
   display: block;
+  overflow-wrap: anywhere;
   font-size: var(--type-sm);
   line-height: 1.35;
 }
@@ -170,14 +197,34 @@
   flex-direction: column;
 }
 
+.lp-main:focus {
+  outline: none;
+}
+
 .lp-lesson {
   width: min(calc(100% - (2 * var(--page-gutter))), var(--layout-reading-max));
   margin: 0 auto;
-  padding: clamp(3rem, 7vw, 6.5rem) 0 var(--space-16);
+  padding: clamp(2.75rem, 5vw, 4.75rem) 0 var(--space-16);
+}
+
+.lp-lesson__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.lp-lesson__position {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
 .lp-lesson h1 {
-  max-width: 16ch;
+  max-width: 18ch;
   margin: var(--space-3) 0 var(--space-5);
   font-size: var(--type-2xl);
   line-height: 1.08;
@@ -189,17 +236,17 @@
   margin: 0;
   color: var(--text-secondary);
   font-size: var(--type-lg);
-  line-height: 1.65;
+  line-height: 1.55;
 }
 
 .lp-divider {
   height: 1px;
-  margin: var(--space-10) 0;
+  margin: var(--space-8) 0;
   background: var(--border-muted);
 }
 
 .lp-content-section + .lp-content-section {
-  margin-top: var(--space-10);
+  margin-top: var(--space-8);
 }
 
 .lp-content-section h2 {
@@ -209,13 +256,16 @@
 }
 
 .lp-content-section p {
+  max-width: 68ch;
   margin: 0;
   color: var(--text-secondary);
   font-size: var(--type-md);
-  line-height: 1.82;
+  line-height: 1.75;
 }
 
 .lp-code {
+  max-width: 100%;
+  tab-size: 2;
   margin: var(--space-5) 0 0;
   overflow: auto;
   border: 1px solid #30363d;
@@ -229,16 +279,18 @@
 }
 
 .lp-footer {
+  min-width: 0;
   position: sticky;
   bottom: 0;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--space-4);
+  min-height: 4.25rem;
   padding: var(--space-3) var(--page-gutter);
   background: color-mix(in srgb, var(--surface-default) 95%, transparent);
   border-top: 1px solid var(--border-default);
-  backdrop-filter: blur(14px);
+  box-shadow: 0 -8px 24px rgb(31 35 40 / 0.035);  backdrop-filter: blur(14px);
 }
 
 .lp-footer > :last-child {
@@ -279,7 +331,8 @@
 
   .lp-mobile-curriculum > summary {
     min-height: 3rem;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
@@ -295,10 +348,26 @@
     display: none;
   }
 
-  .lp-mobile-curriculum > summary span {
+  .lp-mobile-curriculum > summary::after {
+    content: "⌄";
+    color: var(--text-muted);
+    font-size: var(--type-sm);
+    transition: transform var(--motion-fast) var(--ease-standard);
+  }
+
+  .lp-mobile-curriculum[open] > summary::after {
+    transform: rotate(180deg);
+  }
+
+  .lp-mobile-curriculum__title {
+    color: var(--text-secondary);
+  }
+
+  .lp-mobile-curriculum__progress {
     color: var(--text-muted);
     font-family: var(--font-mono);
     font-size: var(--type-xs);
+    font-weight: 500;
   }
 
   .lp-mobile-curriculum[open] .lp-curriculum {
@@ -310,7 +379,7 @@
 }
 
 @media (max-width: 560px) {
-  :root {
+  .learning-player {
     --page-gutter: 1rem;
   }
 
@@ -320,7 +389,13 @@
 
   .lp-lesson {
     padding-top: var(--space-10);
+  }  .lp-lesson__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-2);
   }
+
+
 
   .lp-lesson h1 {
     max-width: none;
@@ -330,11 +405,33 @@
     grid-template-columns: auto 1fr;
   }
 
+  .lp-footer .cx-button {
+    min-width: 0;
+    padding-inline: var(--space-3);
+    white-space: nowrap;
+  }
+
   .lp-footer__position {
     display: none;
   }
 
   .lp-footer > :last-child {
     justify-self: stretch;
+  }
+}
+
+
+@media (max-width: 390px) {
+  .lp-header__course strong {
+    max-width: 13rem;
+  }
+
+  .lp-footer {
+    gap: var(--space-2);
+  }
+
+  .lp-footer .cx-button {
+    font-size: var(--type-xs);
+    padding-inline: var(--space-2);
   }
 }
