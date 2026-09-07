@@ -1,3 +1,8 @@
+export { CourseCatalog } from "./course-catalog/course-catalog";
+export type {
+  CatalogCourseView,
+  CourseCatalogView,
+} from "./course-catalog/types";
 export { MyLearning } from "./my-learning/my-learning";
 export type {
   MyLearningCourseView,

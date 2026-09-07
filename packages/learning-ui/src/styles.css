@@ -1,5 +1,6 @@
 @import "./course-detail/styles.css";
 @import "./my-learning/styles.css";
+@import "./course-catalog/styles.css";
 
 /* Learning player */
 .learning-player {
