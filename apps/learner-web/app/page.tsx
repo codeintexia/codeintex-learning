@@ -11,9 +11,9 @@ export default function Home() {
         <div className="home-actions">
           <a
             className="cx-button cx-button--primary"
-            href="/learn/backend-engineering"
+            href="/courses/backend-engineering"
           >
-            Open Learning Player →
+            View backend course →
           </a>
           <a className="cx-button cx-button--secondary" href="/dev/ui">
             UI foundation

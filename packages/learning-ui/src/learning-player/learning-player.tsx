@@ -103,7 +103,11 @@ export function LearningPlayer({
     <div className="learning-player">
       <header className="lp-header">
         <div className="lp-header__course">
-          <a className="lp-back" href="/" aria-label="Back to CodeInteX Learning">
+          <a
+            className="lp-back"
+            href="/courses/backend-engineering"
+            aria-label="Back to course details"
+          >
             ←
           </a>
           <div>
