@@ -15,8 +15,8 @@ export default function Home() {
           >
             View backend course →
           </a>
-          <a className="cx-button cx-button--secondary" href="/dev/ui">
-            UI foundation
+          <a className="cx-button cx-button--secondary" href="/my-learning">
+            My Learning
           </a>
         </div>
       </div>
