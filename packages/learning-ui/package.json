@@ -9,6 +9,10 @@
     "@codeintex/ui-primitives": "0.2.0"
   },
   "exports": {
-    ".": "./src/index.ts"
-  }
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "sideEffects": [
+    "./src/styles.css"
+  ]
 }

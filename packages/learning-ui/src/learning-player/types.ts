@@ -36,6 +36,5 @@ export type LessonContentView = {
 };
 
 export type LearningPlayerState = {
-  progressPercent: number;
   currentItemId: string;
 };

@@ -81,7 +81,6 @@ export const backendCourseRelease: CourseReleaseView = {
 };
 
 export const backendInitialState: LearningPlayerState = {
-  progressPercent: 29,
   currentItemId: "lesson_auth",
 };
 

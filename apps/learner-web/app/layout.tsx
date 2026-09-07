@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "@codeintex/design-tokens/styles.css";
+import "@codeintex/ui-primitives/styles.css";
+import "@codeintex/learning-ui/styles.css";
 import "./globals.css";
 
 export const metadata: Metadata = {

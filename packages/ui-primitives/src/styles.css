@@ -1,0 +1,88 @@
+/* UI primitive implementation */
+.cx-button {
+  min-height: 2.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  color: var(--text-primary);
+  font-size: var(--type-sm);
+  font-weight: 650;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard);
+}
+
+.cx-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.cx-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.cx-button--primary {
+  background: var(--action-primary);
+  color: var(--text-inverse);
+  border-color: var(--action-primary);
+}
+
+.cx-button--primary:hover:not(:disabled) {
+  background: var(--action-primary-hover);
+  border-color: var(--action-primary-hover);
+}
+
+.cx-button--secondary {
+  background: var(--surface-default);
+  border-color: var(--border-default);
+  box-shadow: 0 1px 1px rgb(31 35 40 / 0.04);
+}
+
+.cx-button--secondary:hover:not(:disabled),
+.cx-button--ghost:hover:not(:disabled) {
+  background: var(--surface-subtle);
+}
+
+.cx-button--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.cx-progress {
+  min-width: 11rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.cx-progress__track {
+  height: 0.375rem;
+  overflow: hidden;
+  background: var(--border-muted);
+  border-radius: var(--radius-pill);
+}
+
+.cx-progress__value {
+  height: 100%;
+  background: var(--action-primary);
+  border-radius: inherit;
+  transition: width var(--motion-standard) var(--ease-standard);
+}
+
+.cx-progress__text {
+  min-width: 2.75rem;
+  color: var(--text-secondary);
+  font-size: var(--type-xs);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+

@@ -69,12 +69,16 @@ export function LearningPlayer({
 
   const progressPercent = Math.round((completedIds.size / allItems.length) * 100);
 
+  function selectItem(itemId: string) {
+    setCurrentItemId(itemId);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function goTo(index: number) {
     const item = allItems[index];
     if (!item) return;
 
-    setCurrentItemId(item.id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    selectItem(item.id);
   }
 
   function completeAndContinue() {
@@ -93,7 +97,7 @@ export function LearningPlayer({
     <div className="learning-player">
       <header className="lp-header">
         <div className="lp-header__course">
-          <a className="lp-back" href="/" aria-label="Back to course">
+          <a className="lp-back" href="/" aria-label="Back to CodeInteX Learning">
             ←
           </a>
           <div>
@@ -115,7 +119,7 @@ export function LearningPlayer({
           release={release}
           currentItemId={currentItemId}
           completedIds={completedIds}
-          onSelect={setCurrentItemId}
+          onSelect={selectItem}
         />
       </details>
 
@@ -125,7 +129,7 @@ export function LearningPlayer({
             release={release}
             currentItemId={currentItemId}
             completedIds={completedIds}
-            onSelect={setCurrentItemId}
+            onSelect={selectItem}
           />
         </aside>
 
