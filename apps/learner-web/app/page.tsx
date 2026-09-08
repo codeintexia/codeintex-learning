@@ -1,6 +1,10 @@
 import { CourseCatalog } from "@codeintex/learning-ui";
-import { courseCatalog } from "../src/fixtures/course-catalog";
+import { getCourseCatalog } from "../src/data/course-catalog";
 
-export default function Home() {
-  return <CourseCatalog catalog={courseCatalog} />;
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const catalog = await getCourseCatalog();
+
+  return <CourseCatalog catalog={catalog} />;
 }

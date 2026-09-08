@@ -10,3 +10,13 @@ next-env.d.ts
 
 # Local backup files
 *.bak
+
+# Python backend environment
+.venv-backend/
+
+# Django / Wagtail local runtime
+apps/learning-backend/db.sqlite3
+apps/learning-backend/**/__pycache__/
+apps/learning-backend/**/*.py[cod]
+apps/learning-backend/media/
+apps/learning-backend/staticfiles/
