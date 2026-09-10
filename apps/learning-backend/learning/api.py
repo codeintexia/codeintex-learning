@@ -125,3 +125,94 @@ def course_detail(request, slug):
             },
         }
     )
+
+
+def player_content(request, slug):
+    try:
+        course = (
+            Course.objects
+            .filter(slug=slug, is_active=True)
+            .prefetch_related("releases__modules__lessons")
+            .get()
+        )
+    except Course.DoesNotExist:
+        return JsonResponse(
+            {"detail": "Course not found."},
+            status=404,
+        )
+
+    release = (
+        course.releases
+        .filter(is_published=True)
+        .order_by("-release_number")
+        .first()
+    )
+
+    if release is None:
+        return JsonResponse(
+            {"detail": "Published course release not found."},
+            status=404,
+        )
+
+    modules = []
+    lessons = {}
+
+    for module in release.modules.all():
+        items = []
+
+        for lesson in module.lessons.all():
+            lesson_id = str(lesson.id)
+
+            items.append(
+                {
+                    "id": lesson_id,
+                    "kind": "lesson",
+                    "title": lesson.title,
+                    "durationMinutes": lesson.duration_minutes,
+                }
+            )
+
+            sections = []
+
+            for block in lesson.sections:
+                if block.block_type != "section":
+                    continue
+
+                value = block.value
+
+                sections.append(
+                    {
+                        "heading": value.get("heading") or "",
+                        "body": value.get("body") or "",
+                        "code": value.get("code") or "",
+                    }
+                )
+
+            lessons[lesson_id] = {
+                "itemId": lesson_id,
+                "eyebrow": lesson.eyebrow,
+                "title": lesson.title,
+                "summary": lesson.summary,
+                "sections": sections,
+            }
+
+        modules.append(
+            {
+                "id": str(module.id),
+                "title": module.title,
+                "items": items,
+            }
+        )
+
+    return JsonResponse(
+        {
+            "release": {
+                "id": str(release.id),
+                "courseId": str(course.id),
+                "release": release.release_number,
+                "title": release.title,
+                "modules": modules,
+            },
+            "lessons": lessons,
+        }
+    )

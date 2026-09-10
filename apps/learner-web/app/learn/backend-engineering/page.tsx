@@ -1,16 +1,17 @@
 import { LearningPlayer } from "@codeintex/learning-ui";
-import {
-  backendCourseRelease,
-  backendInitialState,
-  backendLessons,
-} from "../../../src/fixtures/backend-engineering-course";
 
-export default function BackendEngineeringPlayerPage() {
+import { getPlayerContent } from "../../../src/data/player-content";
+
+export const dynamic = "force-dynamic";
+
+export default async function BackendEngineeringPlayerPage() {
+  const player = await getPlayerContent("backend-engineering");
+
   return (
     <LearningPlayer
-      release={backendCourseRelease}
-      initialState={backendInitialState}
-      lessonByItemId={backendLessons}
+      release={player.release}
+      initialState={player.initialState}
+      lessonByItemId={player.lessonByItemId}
     />
   );
 }
