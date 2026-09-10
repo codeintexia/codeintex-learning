@@ -1,11 +1,18 @@
 import uuid
 
 from django.db import models
+
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
 from wagtail.snippets.models import register_snippet
 
 from .blocks import LessonSectionBlock
+from .immutability import (
+    CourseReleaseQuerySet,
+    LessonQuerySet,
+    ModuleQuerySet,
+    PublishedReleaseMutationError,
+)
 
 
 @register_snippet
@@ -51,10 +58,6 @@ class Course(models.Model):
         FieldPanel("slug"),
         FieldPanel("subject"),
         FieldPanel("title"),
-        FieldPanel("summary"),
-        FieldPanel("level"),
-        FieldPanel("audience"),
-        FieldPanel("outcomes"),
         FieldPanel("is_active"),
     ]
 
@@ -72,9 +75,17 @@ class Course(models.Model):
             if line.strip()
         ]
 
+    def delete(self, *args, **kwargs):
+        if self.releases.filter(is_published=True).exists():
+            raise PublishedReleaseMutationError()
+
+        return super().delete(*args, **kwargs)
+
 
 @register_snippet
 class CourseRelease(models.Model):
+    objects = CourseReleaseQuerySet.as_manager()
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -88,6 +99,20 @@ class CourseRelease(models.Model):
     release_number = models.PositiveIntegerField()
     title = models.CharField(
         max_length=255,
+    )
+    summary = models.TextField(
+        blank=True,
+    )
+    level = models.CharField(
+        max_length=80,
+        default="Foundation",
+    )
+    audience = models.TextField(
+        blank=True,
+    )
+    outcomes = models.TextField(
+        blank=True,
+        help_text="One learning outcome per line.",
     )
     is_published = models.BooleanField(
         default=False,
@@ -103,6 +128,10 @@ class CourseRelease(models.Model):
         FieldPanel("course"),
         FieldPanel("release_number"),
         FieldPanel("title"),
+        FieldPanel("summary"),
+        FieldPanel("level"),
+        FieldPanel("audience"),
+        FieldPanel("outcomes"),
         FieldPanel("is_published"),
     ]
 
@@ -118,9 +147,43 @@ class CourseRelease(models.Model):
     def __str__(self):
         return f"{self.course.title} · Release {self.release_number}"
 
+    @property
+    def outcome_list(self):
+        return [
+            line.strip()
+            for line in self.outcomes.splitlines()
+            if line.strip()
+        ]
+
+    def save(self, *args, **kwargs):
+        if (
+            not self._state.adding
+            and type(self).objects.filter(
+                pk=self.pk,
+                is_published=True,
+            ).exists()
+        ):
+            raise PublishedReleaseMutationError()
+
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if (
+            self.pk
+            and type(self).objects.filter(
+                pk=self.pk,
+                is_published=True,
+            ).exists()
+        ):
+            raise PublishedReleaseMutationError()
+
+        return super().delete(*args, **kwargs)
+
 
 @register_snippet
 class Module(models.Model):
+    objects = ModuleQuerySet.as_manager()
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -154,9 +217,45 @@ class Module(models.Model):
     def __str__(self):
         return f"{self.position}. {self.title}"
 
+    def save(self, *args, **kwargs):
+        source_is_published = (
+            not self._state.adding
+            and type(self).objects.filter(
+                pk=self.pk,
+                release__is_published=True,
+            ).exists()
+        )
+
+        target_is_published = (
+            self.release_id
+            and CourseRelease.objects.filter(
+                pk=self.release_id,
+                is_published=True,
+            ).exists()
+        )
+
+        if source_is_published or target_is_published:
+            raise PublishedReleaseMutationError()
+
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if (
+            self.pk
+            and type(self).objects.filter(
+                pk=self.pk,
+                release__is_published=True,
+            ).exists()
+        ):
+            raise PublishedReleaseMutationError()
+
+        return super().delete(*args, **kwargs)
+
 
 @register_snippet
 class Lesson(models.Model):
+    objects = LessonQuerySet.as_manager()
+
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -218,3 +317,37 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.position}. {self.title}"
+
+    def save(self, *args, **kwargs):
+        source_is_published = (
+            not self._state.adding
+            and type(self).objects.filter(
+                pk=self.pk,
+                module__release__is_published=True,
+            ).exists()
+        )
+
+        target_is_published = (
+            self.module_id
+            and Module.objects.filter(
+                pk=self.module_id,
+                release__is_published=True,
+            ).exists()
+        )
+
+        if source_is_published or target_is_published:
+            raise PublishedReleaseMutationError()
+
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if (
+            self.pk
+            and type(self).objects.filter(
+                pk=self.pk,
+                module__release__is_published=True,
+            ).exists()
+        ):
+            raise PublishedReleaseMutationError()
+
+        return super().delete(*args, **kwargs)
