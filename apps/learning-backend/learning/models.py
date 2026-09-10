@@ -1,5 +1,7 @@
 import uuid
 
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from wagtail.admin.panels import FieldPanel
@@ -351,3 +353,134 @@ class Lesson(models.Model):
             raise PublishedReleaseMutationError()
 
         return super().delete(*args, **kwargs)
+
+class Enrollment(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    learner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="learning_enrollments",
+    )
+    course_release = models.ForeignKey(
+        CourseRelease,
+        on_delete=models.PROTECT,
+        related_name="enrollments",
+    )
+    enrolled_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        ordering = ["-enrolled_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["learner", "course_release"],
+                name="unique_learner_course_release_enrollment",
+            ),
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.learner} · "
+            f"{self.course_release.course.title} · "
+            f"Release {self.course_release.release_number}"
+        )
+
+    def clean(self):
+        super().clean()
+
+        if not self.course_release_id:
+            return
+
+        is_published = CourseRelease.objects.filter(
+            pk=self.course_release_id,
+            is_published=True,
+        ).exists()
+
+        if not is_published:
+            raise ValidationError(
+                {
+                    "course_release": (
+                        "Enrollment requires a published course release."
+                    ),
+                }
+            )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super().save(*args, **kwargs)
+
+
+class LessonProgress(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    enrollment = models.ForeignKey(
+        Enrollment,
+        on_delete=models.CASCADE,
+        related_name="lesson_progress",
+    )
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.PROTECT,
+        related_name="progress_records",
+    )
+    completed_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    class Meta:
+        ordering = ["completed_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["enrollment", "lesson"],
+                name="unique_lesson_progress_per_enrollment",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.enrollment} · {self.lesson.title}"
+
+    def clean(self):
+        super().clean()
+
+        if not self.enrollment_id or not self.lesson_id:
+            return
+
+        enrollment_release_id = (
+            Enrollment.objects
+            .filter(pk=self.enrollment_id)
+            .values_list("course_release_id", flat=True)
+            .first()
+        )
+
+        lesson_release_id = (
+            Lesson.objects
+            .filter(pk=self.lesson_id)
+            .values_list("module__release_id", flat=True)
+            .first()
+        )
+
+        if (
+            enrollment_release_id is not None
+            and lesson_release_id is not None
+            and enrollment_release_id != lesson_release_id
+        ):
+            raise ValidationError(
+                {
+                    "lesson": (
+                        "Lesson must belong to the enrollment's "
+                        "course release."
+                    ),
+                }
+            )
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super().save(*args, **kwargs)
