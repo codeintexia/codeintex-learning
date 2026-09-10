@@ -5,6 +5,12 @@ from .api import (
     course_detail,
     player_content,
 )
+from .auth_api import (
+    csrf,
+    log_in,
+    log_out,
+    session,
+)
 from .runtime_api import (
     complete_lesson,
     course_enrollment,
@@ -12,6 +18,26 @@ from .runtime_api import (
 )
 
 urlpatterns = [
+    path(
+        "auth/csrf/",
+        csrf,
+        name="auth-csrf",
+    ),
+    path(
+        "auth/session/",
+        session,
+        name="auth-session",
+    ),
+    path(
+        "auth/login/",
+        log_in,
+        name="auth-login",
+    ),
+    path(
+        "auth/logout/",
+        log_out,
+        name="auth-logout",
+    ),
     path(
         "catalog/",
         catalog,
