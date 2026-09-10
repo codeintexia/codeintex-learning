@@ -141,12 +141,27 @@ def player_content(request, slug):
             status=404,
         )
 
-    release = (
-        course.releases
-        .filter(is_published=True)
-        .order_by("-release_number")
-        .first()
-    )
+    release_id = request.GET.get("releaseId")
+
+    if release_id:
+        try:
+            release = (
+                course.releases
+                .filter(
+                    pk=release_id,
+                    is_published=True,
+                )
+                .first()
+            )
+        except (ValueError, TypeError):
+            release = None
+    else:
+        release = (
+            course.releases
+            .filter(is_published=True)
+            .order_by("-release_number")
+            .first()
+        )
 
     if release is None:
         return JsonResponse(

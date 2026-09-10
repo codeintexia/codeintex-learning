@@ -1,0 +1,113 @@
+.shell {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: var(--page-gutter);
+}
+
+.card {
+  width: min(100%, 29rem);
+  padding: clamp(1.75rem, 5vw, 2.5rem);
+  background: color-mix(
+    in srgb,
+    var(--surface-default) 96%,
+    transparent
+  );
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-raised);
+}
+
+.header {
+  margin-bottom: var(--space-8);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--type-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--type-2xl);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.035em;
+}
+
+.description {
+  margin: var(--space-3) 0 0;
+  color: var(--text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.label {
+  color: var(--text-default);
+  font-size: var(--type-sm);
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  color: var(--text-default);
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font: inherit;
+  outline: none;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.input:hover {
+  border-color: var(--text-muted);
+}
+
+.input:focus-visible {
+  border-color: var(--feedback-info);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--feedback-info) 18%, transparent);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-1);
+}
+
+.error {
+  margin: 0;
+  color: var(--feedback-danger);
+  font-size: var(--type-sm);
+  line-height: var(--leading-normal);
+}
+
+.meta {
+  margin: var(--space-8) 0 0;
+  padding-top: var(--space-5);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-muted);
+  font-size: var(--type-xs);
+  line-height: var(--leading-normal);
+}

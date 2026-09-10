@@ -13,6 +13,7 @@ type LearningPlayerProps = {
   release: CourseReleaseView;
   initialState: LearningPlayerState;
   lessonByItemId: Record<string, LessonContentView>;
+  onComplete?: (itemId: string) => Promise<void> | void;
 };
 
 function flattenItems(release: CourseReleaseView) {
@@ -53,12 +54,15 @@ export function LearningPlayer({
   release,
   initialState,
   lessonByItemId,
+  onComplete,
 }: LearningPlayerProps) {
   const allItems = useMemo(() => flattenItems(release), [release]);
   const [currentItemId, setCurrentItemId] = useState(initialState.currentItemId);
   const [completedIds, setCompletedIds] = useState(
     new Set(allItems.filter((item) => item.completed).map((item) => item.id)),
   );
+  const [completionPending, setCompletionPending] = useState(false);
+  const [completionError, setCompletionError] = useState<string | null>(null);
   const mobileCurriculumRef = useRef<HTMLDetailsElement>(null);
 
   const currentIndex = Math.max(
@@ -87,15 +91,28 @@ export function LearningPlayer({
     selectItem(item.id);
   }
 
-  function completeAndContinue() {
-    setCompletedIds((previous) => {
-      const next = new Set(previous);
-      next.add(currentItemId);
-      return next;
-    });
+  async function completeAndContinue() {
+    if (completionPending) return;
 
-    if (currentIndex < allItems.length - 1) {
-      goTo(currentIndex + 1);
+    setCompletionPending(true);
+    setCompletionError(null);
+
+    try {
+      await onComplete?.(currentItemId);
+
+      setCompletedIds((previous) => {
+        const next = new Set(previous);
+        next.add(currentItemId);
+        return next;
+      });
+
+      if (currentIndex < allItems.length - 1) {
+        goTo(currentIndex + 1);
+      }
+    } catch {
+      setCompletionError("Progress could not be saved. Try again.");
+    } finally {
+      setCompletionPending(false);
     }
   }
 
@@ -204,19 +221,31 @@ export function LearningPlayer({
 
             <div
               className="lp-footer__position"
+              aria-live="polite"
               aria-label={`Item ${currentIndex + 1} of ${allItems.length}`}
             >
-              {String(currentIndex + 1).padStart(2, "0")}
-              <span aria-hidden="true"> / </span>
-              {String(allItems.length).padStart(2, "0")}
+              {completionError ? (
+                completionError
+              ) : (
+                <>
+                  {String(currentIndex + 1).padStart(2, "0")}
+                  <span aria-hidden="true"> / </span>
+                  {String(allItems.length).padStart(2, "0")}
+                </>
+              )}
             </div>
 
-            <Button onClick={completeAndContinue}>
-              {currentIndex === allItems.length - 1
-                ? "Complete lesson"
-                : completedIds.has(current.id)
-                  ? "Continue →"
-                  : "Complete & continue →"}
+            <Button
+              disabled={completionPending}
+              onClick={completeAndContinue}
+            >
+              {completionPending
+                ? "Saving…"
+                : currentIndex === allItems.length - 1
+                  ? "Complete lesson"
+                  : completedIds.has(current.id)
+                    ? "Continue →"
+                    : "Complete & continue →"}
             </Button>
           </footer>
         </main>

@@ -39,12 +39,17 @@ const DEFAULT_API_BASE_URL =
 
 export async function getPlayerContent(
   slug: string,
+  releaseId?: string,
 ): Promise<LearningPlayerData> {
   const apiBaseUrl =
     process.env.LEARNING_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 
+  const releaseQuery = releaseId
+    ? `?releaseId=${encodeURIComponent(releaseId)}`
+    : "";
+
   const response = await fetch(
-    `${apiBaseUrl}/api/v1/courses/${slug}/player/`,
+    `${apiBaseUrl}/api/v1/courses/${slug}/player/${releaseQuery}`,
     {
       cache: "no-store",
     },
