@@ -118,6 +118,27 @@ The learner loop is already functional and should not be expanded before monetiz
 - In V1, granting an entitlement provisions an Enrollment to the current published CourseRelease.
 - Refund or confirmed chargeback may revoke entitlement without deleting Enrollment or learning progress.
 
+### Commerce & Payment Integrity V1
+
+- Order is a server-authoritative immutable commercial snapshot once checkout is created.
+- CodeInteX Order identity and provider Payment identity are separate.
+- One Order may have multiple sequential provider Payment transactions.
+- Only one externally payable nonterminal Payment may exist per Order in V1.
+- Ordinary duplicate payable purchase Orders for the same learner and Course must be prevented under concurrency.
+- Browser redirects/callbacks are never payment authority.
+- Payment success requires trusted server-side provider verification.
+- CodeInteX owns business idempotency and ambiguous-outcome recovery.
+- Authenticated provider notifications enter a durable database-backed ProviderEvent inbox before acknowledgement.
+- Webhook ingestion is separated from retryable business processing.
+- Webhook processing and reconciliation converge through the same payment-observation logic.
+- Financial acquisition history is separate from refund, reversal, dispute, and chargeback facts.
+- Payment integrity/review workflow is separate from Payment financial state.
+- Partial refund does not automatically revoke Course access.
+- Confirmed full refund, full chargeback, or full reversal may revoke only the affected purchase entitlement.
+- Independent ACTIVE entitlements continue to provide effective Course access.
+- Learning history survives commercial-access revocation.
+- Manual payment-anomaly resolution must be authorized, idempotent, and auditable.
+
 ## PROVISIONAL
 
 - If a learner has multiple enrollments for the same course, the newest enrollment is treated as current.
@@ -142,8 +163,6 @@ The learner loop is already functional and should not be expanded before monetiz
 - B2B seat and license semantics.
 - International tax policy.
 
-- Payment-to-entitlement state model and reconciliation.
-- Webhook authenticity, replay protection, and idempotency design.
 - Production hosting and reverse-proxy topology.
 - Production TLS/proxy trust configuration.
 - SSO/OIDC architecture for the wider CodeInteX ecosystem.
@@ -216,7 +235,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Design the minimum provider-portable Commerce & Access state machines and domain model before implementing payment.
+Design the minimum Django Commerce & Access schema and invariants from the accepted Commerce & Payment Integrity V1 specification before implementing the payment-provider adapter.
 
 Required questions before locking implementation:
 
