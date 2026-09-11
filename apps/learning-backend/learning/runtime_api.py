@@ -240,3 +240,66 @@ def complete_lesson(request, slug, lesson_id):
         },
         status=201 if created else 200,
     )
+
+
+@require_GET
+def my_learning(request):
+    auth_error = _authentication_required(request)
+    if auth_error:
+        return auth_error
+
+    enrollments = (
+        Enrollment.objects
+        .filter(learner=request.user)
+        .select_related("course_release__course")
+        .order_by("-enrolled_at")
+    )
+
+    courses = []
+    seen_course_ids = set()
+
+    for enrollment in enrollments:
+        release = enrollment.course_release
+        course = release.course
+
+        if course.id in seen_course_ids:
+            continue
+
+        seen_course_ids.add(course.id)
+        progress = _progress_payload(enrollment)
+
+        current_item = None
+
+        if progress["currentItemId"]:
+            lesson = (
+                Lesson.objects
+                .select_related("module")
+                .filter(
+                    pk=progress["currentItemId"],
+                    module__release=release,
+                )
+                .first()
+            )
+
+            if lesson:
+                current_item = {
+                    "itemId": str(lesson.id),
+                    "itemTitle": lesson.title,
+                    "moduleTitle": lesson.module.title,
+                }
+
+        courses.append(
+            {
+                "courseId": str(course.id),
+                "courseSlug": course.slug,
+                "subject": str(course.subject),
+                "releaseId": str(release.id),
+                "release": release.release_number,
+                "title": release.title,
+                "summary": release.summary,
+                "progress": progress,
+                "current": current_item,
+            }
+        )
+
+    return JsonResponse({"courses": courses})

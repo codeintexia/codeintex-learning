@@ -224,3 +224,97 @@ class ProgressApiTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(LessonProgress.objects.count(), 0)
+
+    def test_my_learning_requires_authentication(self):
+        response = self.client.get("/api/v1/my-learning/")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_my_learning_returns_persisted_progress_and_current_lesson(self):
+        self.enroll()
+
+        completion = self.client.post(
+            (
+                "/api/v1/courses/progress-course/lessons/"
+                f"{self.lessons_one[0].id}/complete/"
+            )
+        )
+        self.assertEqual(completion.status_code, 201)
+
+        response = self.client.get("/api/v1/my-learning/")
+
+        self.assertEqual(response.status_code, 200)
+
+        courses = response.json()["courses"]
+        self.assertEqual(len(courses), 1)
+
+        course = courses[0]
+
+        self.assertEqual(course["courseSlug"], "progress-course")
+        self.assertEqual(
+            course["releaseId"],
+            str(self.release_one.id),
+        )
+        self.assertEqual(course["release"], 1)
+
+        self.assertEqual(
+            course["progress"]["completedItems"],
+            1,
+        )
+        self.assertEqual(
+            course["progress"]["totalItems"],
+            2,
+        )
+        self.assertEqual(
+            course["progress"]["progressPercent"],
+            50,
+        )
+        self.assertEqual(
+            course["progress"]["currentItemId"],
+            str(self.lessons_one[1].id),
+        )
+
+        self.assertEqual(
+            course["current"]["itemId"],
+            str(self.lessons_one[1].id),
+        )
+        self.assertEqual(
+            course["current"]["itemTitle"],
+            self.lessons_one[1].title,
+        )
+        self.assertEqual(
+            course["current"]["moduleTitle"],
+            "Module 1",
+        )
+
+    def test_my_learning_keeps_latest_enrollment_per_course(self):
+        self.enroll()
+
+        release_two, lessons_two = self.create_release(
+            2,
+            published=True,
+        )
+
+        Enrollment.objects.create(
+            learner=self.learner,
+            course_release=release_two,
+        )
+
+        response = self.client.get("/api/v1/my-learning/")
+
+        self.assertEqual(response.status_code, 200)
+
+        courses = response.json()["courses"]
+        self.assertEqual(len(courses), 1)
+
+        course = courses[0]
+
+        self.assertEqual(
+            course["releaseId"],
+            str(release_two.id),
+        )
+        self.assertEqual(course["release"], 2)
+        self.assertEqual(
+            course["progress"]["currentItemId"],
+            str(lessons_two[0].id),
+        )

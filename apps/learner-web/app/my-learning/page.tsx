@@ -1,12 +1,16 @@
-import type { Metadata } from "next";
 import { MyLearning } from "@codeintex/learning-ui";
-import { backendMyLearning } from "../../src/fixtures/backend-engineering-my-learning";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "My Learning | CodeInteX Learning",
-  description: "Resume your active CodeInteX Learning courses.",
-};
+import { getMyLearning } from "../../src/data/my-learning";
 
-export default function MyLearningPage() {
-  return <MyLearning learning={backendMyLearning} />;
+export const dynamic = "force-dynamic";
+
+export default async function MyLearningPage() {
+  const result = await getMyLearning();
+
+  if (result.status === "unauthenticated") {
+    redirect("/login");
+  }
+
+  return <MyLearning learning={result.learning} />;
 }

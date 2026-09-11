@@ -15,6 +15,7 @@ from .runtime_api import (
     complete_lesson,
     course_enrollment,
     course_progress,
+    my_learning,
 )
 
 urlpatterns = [
@@ -42,6 +43,11 @@ urlpatterns = [
         "catalog/",
         catalog,
         name="catalog",
+    ),
+    path(
+        "my-learning/",
+        my_learning,
+        name="my-learning",
     ),
     path(
         "courses/<slug:slug>/",
