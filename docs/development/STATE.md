@@ -13,7 +13,7 @@ Use this file together with the ADRs under `docs/architecture/adr/` and the curr
 
 ## Current Critical Path
 
-`payment → entitlement/enrollment → minimum production deploy/hardening`
+`commercial access policy → commerce/access design → payment MVP → minimum production deploy/hardening`
 
 The learner loop is already functional and should not be expanded before monetization unless a real defect blocks the critical path.
 
@@ -75,6 +75,16 @@ The learner loop is already functional and should not be expanded before monetiz
 - Learner session cookies should remain scoped to the learning host unless a later SSO architecture explicitly changes this.
 - Broad wildcard trusted origins and broad cookie domains are not acceptable shortcuts.
 
+### Commerce Portability
+
+- CodeInteX Commerce is provider-portable, not Midtrans-based.
+- Payment providers are integration adapters, not domain authorities.
+- Provider-specific IDs, tokens, statuses, and vocabulary must remain inside the integration/payment boundary.
+- CodeInteX owns its internal Order, Payment, access, and entitlement semantics.
+- Indonesian and international payment providers may coexist.
+- Historical payments retain their original provider identity; historical records are not rewritten when providers change.
+- Learner-facing product code must not depend on a provider-specific checkout component or status model.
+
 ### Learner Runtime
 
 - `Enrollment` is authoritative for learner access to a specific release.
@@ -101,6 +111,8 @@ The learner loop is already functional and should not be expanded before monetiz
 - Reusable Django/Wagtail package extraction may be valuable later but is not a current implementation target.
 - Local Next.js external rewrite is a development same-origin bridge; production routing remains to be finalized.
 
+- Midtrans Snap is the current strong MVP candidate for Indonesian one-time checkout, but is not an architectural dependency.
+
 ## OPEN
 
 - Payment provider selection.
@@ -117,6 +129,8 @@ The learner loop is already functional and should not be expanded before monetiz
 - Load/performance verification.
 - CI/CD and security scanning baseline.
 - Public package/open-source/framework extraction.
+
+- Global expansion payment strategy: global PSP vs Merchant of Record vs multi-provider routing.
 
 ## PARKED
 
@@ -177,7 +191,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Design and implement the minimum payment + entitlement flow.
+Define Commercial Access Policy V1, then design the minimum provider-portable Commerce & Access model before implementing payment.
 
 Required questions before locking implementation:
 
