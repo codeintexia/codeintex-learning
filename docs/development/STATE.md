@@ -103,6 +103,21 @@ The learner loop is already functional and should not be expanded before monetiz
 - Prefer simple, reversible implementation choices that preserve stable architectural boundaries.
 - Docker files remain parked until production deployment assumptions are locked.
 
+### Commercial Access Policy V1
+
+- One-time purchase grants indefinite access to the purchased Course, unless the entitlement is later revoked.
+- CourseEntitlement targets Course rather than a specific CourseRelease.
+- Normal future CourseRelease revisions remain available to entitled learners.
+- Materially different scope or value proposition is modeled as a new Course/product rather than a disguised revision.
+- Enrollment remains pinned to a specific CourseRelease.
+- Publishing a new CourseRelease never silently migrates an existing Enrollment.
+- Learning history and LessonProgress survive entitlement revocation.
+- Free preview does not create a CourseEntitlement.
+- Scholarship and administrative grants create real entitlements without fake Payment records.
+- Coupons and discounts affect commerce calculations, not learning-access semantics.
+- In V1, granting an entitlement provisions an Enrollment to the current published CourseRelease.
+- Refund or confirmed chargeback may revoke entitlement without deleting Enrollment or learning progress.
+
 ## PROVISIONAL
 
 - If a learner has multiple enrollments for the same course, the newest enrollment is treated as current.
@@ -115,9 +130,19 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ## OPEN
 
-- Payment provider selection.
+### Commercial Access Policy V1 — Open Decisions
+
+- Exact refund eligibility and refund window.
+- Detailed fraud policy.
+- UX and policy for moving from CourseRelease N to N+1.
+- Whether multiple release enrollments may be active simultaneously.
+- Commercial handling of 100%-discount orders.
+- Subscription semantics.
+- Bundle semantics.
+- B2B seat and license semantics.
+- International tax policy.
+
 - Payment-to-entitlement state model and reconciliation.
-- Refund/revocation semantics.
 - Webhook authenticity, replay protection, and idempotency design.
 - Production hosting and reverse-proxy topology.
 - Production TLS/proxy trust configuration.
@@ -191,7 +216,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Define Commercial Access Policy V1, then design the minimum provider-portable Commerce & Access model before implementing payment.
+Design the minimum provider-portable Commerce & Access state machines and domain model before implementing payment.
 
 Required questions before locking implementation:
 
