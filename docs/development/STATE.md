@@ -141,6 +141,8 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
+**Implementation state:** Model-level Commerce Schema V1 is implemented and passes the full backend regression suite (81/81). PostgreSQL concurrency correctness and provider-neutral transactional services remain unproven and are the next milestone.
+
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
 - V1 core models are CourseOffer, Order, Payment, ProviderEvent, FinancialAdjustment, PaymentIntegrityCase, and CourseEntitlement.
@@ -251,7 +253,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Implement the accepted Commerce Schema V1 tests-first: create the `commerce` Django app, add model/constraint tests, add PostgreSQL-backed concurrency acceptance tests, then implement models and migrations before any payment-provider adapter.
+Prove Commerce V1 concurrency correctness on PostgreSQL with `TransactionTestCase` coverage for competing Orders, checkout creation, fulfillment, ProviderEvent claiming, and refunds; then implement provider-neutral transactional services before any payment-provider adapter.
 
 Required questions before locking implementation:
 
