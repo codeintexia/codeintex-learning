@@ -9,14 +9,17 @@ from django.db import IntegrityError, close_old_connections, connection, transac
 from django.test import TransactionTestCase
 from django.utils import timezone
 
-from learning.models import Course
+from learning.models import Course, CourseRelease, Enrollment
 
 from .models import CourseOffer, Order, Payment
+from .models import CourseEntitlement
+
 from .services import (
     OpenOrderExistsError,
     PayablePaymentExistsError,
     create_order,
     create_payment,
+    fulfill_purchase,
 )
 
 
@@ -347,3 +350,110 @@ class CreatePaymentServiceConcurrencyTests(TransactionTestCase):
             ).count(),
             1,
         )
+
+@skipUnless(
+    connection.vendor == "postgresql",
+    "PostgreSQL concurrency test",
+)
+class PurchaseFulfillmentConcurrencyTests(TransactionTestCase):
+    reset_sequences = True
+
+    def setUp(self):
+        self.learner = get_user_model().objects.create_user(
+            username="fulfillment-concurrency-learner",
+            password="test-password",
+        )
+        self.course = Course.objects.create(
+            slug="fulfillment-concurrency-course",
+            subject="Backend Engineering",
+            title="Fulfillment Concurrency Course",
+            summary="Concurrent purchase fulfillment acceptance test.",
+        )
+        self.release = CourseRelease.objects.create(
+            course=self.course,
+            release_number=1,
+            title="Fulfillment Concurrency Course R1",
+            summary="Published release for fulfillment concurrency.",
+            is_published=True,
+        )
+        self.offer = CourseOffer.objects.create(
+            course=self.course,
+            amount_minor=500_000,
+            currency="IDR",
+            is_active=True,
+        )
+        self.order = create_order(
+            learner=self.learner,
+            course=self.course,
+            offer_id=self.offer.pk,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+        self.payment = create_payment(
+            order=self.order,
+            provider="test-provider",
+        )
+        self.payment.status = Payment.Status.SUCCEEDED
+        self.payment.succeeded_at = timezone.now()
+        self.payment.save(
+            update_fields=[
+                "status",
+                "succeeded_at",
+            ]
+        )
+
+    def _fulfill_purchase(self, barrier):
+        close_old_connections()
+
+        try:
+            payment = Payment.objects.get(pk=self.payment.pk)
+
+            barrier.wait(timeout=10)
+
+            fulfill_purchase(payment=payment)
+            return "fulfilled"
+        finally:
+            close_old_connections()
+
+    def test_concurrent_fulfillment_is_idempotent(self):
+        barrier = Barrier(2)
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(
+                    self._fulfill_purchase,
+                    barrier,
+                )
+                for _ in range(2)
+            ]
+            results = [
+                future.result(timeout=15)
+                for future in futures
+            ]
+
+        self.assertCountEqual(
+            results,
+            ["fulfilled", "fulfilled"],
+        )
+
+        self.assertEqual(
+            CourseEntitlement.objects.filter(
+                order=self.order,
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            Enrollment.objects.filter(
+                learner=self.learner,
+                course_release=self.release,
+            ).count(),
+            1,
+        )
+
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.order.status,
+            Order.Status.FULFILLED,
+        )
+        self.assertIsNotNone(self.order.fulfilled_at)

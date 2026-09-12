@@ -141,7 +141,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Commerce Schema V1 model layer is implemented. The provider-neutral `create_order()` and `create_payment()` transactional services are implemented, their business rules are tested, and their concurrent PostgreSQL behavior is proven. The current full default backend suite passes 93 tests with 4 PostgreSQL-only concurrency tests skipped; those 4 tests pass separately on PostgreSQL 18.6.
+**Implementation state:** Commerce Schema V1 model layer and the provider-neutral `create_order()`, `create_payment()`, and `fulfill_purchase()` transactional services are implemented. Their business rules are tested, and their critical concurrent behavior is proven on PostgreSQL 18.6. The current full default backend suite reports 99 tests: OK, with 5 PostgreSQL-only concurrency tests skipped; all 5 pass separately on PostgreSQL 18.6.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -253,7 +253,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Implement purchase fulfillment tests-first: a verified successful Payment must idempotently create or preserve the purchase CourseEntitlement, resolve the current published CourseRelease, create or preserve the Enrollment, and transition the Order to FULFILLED atomically. Prove the critical fulfillment race on PostgreSQL before ProviderEvent processing/reconciliation.
+Implement provider-neutral ProviderEvent processing and reconciliation tests-first: safely claim durable inbox rows, normalize payment observations, apply idempotent Payment state transitions, and route successful payment observations through `fulfill_purchase()` so duplicate, out-of-order, and reconciliation paths converge. Then prove refund correctness and concurrency before any payment-provider adapter.
 
 Provider selection remains downstream of these provider-neutral correctness boundaries.
 
