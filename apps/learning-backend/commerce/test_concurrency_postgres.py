@@ -12,6 +12,7 @@ from django.utils import timezone
 from learning.models import Course
 
 from .models import CourseOffer, Order, Payment
+from .services import OpenOrderExistsError, create_order
 
 
 @skipUnless(
@@ -178,6 +179,87 @@ class PaymentConcurrencyTests(TransactionTestCase):
                     Payment.Status.CREATED,
                     Payment.Status.PENDING,
                 ],
+            ).count(),
+            1,
+        )
+
+@skipUnless(
+    connection.vendor == "postgresql",
+    "PostgreSQL concurrency test",
+)
+class CreateOrderServiceConcurrencyTests(TransactionTestCase):
+    reset_sequences = True
+
+    def setUp(self):
+        self.learner = get_user_model().objects.create_user(
+            username="service-concurrency-learner",
+            password="test-password",
+        )
+        self.course = Course.objects.create(
+            slug="service-concurrency-course",
+            subject="Backend Engineering",
+            title="Service Concurrency Course",
+            summary="Service-level concurrency acceptance test.",
+        )
+        self.offer = CourseOffer.objects.create(
+            course=self.course,
+            amount_minor=500_000,
+            currency="IDR",
+            is_active=True,
+        )
+
+    def _create_order(self, barrier):
+        close_old_connections()
+
+        try:
+            learner = get_user_model().objects.get(
+                pk=self.learner.pk,
+            )
+            course = Course.objects.get(pk=self.course.pk)
+
+            barrier.wait(timeout=10)
+
+            try:
+                create_order(
+                    learner=learner,
+                    course=course,
+                    offer_id=self.offer.pk,
+                    expires_at=(
+                        timezone.now()
+                        + timedelta(minutes=30)
+                    ),
+                )
+                return "created"
+            except OpenOrderExistsError:
+                return "open_order_exists"
+        finally:
+            close_old_connections()
+
+    def test_concurrent_create_order_serializes_per_learner_course(
+        self,
+    ):
+        barrier = Barrier(2)
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(self._create_order, barrier)
+                for _ in range(2)
+            ]
+            results = [
+                future.result(timeout=15)
+                for future in futures
+            ]
+
+        self.assertCountEqual(
+            results,
+            ["created", "open_order_exists"],
+        )
+
+        self.assertEqual(
+            Order.objects.filter(
+                learner=self.learner,
+                course=self.course,
+                status=Order.Status.OPEN,
             ).count(),
             1,
         )

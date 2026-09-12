@@ -141,7 +141,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Model-level Commerce Schema V1 is implemented and passes the full backend regression suite (81/81). PostgreSQL concurrency correctness and provider-neutral transactional services remain unproven and are the next milestone.
+**Implementation state:** Commerce Schema V1 model layer is implemented. The Commerce model suite passes on both SQLite and PostgreSQL 18.6. The provider-neutral `create_order()` transactional service is implemented and its business rules plus concurrent PostgreSQL behavior are proven. The current full default backend suite passes 88 tests with 3 PostgreSQL-only concurrency tests skipped; those 3 tests pass separately on PostgreSQL.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -253,18 +253,9 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Prove Commerce V1 concurrency correctness on PostgreSQL with `TransactionTestCase` coverage for competing Orders, checkout creation, fulfillment, ProviderEvent claiming, and refunds; then implement provider-neutral transactional services before any payment-provider adapter.
+Implement the provider-neutral `create_payment()` transactional service tests-first, including PostgreSQL service-level concurrency proof. Then implement purchase fulfillment, ProviderEvent processing/reconciliation, and refund correctness before any payment-provider adapter.
 
-Required questions before locking implementation:
-
-1. What exactly grants access: successful payment, order state, entitlement record, or enrollment?
-2. Which object is provider-neutral and belongs to CodeInteX?
-3. How are duplicate webhooks handled idempotently?
-4. How are refunds, cancellations, chargebacks, and manual grants represented?
-5. How does payment completion create or activate learner entitlement without tightly coupling learning models to the payment provider?
-6. What reconciliation process detects provider/local-state divergence?
-
-Do not choose a provider solely on popularity. Evaluate against current Indonesian payment requirements, integration complexity, security, operating cost, settlement/reconciliation needs, reversibility, and long-term CodeInteX architecture.
+Provider selection remains downstream of these provider-neutral correctness boundaries.
 
 ## Session Handoff Procedure
 
