@@ -2,11 +2,18 @@ import uuid
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import Sum
 from django.utils import timezone
 
 from learning.models import Course, CourseRelease, Enrollment
 
-from .models import CourseEntitlement, CourseOffer, Order, Payment
+from .models import (
+    CourseEntitlement,
+    CourseOffer,
+    FinancialAdjustment,
+    Order,
+    Payment,
+)
 from .models import PaymentIntegrityCase, ProviderEvent
 
 
@@ -44,6 +51,18 @@ class OrderNotFulfillableError(CommerceServiceError):
 
 class PublishedCourseReleaseRequiredError(CommerceServiceError):
     """Raised when no published CourseRelease is available."""
+
+
+class AdjustmentCurrencyMismatchError(CommerceServiceError):
+    """Raised when an adjustment currency differs from its Payment."""
+
+
+class AdjustmentNotConfirmableError(CommerceServiceError):
+    """Raised when an adjustment cannot transition to CONFIRMED."""
+
+
+class ExcessiveFinancialAdjustmentError(CommerceServiceError):
+    """Raised when confirmed adjustments would exceed acquired funds."""
 
 
 @transaction.atomic
@@ -600,3 +619,107 @@ def process_provider_event(
     )
 
     _mark_provider_event_processed(locked_event)
+
+
+@transaction.atomic
+def confirm_financial_adjustment(
+    *,
+    adjustment: FinancialAdjustment,
+) -> FinancialAdjustment:
+    locked_adjustment = (
+        FinancialAdjustment.objects
+        .select_for_update()
+        .get(pk=adjustment.pk)
+    )
+
+    if (
+        locked_adjustment.status
+        == FinancialAdjustment.Status.CONFIRMED
+    ):
+        return locked_adjustment
+
+    if (
+        locked_adjustment.status
+        != FinancialAdjustment.Status.PENDING
+    ):
+        raise AdjustmentNotConfirmableError(
+            "Only a PENDING FinancialAdjustment can be confirmed."
+        )
+
+    locked_payment = (
+        Payment.objects
+        .select_for_update()
+        .get(pk=locked_adjustment.payment_id)
+    )
+
+    if locked_payment.status != Payment.Status.SUCCEEDED:
+        raise PaymentNotSuccessfulError(
+            "Financial adjustments require a SUCCEEDED Payment."
+        )
+
+    if locked_adjustment.currency != locked_payment.currency:
+        raise AdjustmentCurrencyMismatchError(
+            "FinancialAdjustment currency must match Payment currency."
+        )
+
+    confirmed_before = (
+        FinancialAdjustment.objects
+        .filter(
+            payment=locked_payment,
+            status=FinancialAdjustment.Status.CONFIRMED,
+        )
+        .aggregate(total=Sum("amount_minor"))
+        ["total"]
+        or 0
+    )
+
+    confirmed_after = (
+        confirmed_before
+        + locked_adjustment.amount_minor
+    )
+
+    if confirmed_after > locked_payment.amount_minor:
+        raise ExcessiveFinancialAdjustmentError(
+            "Confirmed financial adjustments cannot exceed "
+            "the acquired Payment amount."
+        )
+
+    locked_adjustment.status = (
+        FinancialAdjustment.Status.CONFIRMED
+    )
+    locked_adjustment.confirmed_at = timezone.now()
+    locked_adjustment.save(
+        update_fields=[
+            "status",
+            "confirmed_at",
+        ]
+    )
+
+    if confirmed_after == locked_payment.amount_minor:
+        entitlement = (
+            CourseEntitlement.objects
+            .select_for_update()
+            .filter(
+                order_id=locked_payment.order_id,
+                source=CourseEntitlement.Source.PURCHASE,
+                status=CourseEntitlement.Status.ACTIVE,
+            )
+            .first()
+        )
+
+        if entitlement is not None:
+            entitlement.status = CourseEntitlement.Status.REVOKED
+            entitlement.revoked_at = timezone.now()
+            entitlement.revocation_reason = (
+                "Purchase access revoked after fully confirmed "
+                "financial adjustment."
+            )
+            entitlement.save(
+                update_fields=[
+                    "status",
+                    "revoked_at",
+                    "revocation_reason",
+                ]
+            )
+
+    return locked_adjustment

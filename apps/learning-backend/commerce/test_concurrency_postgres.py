@@ -16,9 +16,13 @@ from .models import CourseEntitlement
 
 from .models import ProviderEvent
 
+from .models import FinancialAdjustment
+
 from .services import (
+    ExcessiveFinancialAdjustmentError,
     OpenOrderExistsError,
     PayablePaymentExistsError,
+    confirm_financial_adjustment,
     create_order,
     create_payment,
     fulfill_purchase,
@@ -589,4 +593,145 @@ class ProviderEventProcessingConcurrencyTests(TransactionTestCase):
                 course_release=self.release,
             ).count(),
             1,
+        )
+
+@skipUnless(
+    connection.vendor == "postgresql",
+    "PostgreSQL concurrency test",
+)
+class FinancialAdjustmentConcurrencyTests(TransactionTestCase):
+    reset_sequences = True
+
+    def setUp(self):
+        self.learner = get_user_model().objects.create_user(
+            username="adjustment-concurrency-learner",
+            password="test-password",
+        )
+        self.course = Course.objects.create(
+            slug="adjustment-concurrency-course",
+            subject="Backend Engineering",
+            title="Adjustment Concurrency Course",
+            summary="Concurrent financial adjustment acceptance test.",
+        )
+        self.release = CourseRelease.objects.create(
+            course=self.course,
+            release_number=1,
+            title="Adjustment Concurrency Course R1",
+            summary="Published release for adjustment concurrency.",
+            is_published=True,
+        )
+        self.offer = CourseOffer.objects.create(
+            course=self.course,
+            amount_minor=500_000,
+            currency="IDR",
+            is_active=True,
+        )
+        self.order = create_order(
+            learner=self.learner,
+            course=self.course,
+            offer_id=self.offer.pk,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+        self.payment = create_payment(
+            order=self.order,
+            provider="test-provider",
+        )
+        self.payment.status = Payment.Status.SUCCEEDED
+        self.payment.succeeded_at = timezone.now()
+        self.payment.save(
+            update_fields=[
+                "status",
+                "succeeded_at",
+            ]
+        )
+        fulfill_purchase(payment=self.payment)
+
+        self.adjustments = [
+            FinancialAdjustment.objects.create(
+                payment=self.payment,
+                kind=FinancialAdjustment.Kind.REFUND,
+                status=FinancialAdjustment.Status.PENDING,
+                amount_minor=300_000,
+                currency="IDR",
+                operation_key=uuid.uuid4(),
+                provider_reference=f"concurrent-refund-{index}",
+            )
+            for index in range(2)
+        ]
+
+    def _confirm_adjustment(self, adjustment_id, barrier):
+        close_old_connections()
+
+        try:
+            adjustment = FinancialAdjustment.objects.get(
+                pk=adjustment_id
+            )
+
+            barrier.wait(timeout=10)
+
+            try:
+                confirm_financial_adjustment(
+                    adjustment=adjustment,
+                )
+                return "confirmed"
+            except ExcessiveFinancialAdjustmentError:
+                return "excessive"
+        finally:
+            close_old_connections()
+
+    def test_competing_adjustments_cannot_exceed_payment_amount(self):
+        barrier = Barrier(2)
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(
+                    self._confirm_adjustment,
+                    adjustment.pk,
+                    barrier,
+                )
+                for adjustment in self.adjustments
+            ]
+            results = [
+                future.result(timeout=15)
+                for future in futures
+            ]
+
+        self.assertCountEqual(
+            results,
+            ["confirmed", "excessive"],
+        )
+
+        confirmed = FinancialAdjustment.objects.filter(
+            payment=self.payment,
+            status=FinancialAdjustment.Status.CONFIRMED,
+        )
+
+        self.assertEqual(confirmed.count(), 1)
+        self.assertEqual(
+            confirmed.get().amount_minor,
+            300_000,
+        )
+
+        self.assertEqual(
+            FinancialAdjustment.objects.filter(
+                payment=self.payment,
+                status=FinancialAdjustment.Status.PENDING,
+            ).count(),
+            1,
+        )
+
+        self.payment.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+
+        entitlement = CourseEntitlement.objects.get(
+            order=self.order,
+        )
+
+        self.assertEqual(
+            entitlement.status,
+            CourseEntitlement.Status.ACTIVE,
         )

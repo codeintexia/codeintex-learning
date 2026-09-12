@@ -141,7 +141,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Commerce Schema V1 model layer plus the provider-neutral `create_order()`, `create_payment()`, `fulfill_purchase()`, payment-observation, and ProviderEvent processing paths are implemented. Duplicate and out-of-order observations, late success on closed Orders, integrity mismatches, multiple successful payments, reconciliation convergence, and critical concurrent processing behavior are covered. The current full default backend suite reports 108 tests: OK, with 6 PostgreSQL-only concurrency tests skipped; all 6 pass separately on PostgreSQL 18.6.
+**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries are implemented for order creation, payment creation, purchase fulfillment, payment observations, ProviderEvent processing/reconciliation, and FinancialAdjustment confirmation. Partial and cumulative full adjustments, purchase-entitlement revocation, preservation of learning history and independent grants, over-adjustment prevention, idempotent confirmation, and critical competing-adjustment concurrency are covered. The current full default backend suite reports 116 tests: OK, with 7 PostgreSQL-only concurrency tests skipped; all 7 pass separately on PostgreSQL 18.6.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -253,9 +253,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Implement refund, reversal, and chargeback correctness tests-first using `FinancialAdjustment`: preserve immutable payment acquisition facts, prevent confirmed adjustments from exceeding the acquired amount, keep partial refunds from automatically revoking access, and allow a full confirmed refund or chargeback to revoke only the affected purchase entitlement while preserving learning history and independent grants. Prove the critical competing-adjustment race on PostgreSQL before any payment-provider adapter.
-
-Provider selection remains downstream of these provider-neutral correctness boundaries.
+Verify the current Midtrans sandbox/API integration contract and, if it still fits CodeInteX requirements, implement the first payment-provider adapter without leaking provider vocabulary into the commerce domain. The adapter must cover checkout creation, authenticated webhook ingestion, normalized payment observations, and reconciliation through the existing provider-neutral paths. Then prove the complete sandbox purchase flow before the production launch gate.
 
 ## Session Handoff Procedure
 
