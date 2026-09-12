@@ -141,7 +141,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Commerce Schema V1 model layer is implemented. The Commerce model suite passes on both SQLite and PostgreSQL 18.6. The provider-neutral `create_order()` transactional service is implemented and its business rules plus concurrent PostgreSQL behavior are proven. The current full default backend suite passes 88 tests with 3 PostgreSQL-only concurrency tests skipped; those 3 tests pass separately on PostgreSQL.
+**Implementation state:** Commerce Schema V1 model layer is implemented. The provider-neutral `create_order()` and `create_payment()` transactional services are implemented, their business rules are tested, and their concurrent PostgreSQL behavior is proven. The current full default backend suite passes 93 tests with 4 PostgreSQL-only concurrency tests skipped; those 4 tests pass separately on PostgreSQL 18.6.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -253,7 +253,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Implement the provider-neutral `create_payment()` transactional service tests-first, including PostgreSQL service-level concurrency proof. Then implement purchase fulfillment, ProviderEvent processing/reconciliation, and refund correctness before any payment-provider adapter.
+Implement purchase fulfillment tests-first: a verified successful Payment must idempotently create or preserve the purchase CourseEntitlement, resolve the current published CourseRelease, create or preserve the Enrollment, and transition the Order to FULFILLED atomically. Prove the critical fulfillment race on PostgreSQL before ProviderEvent processing/reconciliation.
 
 Provider selection remains downstream of these provider-neutral correctness boundaries.
 

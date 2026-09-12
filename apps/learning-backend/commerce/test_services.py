@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
@@ -6,11 +7,15 @@ from django.utils import timezone
 
 from learning.models import Course
 
-from .models import CourseEntitlement, CourseOffer, Order
+from .models import CourseEntitlement, CourseOffer, Order, Payment
 from .services import (
     ActivePurchaseEntitlementError,
     OpenOrderExistsError,
+    OrderNotPayableError,
+    PayablePaymentExistsError,
+    SuccessfulPaymentExistsError,
     create_order,
+    create_payment,
 )
 
 
@@ -153,3 +158,88 @@ class CreateOrderServiceTests(TestCase):
                 status=Order.Status.OPEN,
             ).exists()
         )
+
+class CreatePaymentServiceTests(TestCase):
+    def setUp(self):
+        self.learner = get_user_model().objects.create_user(
+            username="create-payment-learner",
+            password="test-password",
+        )
+        self.course = Course.objects.create(
+            slug="create-payment-course",
+            subject="Backend Engineering",
+            title="Create Payment Course",
+            summary="Payment service contract test course.",
+        )
+        self.offer = CourseOffer.objects.create(
+            course=self.course,
+            amount_minor=500_000,
+            currency="IDR",
+            is_active=True,
+        )
+        self.order = create_order(
+            learner=self.learner,
+            course=self.course,
+            offer_id=self.offer.pk,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+
+    def test_creates_server_authoritative_payment(self):
+        payment = create_payment(
+            order=self.order,
+            provider="test-provider",
+        )
+
+        self.assertEqual(payment.order, self.order)
+        self.assertEqual(payment.provider, "test-provider")
+        self.assertEqual(payment.status, Payment.Status.CREATED)
+        self.assertEqual(payment.amount_minor, self.order.total_amount_minor)
+        self.assertEqual(payment.currency, self.order.currency)
+        self.assertIsNotNone(payment.operation_key)
+        self.assertTrue(payment.merchant_reference)
+
+    def test_rejects_closed_order(self):
+        self.order.status = Order.Status.CANCELLED
+        self.order.save(update_fields=["status"])
+
+        with self.assertRaises(OrderNotPayableError):
+            create_payment(
+                order=self.order,
+                provider="test-provider",
+            )
+
+    def test_rejects_existing_successful_payment(self):
+        Payment.objects.create(
+            order=self.order,
+            provider="test-provider",
+            status=Payment.Status.SUCCEEDED,
+            operation_key=uuid.uuid4(),
+            merchant_reference=f"payment-{uuid.uuid4()}",
+            provider_transaction_id=f"tx-{uuid.uuid4()}",
+            amount_minor=self.order.total_amount_minor,
+            currency=self.order.currency,
+            succeeded_at=timezone.now(),
+        )
+
+        with self.assertRaises(SuccessfulPaymentExistsError):
+            create_payment(
+                order=self.order,
+                provider="test-provider",
+            )
+
+    def test_rejects_existing_payable_payment(self):
+        Payment.objects.create(
+            order=self.order,
+            provider="test-provider",
+            status=Payment.Status.PENDING,
+            operation_key=uuid.uuid4(),
+            merchant_reference=f"payment-{uuid.uuid4()}",
+            amount_minor=self.order.total_amount_minor,
+            currency=self.order.currency,
+        )
+
+        with self.assertRaises(PayablePaymentExistsError):
+            create_payment(
+                order=self.order,
+                provider="test-provider",
+            )

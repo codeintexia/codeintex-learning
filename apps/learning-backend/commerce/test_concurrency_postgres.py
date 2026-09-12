@@ -12,7 +12,12 @@ from django.utils import timezone
 from learning.models import Course
 
 from .models import CourseOffer, Order, Payment
-from .services import OpenOrderExistsError, create_order
+from .services import (
+    OpenOrderExistsError,
+    PayablePaymentExistsError,
+    create_order,
+    create_payment,
+)
 
 
 @skipUnless(
@@ -260,6 +265,85 @@ class CreateOrderServiceConcurrencyTests(TransactionTestCase):
                 learner=self.learner,
                 course=self.course,
                 status=Order.Status.OPEN,
+            ).count(),
+            1,
+        )
+
+@skipUnless(
+    connection.vendor == "postgresql",
+    "PostgreSQL concurrency test",
+)
+class CreatePaymentServiceConcurrencyTests(TransactionTestCase):
+    reset_sequences = True
+
+    def setUp(self):
+        self.learner = get_user_model().objects.create_user(
+            username="payment-service-concurrency-learner",
+            password="test-password",
+        )
+        self.course = Course.objects.create(
+            slug="payment-service-concurrency-course",
+            subject="Backend Engineering",
+            title="Payment Service Concurrency Course",
+            summary="Payment service concurrency acceptance test.",
+        )
+        self.offer = CourseOffer.objects.create(
+            course=self.course,
+            amount_minor=500_000,
+            currency="IDR",
+            is_active=True,
+        )
+        self.order = create_order(
+            learner=self.learner,
+            course=self.course,
+            offer_id=self.offer.pk,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+
+    def _create_payment(self, barrier):
+        close_old_connections()
+
+        try:
+            order = Order.objects.get(pk=self.order.pk)
+
+            barrier.wait(timeout=10)
+
+            try:
+                create_payment(
+                    order=order,
+                    provider="test-provider",
+                )
+                return "created"
+            except PayablePaymentExistsError:
+                return "payable_payment_exists"
+        finally:
+            close_old_connections()
+
+    def test_concurrent_create_payment_serializes_per_order(self):
+        barrier = Barrier(2)
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(self._create_payment, barrier)
+                for _ in range(2)
+            ]
+            results = [
+                future.result(timeout=15)
+                for future in futures
+            ]
+
+        self.assertCountEqual(
+            results,
+            ["created", "payable_payment_exists"],
+        )
+
+        self.assertEqual(
+            Payment.objects.filter(
+                order=self.order,
+                status__in=[
+                    Payment.Status.CREATED,
+                    Payment.Status.PENDING,
+                ],
             ).count(),
             1,
         )

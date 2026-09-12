@@ -1,10 +1,12 @@
+import uuid
+
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
 
 from learning.models import Course
 
-from .models import CourseEntitlement, CourseOffer, Order
+from .models import CourseEntitlement, CourseOffer, Order, Payment
 
 
 class CommerceServiceError(Exception):
@@ -17,6 +19,18 @@ class OpenOrderExistsError(CommerceServiceError):
 
 class ActivePurchaseEntitlementError(CommerceServiceError):
     """Raised when the learner already has active purchased access."""
+
+
+class OrderNotPayableError(CommerceServiceError):
+    """Raised when an Order is not OPEN and payable."""
+
+
+class SuccessfulPaymentExistsError(CommerceServiceError):
+    """Raised when the Order already has a successful Payment."""
+
+
+class PayablePaymentExistsError(CommerceServiceError):
+    """Raised when the Order already has a CREATED/PENDING Payment."""
 
 
 @transaction.atomic
@@ -97,4 +111,51 @@ def create_order(
         currency=offer.currency,
         course_title_snapshot=course.title,
         expires_at=expires_at,
+    )
+
+
+@transaction.atomic
+def create_payment(
+    *,
+    order: Order,
+    provider: str,
+) -> Payment:
+    locked_order = (
+        Order.objects
+        .select_for_update()
+        .get(pk=order.pk)
+    )
+
+    if locked_order.status != Order.Status.OPEN:
+        raise OrderNotPayableError(
+            "Payment can only be created for an OPEN Order."
+        )
+
+    if Payment.objects.filter(
+        order=locked_order,
+        status=Payment.Status.SUCCEEDED,
+    ).exists():
+        raise SuccessfulPaymentExistsError(
+            "A successful Payment already exists for this Order."
+        )
+
+    if Payment.objects.filter(
+        order=locked_order,
+        status__in=[
+            Payment.Status.CREATED,
+            Payment.Status.PENDING,
+        ],
+    ).exists():
+        raise PayablePaymentExistsError(
+            "A payable Payment already exists for this Order."
+        )
+
+    return Payment.objects.create(
+        order=locked_order,
+        provider=provider,
+        status=Payment.Status.CREATED,
+        operation_key=uuid.uuid4(),
+        merchant_reference=f"payment-{uuid.uuid4()}",
+        amount_minor=locked_order.total_amount_minor,
+        currency=locked_order.currency,
     )
