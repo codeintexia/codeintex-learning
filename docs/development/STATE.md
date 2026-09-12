@@ -139,6 +139,22 @@ The learner loop is already functional and should not be expanded before monetiz
 - Learning history survives commercial-access revocation.
 - Manual payment-anomaly resolution must be authorized, idempotent, and auditable.
 
+### Commerce Schema V1
+
+- V1 introduces one physical Django app: `commerce`.
+- `learning` does not depend on `commerce`.
+- V1 core models are CourseOffer, Order, Payment, ProviderEvent, FinancialAdjustment, PaymentIntegrityCase, and CourseEntitlement.
+- CourseOffer owns server-authoritative Course pricing.
+- Order is an immutable commercial snapshot after creation.
+- Payment represents a provider transaction / checkout intent.
+- ProviderEvent is the durable authenticated notification inbox.
+- FinancialAdjustment preserves refund, reversal, and chargeback facts without rewriting Payment acquisition history.
+- PaymentIntegrityCase owns payment anomaly/reconciliation workflow.
+- CourseEntitlement is independent from Payment and Enrollment.
+- PostgreSQL database constraints and transactional services are correctness boundaries for concurrency-sensitive Commerce behavior.
+- PostgreSQL-backed TransactionTestCase coverage is required for locking and race-sensitive behavior.
+- Production financial/commercial learner references use fail-safe deletion protection in V1; account anonymization/retention workflow remains a separate policy concern.
+
 ## PROVISIONAL
 
 - If a learner has multiple enrollments for the same course, the newest enrollment is treated as current.
@@ -235,7 +251,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Design the minimum Django Commerce & Access schema and invariants from the accepted Commerce & Payment Integrity V1 specification before implementing the payment-provider adapter.
+Implement the accepted Commerce Schema V1 tests-first: create the `commerce` Django app, add model/constraint tests, add PostgreSQL-backed concurrency acceptance tests, then implement models and migrations before any payment-provider adapter.
 
 Required questions before locking implementation:
 
