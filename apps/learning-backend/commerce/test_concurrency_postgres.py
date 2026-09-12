@@ -14,12 +14,15 @@ from learning.models import Course, CourseRelease, Enrollment
 from .models import CourseOffer, Order, Payment
 from .models import CourseEntitlement
 
+from .models import ProviderEvent
+
 from .services import (
     OpenOrderExistsError,
     PayablePaymentExistsError,
     create_order,
     create_payment,
     fulfill_purchase,
+    process_provider_event,
 )
 
 
@@ -457,3 +460,133 @@ class PurchaseFulfillmentConcurrencyTests(TransactionTestCase):
             Order.Status.FULFILLED,
         )
         self.assertIsNotNone(self.order.fulfilled_at)
+
+@skipUnless(
+    connection.vendor == "postgresql",
+    "PostgreSQL concurrency test",
+)
+class ProviderEventProcessingConcurrencyTests(TransactionTestCase):
+    reset_sequences = True
+
+    def setUp(self):
+        self.learner = get_user_model().objects.create_user(
+            username="provider-event-concurrency-learner",
+            password="test-password",
+        )
+        self.course = Course.objects.create(
+            slug="provider-event-concurrency-course",
+            subject="Backend Engineering",
+            title="Provider Event Concurrency Course",
+            summary="Concurrent ProviderEvent processing acceptance test.",
+        )
+        self.release = CourseRelease.objects.create(
+            course=self.course,
+            release_number=1,
+            title="Provider Event Concurrency Course R1",
+            summary="Published release for event concurrency testing.",
+            is_published=True,
+        )
+        self.offer = CourseOffer.objects.create(
+            course=self.course,
+            amount_minor=500_000,
+            currency="IDR",
+            is_active=True,
+        )
+        self.order = create_order(
+            learner=self.learner,
+            course=self.course,
+            offer_id=self.offer.pk,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+        self.payment = create_payment(
+            order=self.order,
+            provider="test-provider",
+        )
+        self.event = ProviderEvent.objects.create(
+            provider="test-provider",
+            payment=self.payment,
+            merchant_reference=self.payment.merchant_reference,
+            provider_event_id="concurrent-event-1",
+            provider_transaction_id="concurrent-tx-1",
+            event_type="payment-status",
+            provider_status="raw-success",
+            amount_minor=self.payment.amount_minor,
+            currency=self.payment.currency,
+            payload_digest="concurrent-event-digest",
+            authenticity_verified_at=timezone.now(),
+            authenticity_method="test-signature",
+        )
+
+    def _process_event(self, barrier):
+        close_old_connections()
+
+        try:
+            event = ProviderEvent.objects.get(pk=self.event.pk)
+
+            barrier.wait(timeout=10)
+
+            process_provider_event(
+                provider_event=event,
+                observed_payment_status=Payment.Status.SUCCEEDED,
+            )
+            return "processed"
+        finally:
+            close_old_connections()
+
+    def test_concurrent_processing_has_one_effective_processor(self):
+        barrier = Barrier(2)
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            futures = [
+                executor.submit(
+                    self._process_event,
+                    barrier,
+                )
+                for _ in range(2)
+            ]
+            results = [
+                future.result(timeout=15)
+                for future in futures
+            ]
+
+        self.assertCountEqual(
+            results,
+            ["processed", "processed"],
+        )
+
+        self.event.refresh_from_db()
+        self.payment.refresh_from_db()
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.event.processing_status,
+            ProviderEvent.ProcessingStatus.PROCESSED,
+        )
+        self.assertEqual(
+            self.event.attempt_count,
+            1,
+        )
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+        self.assertEqual(
+            self.order.status,
+            Order.Status.FULFILLED,
+        )
+
+        self.assertEqual(
+            CourseEntitlement.objects.filter(
+                order=self.order,
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            Enrollment.objects.filter(
+                learner=self.learner,
+                course_release=self.release,
+            ).count(),
+            1,
+        )

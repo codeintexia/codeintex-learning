@@ -7,7 +7,14 @@ from django.utils import timezone
 
 from learning.models import Course, CourseRelease, Enrollment
 
-from .models import CourseEntitlement, CourseOffer, Order, Payment
+from .models import (
+    CourseEntitlement,
+    CourseOffer,
+    Order,
+    Payment,
+    PaymentIntegrityCase,
+    ProviderEvent,
+)
 from .services import (
     ActivePurchaseEntitlementError,
     OpenOrderExistsError,
@@ -17,9 +24,11 @@ from .services import (
     PaymentNotSuccessfulError,
     PublishedCourseReleaseRequiredError,
     SuccessfulPaymentExistsError,
+    apply_payment_observation,
     create_order,
     create_payment,
     fulfill_purchase,
+    process_provider_event,
 )
 
 
@@ -410,4 +419,382 @@ class PurchaseFulfillmentServiceTests(TestCase):
                 learner=self.learner,
                 course_release__course=self.course,
             ).exists()
+        )
+
+class ProviderEventProcessingServiceTests(TestCase):
+    def setUp(self):
+        self.learner = get_user_model().objects.create_user(
+            username="provider-event-learner",
+            password="test-password",
+        )
+        self.course = Course.objects.create(
+            slug="provider-event-course",
+            subject="Backend Engineering",
+            title="Provider Event Course",
+            summary="ProviderEvent processing service test course.",
+        )
+        self.release = CourseRelease.objects.create(
+            course=self.course,
+            release_number=1,
+            title="Provider Event Course R1",
+            summary="Published release for ProviderEvent testing.",
+            is_published=True,
+        )
+        self.offer = CourseOffer.objects.create(
+            course=self.course,
+            amount_minor=500_000,
+            currency="IDR",
+            is_active=True,
+        )
+        self.order = create_order(
+            learner=self.learner,
+            course=self.course,
+            offer_id=self.offer.pk,
+            expires_at=timezone.now() + timedelta(minutes=30),
+        )
+        self.payment = create_payment(
+            order=self.order,
+            provider="test-provider",
+        )
+
+    def create_event(
+        self,
+        *,
+        payment=None,
+        provider="test-provider",
+        merchant_reference=None,
+        provider_transaction_id=None,
+        amount_minor=None,
+        currency=None,
+        provider_status="raw-provider-status",
+    ):
+        if payment is None:
+            payment = self.payment
+
+        return ProviderEvent.objects.create(
+            provider=provider,
+            payment=payment,
+            merchant_reference=(
+                merchant_reference
+                or self.payment.merchant_reference
+            ),
+            provider_event_id=f"event-{uuid.uuid4()}",
+            provider_transaction_id=(
+                provider_transaction_id
+                or f"tx-{uuid.uuid4()}"
+            ),
+            event_type="payment-status",
+            provider_status=provider_status,
+            amount_minor=(
+                self.payment.amount_minor
+                if amount_minor is None
+                else amount_minor
+            ),
+            currency=(
+                self.payment.currency
+                if currency is None
+                else currency
+            ),
+            payload_digest=f"digest-{uuid.uuid4()}",
+            authenticity_verified_at=timezone.now(),
+            authenticity_method="test-signature",
+        )
+
+    def test_success_observation_updates_payment_and_fulfills(self):
+        event = self.create_event()
+
+        process_provider_event(
+            provider_event=event,
+            observed_payment_status=Payment.Status.SUCCEEDED,
+        )
+
+        self.payment.refresh_from_db()
+        self.order.refresh_from_db()
+        event.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+        self.assertEqual(
+            self.payment.provider_transaction_id,
+            event.provider_transaction_id,
+        )
+        self.assertIsNotNone(self.payment.succeeded_at)
+
+        self.assertEqual(
+            self.order.status,
+            Order.Status.FULFILLED,
+        )
+
+        self.assertTrue(
+            CourseEntitlement.objects.filter(
+                order=self.order,
+                status=CourseEntitlement.Status.ACTIVE,
+            ).exists()
+        )
+        self.assertTrue(
+            Enrollment.objects.filter(
+                learner=self.learner,
+                course_release=self.release,
+            ).exists()
+        )
+
+        self.assertEqual(
+            event.processing_status,
+            ProviderEvent.ProcessingStatus.PROCESSED,
+        )
+        self.assertEqual(event.attempt_count, 1)
+        self.assertIsNotNone(event.processed_at)
+
+    def test_reprocessing_same_event_is_idempotent(self):
+        event = self.create_event()
+
+        process_provider_event(
+            provider_event=event,
+            observed_payment_status=Payment.Status.SUCCEEDED,
+        )
+        process_provider_event(
+            provider_event=event,
+            observed_payment_status=Payment.Status.SUCCEEDED,
+        )
+
+        event.refresh_from_db()
+
+        self.assertEqual(event.attempt_count, 1)
+        self.assertEqual(
+            CourseEntitlement.objects.filter(
+                order=self.order,
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            Enrollment.objects.filter(
+                learner=self.learner,
+                course_release=self.release,
+            ).count(),
+            1,
+        )
+
+    def test_out_of_order_failure_does_not_regress_success(self):
+        success_event = self.create_event()
+
+        process_provider_event(
+            provider_event=success_event,
+            observed_payment_status=Payment.Status.SUCCEEDED,
+        )
+
+        late_failure = self.create_event(
+            provider_transaction_id=(
+                success_event.provider_transaction_id
+            ),
+            provider_status="late-failure",
+        )
+
+        process_provider_event(
+            provider_event=late_failure,
+            observed_payment_status=Payment.Status.FAILED,
+        )
+
+        self.payment.refresh_from_db()
+        late_failure.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+        self.assertEqual(
+            late_failure.processing_status,
+            ProviderEvent.ProcessingStatus.PROCESSED,
+        )
+
+    def test_late_success_on_closed_order_preserves_finance_fact(self):
+        self.order.status = Order.Status.EXPIRED
+        self.order.save(update_fields=["status"])
+
+        event = self.create_event()
+
+        process_provider_event(
+            provider_event=event,
+            observed_payment_status=Payment.Status.SUCCEEDED,
+        )
+
+        self.payment.refresh_from_db()
+        self.order.refresh_from_db()
+        event.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+        self.assertEqual(
+            self.order.status,
+            Order.Status.EXPIRED,
+        )
+
+        self.assertFalse(
+            CourseEntitlement.objects.filter(
+                order=self.order,
+            ).exists()
+        )
+        self.assertFalse(
+            Enrollment.objects.filter(
+                learner=self.learner,
+                course_release__course=self.course,
+            ).exists()
+        )
+
+        self.assertTrue(
+            PaymentIntegrityCase.objects.filter(
+                payment=self.payment,
+                reason=(
+                    PaymentIntegrityCase.Reason
+                    .LATE_PAYMENT_CLOSED_ORDER
+                ),
+                status=PaymentIntegrityCase.Status.OPEN,
+            ).exists()
+        )
+
+        self.assertEqual(
+            event.processing_status,
+            ProviderEvent.ProcessingStatus.PROCESSED,
+        )
+
+    def test_amount_mismatch_opens_case_without_payment_transition(self):
+        event = self.create_event(
+            amount_minor=self.payment.amount_minor + 1,
+        )
+
+        process_provider_event(
+            provider_event=event,
+            observed_payment_status=Payment.Status.SUCCEEDED,
+        )
+
+        self.payment.refresh_from_db()
+        event.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.CREATED,
+        )
+
+        self.assertTrue(
+            PaymentIntegrityCase.objects.filter(
+                payment=self.payment,
+                provider_event=event,
+                reason=PaymentIntegrityCase.Reason.AMOUNT_MISMATCH,
+            ).exists()
+        )
+
+        self.assertEqual(
+            event.processing_status,
+            ProviderEvent.ProcessingStatus.PROCESSED,
+        )
+
+    def test_provider_identity_mismatch_opens_case(self):
+        event = self.create_event(
+            provider="different-provider",
+        )
+
+        process_provider_event(
+            provider_event=event,
+            observed_payment_status=Payment.Status.SUCCEEDED,
+        )
+
+        self.payment.refresh_from_db()
+        event.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.CREATED,
+        )
+
+        self.assertTrue(
+            PaymentIntegrityCase.objects.filter(
+                payment=self.payment,
+                provider_event=event,
+                reason=(
+                    PaymentIntegrityCase.Reason
+                    .PROVIDER_IDENTITY_MISMATCH
+                ),
+            ).exists()
+        )
+
+    def test_reconciliation_uses_same_payment_observation_path(self):
+        apply_payment_observation(
+            payment=self.payment,
+            observed_status=Payment.Status.SUCCEEDED,
+            provider_transaction_id="reconciliation-tx",
+        )
+
+        self.payment.refresh_from_db()
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+        self.assertEqual(
+            self.payment.provider_transaction_id,
+            "reconciliation-tx",
+        )
+        self.assertEqual(
+            self.order.status,
+            Order.Status.FULFILLED,
+        )
+
+        self.assertTrue(
+            CourseEntitlement.objects.filter(
+                order=self.order,
+            ).exists()
+        )
+
+    def test_multiple_successful_payments_open_integrity_case(self):
+        other_payment = Payment.objects.create(
+            order=self.order,
+            provider="test-provider",
+            status=Payment.Status.SUCCEEDED,
+            operation_key=uuid.uuid4(),
+            merchant_reference=f"payment-{uuid.uuid4()}",
+            provider_transaction_id=f"tx-{uuid.uuid4()}",
+            amount_minor=self.order.total_amount_minor,
+            currency=self.order.currency,
+            succeeded_at=timezone.now(),
+        )
+
+        event = self.create_event()
+
+        process_provider_event(
+            provider_event=event,
+            observed_payment_status=Payment.Status.SUCCEEDED,
+        )
+
+        self.payment.refresh_from_db()
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+        self.assertEqual(
+            other_payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+
+        self.assertTrue(
+            PaymentIntegrityCase.objects.filter(
+                order=self.order,
+                payment=self.payment,
+                reason=(
+                    PaymentIntegrityCase.Reason
+                    .MULTIPLE_SUCCESSFUL_PAYMENTS
+                ),
+            ).exists()
+        )
+
+        self.assertEqual(
+            CourseEntitlement.objects.filter(
+                order=self.order,
+            ).count(),
+            1,
         )

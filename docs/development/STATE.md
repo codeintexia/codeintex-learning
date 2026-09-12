@@ -141,7 +141,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Commerce Schema V1 model layer and the provider-neutral `create_order()`, `create_payment()`, and `fulfill_purchase()` transactional services are implemented. Their business rules are tested, and their critical concurrent behavior is proven on PostgreSQL 18.6. The current full default backend suite reports 99 tests: OK, with 5 PostgreSQL-only concurrency tests skipped; all 5 pass separately on PostgreSQL 18.6.
+**Implementation state:** Commerce Schema V1 model layer plus the provider-neutral `create_order()`, `create_payment()`, `fulfill_purchase()`, payment-observation, and ProviderEvent processing paths are implemented. Duplicate and out-of-order observations, late success on closed Orders, integrity mismatches, multiple successful payments, reconciliation convergence, and critical concurrent processing behavior are covered. The current full default backend suite reports 108 tests: OK, with 6 PostgreSQL-only concurrency tests skipped; all 6 pass separately on PostgreSQL 18.6.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -253,7 +253,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Implement provider-neutral ProviderEvent processing and reconciliation tests-first: safely claim durable inbox rows, normalize payment observations, apply idempotent Payment state transitions, and route successful payment observations through `fulfill_purchase()` so duplicate, out-of-order, and reconciliation paths converge. Then prove refund correctness and concurrency before any payment-provider adapter.
+Implement refund, reversal, and chargeback correctness tests-first using `FinancialAdjustment`: preserve immutable payment acquisition facts, prevent confirmed adjustments from exceeding the acquired amount, keep partial refunds from automatically revoking access, and allow a full confirmed refund or chargeback to revoke only the affected purchase entitlement while preserving learning history and independent grants. Prove the critical competing-adjustment race on PostgreSQL before any payment-provider adapter.
 
 Provider selection remains downstream of these provider-neutral correctness boundaries.
 
