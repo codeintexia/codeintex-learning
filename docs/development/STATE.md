@@ -141,7 +141,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries are implemented for order creation, payment creation, purchase fulfillment, payment observations, ProviderEvent processing/reconciliation, and FinancialAdjustment confirmation. Partial and cumulative full adjustments, purchase-entitlement revocation, preservation of learning history and independent grants, over-adjustment prevention, idempotent confirmation, and critical competing-adjustment concurrency are covered. The current full default backend suite reports 116 tests: OK, with 7 PostgreSQL-only concurrency tests skipped; all 7 pass separately on PostgreSQL 18.6.
+**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries plus the first Midtrans adapter/workflow bridge are implemented locally. Midtrans coverage includes Snap checkout creation, notification authentication, durable ProviderEvent ingestion, separate event processing, status normalization, reconciliation through the existing observation engine, cumulative refund handling, reversal handling, and partial-chargeback integrity review. The current full default backend suite reports 134 tests: OK, with 7 PostgreSQL-only concurrency tests skipped; all 7 pass separately on PostgreSQL 18.6. Real Midtrans sandbox compatibility remains to be proven.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -253,7 +253,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Verify the current Midtrans sandbox/API integration contract and, if it still fits CodeInteX requirements, implement the first payment-provider adapter without leaking provider vocabulary into the commerce domain. The adapter must cover checkout creation, authenticated webhook ingestion, normalized payment observations, and reconciliation through the existing provider-neutral paths. Then prove the complete sandbox purchase flow before the production launch gate.
+Prove the implemented Midtrans adapter against the real Midtrans sandbox: create a checkout using sandbox credentials, complete a controlled payment, verify authenticated notification ingestion and separate processing, and confirm GET Status reconciliation converges to the same local state. Do not enable production payments until the end-to-end learner purchase flow and production launch gate pass.
 
 ## Session Handoff Procedure
 

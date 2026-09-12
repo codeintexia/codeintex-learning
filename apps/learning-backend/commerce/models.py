@@ -360,6 +360,32 @@ class ProviderEvent(models.Model):
     provider_status = models.CharField(
         max_length=128,
     )
+    observed_payment_status = models.CharField(
+        max_length=16,
+        choices=Payment.Status.choices,
+        null=True,
+        blank=True,
+    )
+    adjustment_kind = models.CharField(
+        max_length=16,
+        null=True,
+        blank=True,
+    )
+    adjustment_cumulative_amount_minor = models.PositiveBigIntegerField(
+        null=True,
+        blank=True,
+    )
+    provider_adjustment_reference = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+    )
+    adjustment_confirmed = models.BooleanField(
+        default=False,
+    )
+    is_partial_adjustment = models.BooleanField(
+        default=False,
+    )
     amount_minor = models.PositiveBigIntegerField(
         null=True,
         blank=True,
