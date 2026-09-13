@@ -1,6 +1,6 @@
 # CodeInteX Learning — Development State
 
-Last updated: 2026-09-11
+Last updated: 2026-09-13
 Project: [Yudi] CodeInteX
 Repository: codeintexia/codeintex-learning
 Branch: rebuild/learner-experience-v1
@@ -26,7 +26,7 @@ The learner loop is already functional and should not be expanded before monetiz
 - Python 3.13.2
 - PostgreSQL is the production canonical transactional database.
 - SQLite is local development only.
-- Backend test suite: **39/39 passing** as of 2026-09-11.
+- Backend test suite: **137 tests OK, 7 PostgreSQL-only tests skipped on SQLite; all 7 pass separately on PostgreSQL 18.6** as of 2026-09-13.
 - `manage.py check`: passing.
 
 ### Frontend
@@ -141,7 +141,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries plus the first Midtrans adapter/workflow bridge are implemented locally. Midtrans coverage includes Snap checkout creation, notification authentication, durable ProviderEvent ingestion, separate event processing, status normalization, reconciliation through the existing observation engine, cumulative refund handling, reversal handling, and partial-chargeback integrity review. The current full default backend suite reports 134 tests: OK, with 7 PostgreSQL-only concurrency tests skipped; all 7 pass separately on PostgreSQL 18.6. Real Midtrans sandbox compatibility remains to be proven.
+**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries plus the first Midtrans adapter/workflow bridge are implemented and partially proven against the real Midtrans Sandbox. A real Snap checkout was created from a CodeInteX Payment, a controlled Sandbox card payment completed, GET Status returned `capture`, reconciliation persisted and processed a ProviderEvent, Payment converged to SUCCEEDED, Order to FULFILLED, PURCHASE CourseEntitlement to ACTIVE, and Enrollment was provisioned to the published CourseRelease with zero PaymentIntegrityCase records. A thin HTTP notification endpoint now locally enforces authenticated durable ingest only: valid notifications persist ProviderEvent as RECEIVED without business processing, invalid signatures are rejected without persistence, and malformed JSON is rejected. Real Midtrans-to-local webhook delivery over public HTTPS remains to be proven. Current verification: 21/21 Midtrans targeted tests pass; the full default backend suite reports 137 tests OK with 7 PostgreSQL-only tests skipped on SQLite; all 7 pass separately on PostgreSQL 18.6.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -241,7 +241,7 @@ Keep domain boundaries stable and implementation choices replaceable.
 
 ### Backend
 
-Next milestone: payment/entitlement integration without coupling payment-provider concepts directly into learning-domain core.
+Next milestone: prove real Midtrans notification delivery over HTTPS, then complete the end-to-end learner purchase and production launch gate without coupling provider concepts into the learning-domain core.
 
 ### Frontend
 
@@ -253,7 +253,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Prove the implemented Midtrans adapter against the real Midtrans sandbox: create a checkout using sandbox credentials, complete a controlled payment, verify authenticated notification ingestion and separate processing, and confirm GET Status reconciliation converges to the same local state. Do not enable production payments until the end-to-end learner purchase flow and production launch gate pass.
+Complete the remaining real Midtrans Sandbox proof: expose the thin notification ingress through a temporary public HTTPS endpoint, verify an authentic Midtrans notification is durably persisted as ProviderEvent.RECEIVED, process it separately through the existing observation engine, and confirm webhook delivery and GET Status reconciliation converge idempotently. Then complete the end-to-end learner purchase flow and production launch gate. Do not enable production payments before those gates pass.
 
 ## Session Handoff Procedure
 

@@ -10,6 +10,7 @@ from search import views as search_views
 
 urlpatterns = [
     path("api/v1/", include("learning.urls")),
+    path("api/v1/commerce/", include("commerce.urls")),
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
