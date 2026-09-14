@@ -73,14 +73,15 @@ class ProgressApiTests(TestCase):
 
     def enroll(self):
         self.client.force_login(self.learner)
-        return self.client.post(
-            "/api/v1/courses/progress-course/enrollment/"
+        Enrollment.objects.get_or_create(
+            learner=self.learner,
+            course_release=self.lessons_one[0].module.release,
+        )
+        return self.client.get(
+            "/api/v1/courses/progress-course/progress/"
         )
 
     def test_progress_endpoints_require_authentication(self):
-        enrollment = self.client.post(
-            "/api/v1/courses/progress-course/enrollment/"
-        )
         progress = self.client.get(
             "/api/v1/courses/progress-course/progress/"
         )
@@ -91,21 +92,18 @@ class ProgressApiTests(TestCase):
             )
         )
 
-        self.assertEqual(enrollment.status_code, 401)
         self.assertEqual(progress.status_code, 401)
         self.assertEqual(completion.status_code, 401)
 
-    def test_enrollment_is_idempotent(self):
-        first = self.enroll()
-        second = self.client.post(
+    def test_direct_enrollment_endpoint_is_not_exposed(self):
+        self.client.force_login(self.learner)
+
+        response = self.client.post(
             "/api/v1/courses/progress-course/enrollment/"
         )
 
-        self.assertEqual(first.status_code, 201)
-        self.assertTrue(first.json()["created"])
-        self.assertEqual(second.status_code, 200)
-        self.assertFalse(second.json()["created"])
-        self.assertEqual(Enrollment.objects.count(), 1)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(Enrollment.objects.count(), 0)
 
     def test_progress_requires_enrollment(self):
         self.client.force_login(self.learner)

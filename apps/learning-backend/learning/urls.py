@@ -13,7 +13,6 @@ from .auth_api import (
 )
 from .runtime_api import (
     complete_lesson,
-    course_enrollment,
     course_progress,
     my_learning,
 )
@@ -58,11 +57,6 @@ urlpatterns = [
         "courses/<slug:slug>/player/",
         player_content,
         name="player-content",
-    ),
-    path(
-        "courses/<slug:slug>/enrollment/",
-        course_enrollment,
-        name="course-enrollment",
     ),
     path(
         "courses/<slug:slug>/progress/",

@@ -26,7 +26,7 @@ The learner loop is already functional and should not be expanded before monetiz
 - Python 3.13.2
 - PostgreSQL is the production canonical transactional database.
 - SQLite is local development only.
-- Backend test suite: **137 tests OK, 7 PostgreSQL-only tests skipped on SQLite; all 7 pass separately on PostgreSQL 18.6** as of 2026-09-13.
+- Backend test suite: **137 tests OK, 7 PostgreSQL-only tests skipped on SQLite; all 7 pass separately on PostgreSQL 18.6** as of 2026-09-14.
 - `manage.py check`: passing.
 
 ### Frontend
@@ -116,6 +116,8 @@ The learner loop is already functional and should not be expanded before monetiz
 - Scholarship and administrative grants create real entitlements without fake Payment records.
 - Coupons and discounts affect commerce calculations, not learning-access semantics.
 - In V1, granting an entitlement provisions an Enrollment to the current published CourseRelease.
+- Paid-course Enrollment is not exposed as a public learner-created mutation; trusted provisioning such as purchase fulfillment owns Enrollment creation.
+- The former `/api/v1/courses/<slug>/enrollment/` learner endpoint has been removed and is regression-tested as unavailable, closing the direct commercial-access bypass.
 - Refund or confirmed chargeback may revoke entitlement without deleting Enrollment or learning progress.
 
 ### Commerce & Payment Integrity V1
@@ -214,7 +216,7 @@ Verified behavior includes:
 
 - Browser login succeeds through the same-origin API bridge.
 - Django returns and accepts session cookies.
-- Enrollment is idempotent.
+- Enrollment is provisioned by trusted backend workflows; there is no public learner enrollment mutation for paid access.
 - Completion is idempotent.
 - Progress persists across requests.
 - Player restores persisted completion and current lesson after refresh.
@@ -241,7 +243,7 @@ Keep domain boundaries stable and implementation choices replaceable.
 
 ### Backend
 
-Real Midtrans notification delivery, durable ingress, separate processing, idempotent replay, and GET Status convergence are now proven against the Sandbox. Next milestone: complete the learner-facing end-to-end purchase and post-payment return flow, including Finish Redirect configuration as needed, then complete the production launch gate without coupling provider concepts into the learning-domain core.
+Real Midtrans notification delivery, durable ingress, separate processing, idempotent replay, and GET Status convergence are proven against the Sandbox. The legacy public learner enrollment mutation has also been removed, closing the direct paid-access bypass without introducing a `learning` → `commerce` dependency. Next milestone: implement the learner-facing checkout orchestration and post-payment return flow, including Finish Redirect configuration as needed, then complete the production launch gate without coupling provider concepts into the learning-domain core.
 
 ### Frontend
 
@@ -253,7 +255,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Complete the learner-facing end-to-end purchase flow around the now-proven Midtrans Sandbox backend path. Add or verify the learner-facing checkout orchestration, configure and verify the post-payment/Finish Redirect flow without treating the browser redirect as payment authority, and confirm the learner experience reflects server-authoritative entitlement and enrollment state. Then complete the production launch gate. Do not enable production payments before those gates pass.
+Implement the learner-facing Checkout Orchestration V1 around the proven Midtrans Sandbox backend path. The checkout boundary must remain in `commerce`, resolve authoritative Course/offer/pricing server-side, preserve session/CSRF protections, and provide retry/recovery semantics without creating duplicate payable transactions. Then configure and verify the post-payment/Finish Redirect flow without treating the browser redirect as payment authority, confirm the learner experience reflects server-authoritative entitlement and enrollment state, and complete the production launch gate. Do not enable production payments before those gates pass.
 
 ## Session Handoff Procedure
 

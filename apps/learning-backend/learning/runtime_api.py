@@ -30,15 +30,6 @@ def _course(slug):
     )
 
 
-def _latest_published_release(course):
-    return (
-        course.releases
-        .filter(is_published=True)
-        .order_by("-release_number")
-        .first()
-    )
-
-
 def _learner_enrollment_for_course(learner, course):
     return (
         Enrollment.objects
@@ -115,43 +106,6 @@ def _progress_payload(enrollment):
         "progressPercent": progress_percent,
         "currentItemId": current_item_id,
     }
-
-
-@require_POST
-def course_enrollment(request, slug):
-    authentication_error = _authentication_required(request)
-
-    if authentication_error is not None:
-        return authentication_error
-
-    course = _course(slug)
-
-    if course is None:
-        return JsonResponse(
-            {"detail": "Course not found."},
-            status=404,
-        )
-
-    release = _latest_published_release(course)
-
-    if release is None:
-        return JsonResponse(
-            {"detail": "Published course release not found."},
-            status=404,
-        )
-
-    enrollment, created = Enrollment.objects.get_or_create(
-        learner=request.user,
-        course_release=release,
-    )
-
-    return JsonResponse(
-        {
-            "created": created,
-            "progress": _progress_payload(enrollment),
-        },
-        status=201 if created else 200,
-    )
 
 
 @require_GET
