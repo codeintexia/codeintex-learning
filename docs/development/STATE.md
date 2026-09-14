@@ -26,7 +26,7 @@ The learner loop is already functional and should not be expanded before monetiz
 - Python 3.13.2
 - PostgreSQL is the production canonical transactional database.
 - SQLite is local development only.
-- Backend test suite: **137 tests OK, 7 PostgreSQL-only tests skipped on SQLite; all 7 pass separately on PostgreSQL 18.6** as of 2026-09-14.
+- Backend test suite: **146 tests OK on the default SQLite-backed run, with 7 PostgreSQL-only tests skipped** as of 2026-09-14. The PostgreSQL-only concurrency harness was last separately verified **7/7 on PostgreSQL 18.6 on 2026-09-13**; it has not yet been rerun after Checkout Orchestration V1.
 - `manage.py check`: passing.
 
 ### Frontend
@@ -143,7 +143,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries plus the first Midtrans adapter/workflow bridge are implemented and proven for the current one-time-purchase Sandbox acceptance path. A real Snap checkout was created from a CodeInteX Payment and a controlled Sandbox card payment completed. Midtrans delivered the authentic signed payment notification over a temporary public HTTPS tunnel to the CodeInteX notification endpoint. The ingress verified the Midtrans SHA-512 signature and durably persisted ProviderEvent as RECEIVED with attempt_count 0 and no business processing: Payment remained CREATED and Order remained OPEN. Separate process_midtrans_event processing then converged Payment to SUCCEEDED, Order to FULFILLED, PURCHASE CourseEntitlement to ACTIVE, and provisioned one Enrollment to the published CourseRelease with zero PaymentIntegrityCase records. Replaying the already-PROCESSED event was a no-op: attempt_count remained 1 and no duplicate entitlement or enrollment was created. A subsequent real Midtrans GET Status reconciliation returned `capture`, authenticated the observation as `midtrans-status-api`, processed it successfully, and converged to the same canonical state without duplicate fulfillment or integrity cases. Current verification: 21/21 Midtrans targeted tests pass; the full default backend suite reports 137 tests OK with 7 PostgreSQL-only tests skipped on SQLite; all 7 pass separately on PostgreSQL 18.6.
+**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries plus the first Midtrans adapter/workflow bridge are implemented and proven for the current one-time-purchase Sandbox acceptance path. A real Snap checkout was created from a CodeInteX Payment and a controlled Sandbox card payment completed. Midtrans delivered the authentic signed payment notification over a temporary public HTTPS tunnel to the CodeInteX notification endpoint. The ingress verified the Midtrans SHA-512 signature and durably persisted ProviderEvent as RECEIVED with attempt_count 0 and no business processing: Payment remained CREATED and Order remained OPEN. Separate process_midtrans_event processing then converged Payment to SUCCEEDED, Order to FULFILLED, PURCHASE CourseEntitlement to ACTIVE, and provisioned one Enrollment to the published CourseRelease with zero PaymentIntegrityCase records. Replaying the already-PROCESSED event was a no-op: attempt_count remained 1 and no duplicate entitlement or enrollment was created. A subsequent real Midtrans GET Status reconciliation returned `capture`, authenticated the observation as `midtrans-status-api`, processed it successfully, and converged to the same canonical state without duplicate fulfillment or integrity cases. Current verification: the Checkout/Midtrans targeted suite passes 17/17, the commerce suite reports 103 tests OK with 7 PostgreSQL-only tests skipped on SQLite, and the full default backend suite reports 146 tests OK with 7 PostgreSQL-only tests skipped on SQLite. The PostgreSQL-only concurrency harness was last separately verified 7/7 on PostgreSQL 18.6 on 2026-09-13 and has not yet been rerun after Checkout Orchestration V1.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -158,6 +158,21 @@ The learner loop is already functional and should not be expanded before monetiz
 - PostgreSQL database constraints and transactional services are correctness boundaries for concurrency-sensitive Commerce behavior.
 - PostgreSQL-backed TransactionTestCase coverage is required for locking and race-sensitive behavior.
 - Production financial/commercial learner references use fail-safe deletion protection in V1; account anonymization/retention workflow remains a separate policy concern.
+
+
+### Checkout Orchestration V1
+
+- Learner checkout is exposed through `POST /api/v1/commerce/courses/<slug>/checkout/`.
+- Checkout requires an authenticated Django session and remains CSRF-protected.
+- Course identity is resolved server-side from the slug; the Course must be active and have a published CourseRelease before it is sellable.
+- The active IDR CourseOffer, amount, and currency are resolved server-side. Client-supplied price, currency, and offer identifiers are not commercial authority.
+- Checkout reuses an existing live OPEN Order and existing CREATED/PENDING Midtrans Payment instead of creating duplicate payable transactions on ordinary retries.
+- `Payment.checkout_url` persists the hosted provider checkout capability so ordinary reload/retry can return the same checkout destination without another provider call.
+- Midtrans Snap creation uses `Payment.operation_key` as the provider `Idempotency-Key`.
+- A provider error after local Order/Payment creation leaves the same local transaction available for retry; regression tests confirm retry does not create a second Order or Payment.
+- An active PURCHASE CourseEntitlement prevents creation of a new purchase checkout for that learner and Course.
+- A browser redirect remains non-authoritative for payment success; fulfillment still requires trusted server-side provider observation.
+- Known limitation: the narrow ambiguous-outcome window where Midtrans successfully creates checkout but CodeInteX fails before persisting `checkout_url` is not considered fully solved for recovery beyond the provider idempotency window.
 
 ## PROVISIONAL
 
@@ -230,6 +245,7 @@ Verified behavior includes:
 - 31 tests: authenticated progress API.
 - 36 tests: authentication API.
 - 39 tests: My Learning read-model and latest-enrollment behavior.
+- 146 tests: Checkout Orchestration V1 backend checkpoint on the default SQLite-backed run; 7 PostgreSQL-only tests skipped. Last separate PostgreSQL 18.6 concurrency verification: 7/7 on 2026-09-13, before Checkout Orchestration V1.
 
 ## Current Workstream Boundary
 
@@ -243,7 +259,7 @@ Keep domain boundaries stable and implementation choices replaceable.
 
 ### Backend
 
-Real Midtrans notification delivery, durable ingress, separate processing, idempotent replay, and GET Status convergence are proven against the Sandbox. The legacy public learner enrollment mutation has also been removed, closing the direct paid-access bypass without introducing a `learning` → `commerce` dependency. Next milestone: implement the learner-facing checkout orchestration and post-payment return flow, including Finish Redirect configuration as needed, then complete the production launch gate without coupling provider concepts into the learning-domain core.
+Real Midtrans notification delivery, durable ingress, separate processing, idempotent replay, and GET Status convergence are proven against the Sandbox. The direct paid-enrollment bypass is closed, and Checkout Orchestration V1 is now implemented and backend-regression-proven with server-authoritative pricing, session/CSRF protection, retry reuse, persisted hosted checkout capability, and Midtrans `Idempotency-Key` adapter wiring. Next milestone: connect the learner-facing course purchase CTA to this checkout contract, verify the real Sandbox flow through the HTTP endpoint, and complete the post-payment/Finish Redirect experience without treating the browser redirect as payment authority.
 
 ### Frontend
 
@@ -255,7 +271,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Implement the learner-facing Checkout Orchestration V1 around the proven Midtrans Sandbox backend path. The checkout boundary must remain in `commerce`, resolve authoritative Course/offer/pricing server-side, preserve session/CSRF protections, and provide retry/recovery semantics without creating duplicate payable transactions. Then configure and verify the post-payment/Finish Redirect flow without treating the browser redirect as payment authority, confirm the learner experience reflects server-authoritative entitlement and enrollment state, and complete the production launch gate. Do not enable production payments before those gates pass.
+Connect the learner-facing course purchase experience to the proven Checkout Orchestration V1 backend. The course page must present the correct commercial CTA, authenticated browser checkout must use the existing same-origin session/CSRF model, and successful checkout creation must redirect to the hosted Midtrans payment page without exposing commercial authority to the client. Then configure and verify the post-payment/Finish Redirect experience, run a real Sandbox purchase through the learner-facing HTTP flow, and confirm the learner experience reflects server-authoritative entitlement and enrollment state. Browser return parameters are never payment authority. Do not enable production payments before those gates pass.
 
 ## Session Handoff Procedure
 

@@ -73,6 +73,7 @@ class MidtransClient:
         merchant_reference: str,
         amount_minor: int,
         currency: str,
+        idempotency_key: str | None = None,
     ) -> MidtransCheckout:
         if currency != "IDR":
             raise MidtransConfigurationError(
@@ -94,6 +95,15 @@ class MidtransClient:
                 "Midtrans gross_amount must be greater than zero."
             )
 
+        if idempotency_key is not None and len(idempotency_key) > 46:
+            raise MidtransConfigurationError(
+                "Midtrans Idempotency-Key cannot exceed 46 characters."
+            )
+
+        headers = {"Accept": "application/json"}
+        if idempotency_key:
+            headers["Idempotency-Key"] = idempotency_key
+
         response = self.session.post(
             (
                 f"{self.SNAP_BASE_URLS[self.environment]}"
@@ -106,7 +116,7 @@ class MidtransClient:
                 },
             },
             auth=(self.server_key, ""),
-            headers={"Accept": "application/json"},
+            headers=headers,
             timeout=self.TIMEOUT,
         )
 

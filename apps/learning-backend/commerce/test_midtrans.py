@@ -42,6 +42,7 @@ class MidtransAdapterTests(SimpleTestCase):
             merchant_reference="payment-123",
             amount_minor=500_000,
             currency="IDR",
+            idempotency_key="d63ae3e0-a7c5-4733-8d81-b451168d8a2c",
         )
 
         self.assertEqual(checkout.token, "snap-token-123")
@@ -59,7 +60,12 @@ class MidtransAdapterTests(SimpleTestCase):
                 },
             },
             auth=("SB-Mid-server-test", ""),
-            headers={"Accept": "application/json"},
+            headers={
+                "Accept": "application/json",
+                "Idempotency-Key": (
+                    "d63ae3e0-a7c5-4733-8d81-b451168d8a2c"
+                ),
+            },
             timeout=(3.05, 10.0),
         )
 

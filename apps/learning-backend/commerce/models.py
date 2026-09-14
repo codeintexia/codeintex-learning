@@ -265,6 +265,11 @@ class Payment(models.Model):
     currency = models.CharField(
         max_length=3,
     )
+
+    checkout_url = models.URLField(
+        max_length=2048,
+        blank=True,
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
     )

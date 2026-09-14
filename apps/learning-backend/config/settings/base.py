@@ -188,3 +188,7 @@ WAGTAILDOCS_EXTENSIONS = ['csv', 'docx', 'key', 'odt', 'pdf', 'pptx', 'rtf', 'tx
 WAGTAILDOCS_MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
 
 MIDTRANS_SERVER_KEY = os.environ.get("MIDTRANS_SERVER_KEY", "").strip()
+MIDTRANS_ENVIRONMENT = (
+    os.environ.get("MIDTRANS_ENVIRONMENT", "sandbox").strip()
+    or "sandbox"
+)
