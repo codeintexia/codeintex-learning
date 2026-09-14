@@ -1,6 +1,6 @@
 # CodeInteX Learning — Development State
 
-Last updated: 2026-09-13
+Last updated: 2026-09-14
 Project: [Yudi] CodeInteX
 Repository: codeintexia/codeintex-learning
 Branch: rebuild/learner-experience-v1
@@ -141,7 +141,7 @@ The learner loop is already functional and should not be expanded before monetiz
 
 ### Commerce Schema V1
 
-**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries plus the first Midtrans adapter/workflow bridge are implemented and partially proven against the real Midtrans Sandbox. A real Snap checkout was created from a CodeInteX Payment, a controlled Sandbox card payment completed, GET Status returned `capture`, reconciliation persisted and processed a ProviderEvent, Payment converged to SUCCEEDED, Order to FULFILLED, PURCHASE CourseEntitlement to ACTIVE, and Enrollment was provisioned to the published CourseRelease with zero PaymentIntegrityCase records. A thin HTTP notification endpoint now locally enforces authenticated durable ingest only: valid notifications persist ProviderEvent as RECEIVED without business processing, invalid signatures are rejected without persistence, and malformed JSON is rejected. Real Midtrans-to-local webhook delivery over public HTTPS remains to be proven. Current verification: 21/21 Midtrans targeted tests pass; the full default backend suite reports 137 tests OK with 7 PostgreSQL-only tests skipped on SQLite; all 7 pass separately on PostgreSQL 18.6.
+**Implementation state:** Commerce Schema V1 provider-neutral transaction boundaries plus the first Midtrans adapter/workflow bridge are implemented and proven for the current one-time-purchase Sandbox acceptance path. A real Snap checkout was created from a CodeInteX Payment and a controlled Sandbox card payment completed. Midtrans delivered the authentic signed payment notification over a temporary public HTTPS tunnel to the CodeInteX notification endpoint. The ingress verified the Midtrans SHA-512 signature and durably persisted ProviderEvent as RECEIVED with attempt_count 0 and no business processing: Payment remained CREATED and Order remained OPEN. Separate process_midtrans_event processing then converged Payment to SUCCEEDED, Order to FULFILLED, PURCHASE CourseEntitlement to ACTIVE, and provisioned one Enrollment to the published CourseRelease with zero PaymentIntegrityCase records. Replaying the already-PROCESSED event was a no-op: attempt_count remained 1 and no duplicate entitlement or enrollment was created. A subsequent real Midtrans GET Status reconciliation returned `capture`, authenticated the observation as `midtrans-status-api`, processed it successfully, and converged to the same canonical state without duplicate fulfillment or integrity cases. Current verification: 21/21 Midtrans targeted tests pass; the full default backend suite reports 137 tests OK with 7 PostgreSQL-only tests skipped on SQLite; all 7 pass separately on PostgreSQL 18.6.
 
 - V1 introduces one physical Django app: `commerce`.
 - `learning` does not depend on `commerce`.
@@ -241,7 +241,7 @@ Keep domain boundaries stable and implementation choices replaceable.
 
 ### Backend
 
-Next milestone: prove real Midtrans notification delivery over HTTPS, then complete the end-to-end learner purchase and production launch gate without coupling provider concepts into the learning-domain core.
+Real Midtrans notification delivery, durable ingress, separate processing, idempotent replay, and GET Status convergence are now proven against the Sandbox. Next milestone: complete the learner-facing end-to-end purchase and post-payment return flow, including Finish Redirect configuration as needed, then complete the production launch gate without coupling provider concepts into the learning-domain core.
 
 ### Frontend
 
@@ -253,7 +253,7 @@ Essential controls must be completed before production payment acceptance; deepe
 
 ## Next Milestone
 
-Complete the remaining real Midtrans Sandbox proof: expose the thin notification ingress through a temporary public HTTPS endpoint, verify an authentic Midtrans notification is durably persisted as ProviderEvent.RECEIVED, process it separately through the existing observation engine, and confirm webhook delivery and GET Status reconciliation converge idempotently. Then complete the end-to-end learner purchase flow and production launch gate. Do not enable production payments before those gates pass.
+Complete the learner-facing end-to-end purchase flow around the now-proven Midtrans Sandbox backend path. Add or verify the learner-facing checkout orchestration, configure and verify the post-payment/Finish Redirect flow without treating the browser redirect as payment authority, and confirm the learner experience reflects server-authoritative entitlement and enrollment state. Then complete the production launch gate. Do not enable production payments before those gates pass.
 
 ## Session Handoff Procedure
 
