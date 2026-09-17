@@ -192,3 +192,7 @@ MIDTRANS_ENVIRONMENT = (
     os.environ.get("MIDTRANS_ENVIRONMENT", "sandbox").strip()
     or "sandbox"
 )
+MIDTRANS_NOTIFICATION_URL = os.environ.get(
+    "MIDTRANS_NOTIFICATION_URL",
+    "",
+).strip()

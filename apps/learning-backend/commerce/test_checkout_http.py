@@ -18,6 +18,7 @@ from commerce.providers.midtrans import (
 
 
 CHECKOUT_URL = "/api/v1/commerce/courses/checkout-course/checkout/"
+OFFER_URL = "/api/v1/commerce/courses/checkout-course/offer/"
 
 
 @override_settings(
@@ -130,6 +131,43 @@ class CheckoutHttpTests(TestCase):
         self.assertEqual(payload["amountMinor"], 500_000)
         self.assertEqual(payload["currency"], "IDR")
         self.assertIn("expiresAt", payload)
+
+    @override_settings(
+        MIDTRANS_NOTIFICATION_URL=(
+            "https://notify.example.test/"
+            "api/v1/commerce/providers/midtrans/notifications/"
+        ),
+    )
+    @patch("commerce.http_api.MidtransClient", create=True)
+    def test_checkout_passes_configured_notification_url_to_provider(
+        self,
+        client_class,
+    ):
+        self.client.force_login(self.learner)
+
+        provider_client = Mock()
+        provider_client.create_snap_checkout.return_value = MidtransCheckout(
+            token="snap-token-123",
+            redirect_url="https://example.test/snap-token-123",
+        )
+        client_class.return_value = provider_client
+
+        response = self.client.post(CHECKOUT_URL)
+
+        self.assertEqual(response.status_code, 201)
+
+        payment = Payment.objects.get()
+
+        provider_client.create_snap_checkout.assert_called_once_with(
+            merchant_reference=payment.merchant_reference,
+            amount_minor=500_000,
+            currency="IDR",
+            idempotency_key=str(payment.operation_key),
+            notification_url=(
+                "https://notify.example.test/"
+                "api/v1/commerce/providers/midtrans/notifications/"
+            ),
+        )
 
     @patch("commerce.http_api.MidtransClient", create=True)
     def test_checkout_retry_reuses_order_payment_and_checkout_url(
@@ -288,6 +326,63 @@ class CheckoutHttpTests(TestCase):
         self.assertEqual(
             response.json()["error"],
             "payment_provider_unavailable",
+        )
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(Payment.objects.count(), 0)
+
+    def test_offer_is_public_and_returns_active_server_offer(self):
+        response = self.client.get(OFFER_URL)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "offer": {
+                    "amountMinor": 500_000,
+                    "currency": "IDR",
+                }
+            },
+        )
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(Payment.objects.count(), 0)
+
+    def test_offer_returns_unavailable_when_no_active_offer_exists(self):
+        self.offer.is_active = False
+        self.offer.save(update_fields=["is_active"])
+
+        response = self.client.get(OFFER_URL)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.json()["error"],
+            "offer_unavailable",
+        )
+        self.assertEqual(Order.objects.count(), 0)
+        self.assertEqual(Payment.objects.count(), 0)
+
+    def test_offer_hides_course_without_published_release(self):
+        unavailable_course = Course.objects.create(
+            slug="unreleased-offer-course",
+            subject="Backend Engineering",
+            title="Unreleased Offer Course",
+            summary="Not published.",
+        )
+        CourseOffer.objects.create(
+            course=unavailable_course,
+            amount_minor=250_000,
+            currency="IDR",
+            is_active=True,
+        )
+
+        response = self.client.get(
+            "/api/v1/commerce/courses/"
+            "unreleased-offer-course/offer/"
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.json()["error"],
+            "course_unavailable",
         )
         self.assertEqual(Order.objects.count(), 0)
         self.assertEqual(Payment.objects.count(), 0)

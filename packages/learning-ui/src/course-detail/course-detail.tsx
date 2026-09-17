@@ -38,7 +38,7 @@ export function CourseDetail({ course }: CourseDetailProps) {
         </a>
 
         <a className="cd-topbar__player" href={course.primaryAction.href}>
-          Learning Player →
+          {course.primaryAction.label} →
         </a>
       </header>
 

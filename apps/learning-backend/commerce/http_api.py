@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from learning.models import Course
 
@@ -23,6 +23,7 @@ from commerce.providers.midtrans import (
 from commerce.providers.midtrans_workflows import (
     MidtransNotificationAuthenticationError,
     ingest_midtrans_notification,
+    process_midtrans_event,
 )
 from commerce.services import (
     ActivePurchaseEntitlementError,
@@ -49,6 +50,55 @@ def _checkout_payload(*, order, payment):
             "expiresAt": order.expires_at.isoformat(),
         }
     }
+
+
+@require_GET
+def course_offer(request, slug):
+    course = (
+        Course.objects
+        .filter(
+            slug=slug,
+            is_active=True,
+        )
+        .first()
+    )
+
+    if course is None:
+        return JsonResponse(
+            {"detail": "Course not found."},
+            status=404,
+        )
+
+    if not course.releases.filter(is_published=True).exists():
+        return JsonResponse(
+            {"error": "course_unavailable"},
+            status=404,
+        )
+
+    offer = (
+        CourseOffer.objects
+        .filter(
+            course=course,
+            currency="IDR",
+            is_active=True,
+        )
+        .first()
+    )
+
+    if offer is None:
+        return JsonResponse(
+            {"error": "offer_unavailable"},
+            status=404,
+        )
+
+    return JsonResponse(
+        {
+            "offer": {
+                "amountMinor": offer.amount_minor,
+                "currency": offer.currency,
+            }
+        }
+    )
 
 
 @require_POST
@@ -249,17 +299,30 @@ def course_checkout(request, slug):
         "sandbox",
     ).strip() or "sandbox"
 
+    notification_url = getattr(
+        settings,
+        "MIDTRANS_NOTIFICATION_URL",
+        "",
+    ).strip()
+
     client = MidtransClient(
         server_key=server_key,
         environment=environment,
     )
 
     try:
+        checkout_kwargs = {
+            "merchant_reference": payment.merchant_reference,
+            "amount_minor": payment.amount_minor,
+            "currency": payment.currency,
+            "idempotency_key": str(payment.operation_key),
+        }
+
+        if notification_url:
+            checkout_kwargs["notification_url"] = notification_url
+
         checkout = client.create_snap_checkout(
-            merchant_reference=payment.merchant_reference,
-            amount_minor=payment.amount_minor,
-            currency=payment.currency,
-            idempotency_key=str(payment.operation_key),
+            **checkout_kwargs,
         )
     except (MidtransError, requests.RequestException):
         return JsonResponse(
@@ -315,7 +378,7 @@ def midtrans_notification(request):
         )
 
     try:
-        ingest_midtrans_notification(
+        event = ingest_midtrans_notification(
             payload=payload,
             server_key=server_key,
         )
@@ -325,7 +388,11 @@ def midtrans_notification(request):
             status=401,
         )
 
+    process_midtrans_event(
+        provider_event=event,
+    )
+
     return JsonResponse(
-        {"status": "received"},
+        {"status": "processed"},
         status=200,
     )

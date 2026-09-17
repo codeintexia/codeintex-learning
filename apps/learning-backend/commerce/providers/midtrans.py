@@ -74,6 +74,7 @@ class MidtransClient:
         amount_minor: int,
         currency: str,
         idempotency_key: str | None = None,
+        notification_url: str | None = None,
     ) -> MidtransCheckout:
         if currency != "IDR":
             raise MidtransConfigurationError(
@@ -103,6 +104,8 @@ class MidtransClient:
         headers = {"Accept": "application/json"}
         if idempotency_key:
             headers["Idempotency-Key"] = idempotency_key
+        if notification_url:
+            headers["X-Override-Notification"] = notification_url
 
         response = self.session.post(
             (

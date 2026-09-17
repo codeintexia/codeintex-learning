@@ -6,9 +6,10 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from learning.models import Course, CourseRelease
+from learning.models import Course, CourseRelease, Enrollment
 
 from commerce.models import (
+    CourseEntitlement,
     CourseOffer,
     Order,
     Payment,
@@ -85,7 +86,7 @@ class MidtransNotificationHttpTests(TestCase):
 
         return payload
 
-    def test_valid_notification_is_durably_ingested_only(self):
+    def test_valid_notification_is_ingested_and_processed(self):
         response = self.client.post(
             self.endpoint,
             data=json.dumps(self.signed_payload()),
@@ -104,15 +105,97 @@ class MidtransNotificationHttpTests(TestCase):
 
         self.assertEqual(
             event.processing_status,
-            ProviderEvent.ProcessingStatus.RECEIVED,
+            ProviderEvent.ProcessingStatus.PROCESSED,
         )
+        self.assertEqual(event.attempt_count, 1)
         self.assertEqual(
             self.payment.status,
-            Payment.Status.CREATED,
+            Payment.Status.SUCCEEDED,
         )
         self.assertEqual(
             self.order.status,
-            Order.Status.OPEN,
+            Order.Status.FULFILLED,
+        )
+
+        entitlement = CourseEntitlement.objects.get(
+            learner=self.learner,
+            course=self.course,
+        )
+        self.assertEqual(
+            entitlement.source,
+            CourseEntitlement.Source.PURCHASE,
+        )
+        self.assertEqual(
+            entitlement.status,
+            CourseEntitlement.Status.ACTIVE,
+        )
+
+        self.assertEqual(
+            Enrollment.objects.filter(
+                learner=self.learner,
+                course_release__course=self.course,
+            ).count(),
+            1,
+        )
+
+    def test_replayed_valid_notification_is_idempotent(self):
+        payload = self.signed_payload()
+
+        first = self.client.post(
+            self.endpoint,
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        second = self.client.post(
+            self.endpoint,
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 200)
+
+        events = ProviderEvent.objects.filter(
+            provider="midtrans",
+            merchant_reference=self.payment.merchant_reference,
+        )
+
+        self.assertEqual(events.count(), 1)
+
+        event = events.get()
+
+        self.assertEqual(
+            event.processing_status,
+            ProviderEvent.ProcessingStatus.PROCESSED,
+        )
+        self.assertEqual(event.attempt_count, 1)
+
+        self.payment.refresh_from_db()
+        self.order.refresh_from_db()
+
+        self.assertEqual(
+            self.payment.status,
+            Payment.Status.SUCCEEDED,
+        )
+        self.assertEqual(
+            self.order.status,
+            Order.Status.FULFILLED,
+        )
+
+        self.assertEqual(
+            CourseEntitlement.objects.filter(
+                learner=self.learner,
+                course=self.course,
+            ).count(),
+            1,
+        )
+
+        self.assertEqual(
+            Enrollment.objects.filter(
+                learner=self.learner,
+                course_release__course=self.course,
+            ).count(),
+            1,
         )
 
     def test_invalid_signature_is_rejected_without_persistence(self):

@@ -67,7 +67,31 @@ export default function LoginPage() {
         return;
       }
 
-      router.replace("/learn/backend-engineering");
+      const requestedNext = new URLSearchParams(
+        window.location.search,
+      ).get("next");
+
+      let destination = "/learn/backend-engineering";
+
+      if (requestedNext) {
+        try {
+          const resolved = new URL(
+            requestedNext,
+            window.location.origin,
+          );
+
+          if (resolved.origin === window.location.origin) {
+            destination =
+              resolved.pathname +
+              resolved.search +
+              resolved.hash;
+          }
+        } catch {
+          // Fall back to the default internal destination.
+        }
+      }
+
+      router.replace(destination);
       router.refresh();
     } catch {
       setError("Sign-in could not be completed. Try again.");

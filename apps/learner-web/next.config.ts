@@ -7,6 +7,10 @@ const learningApiBaseUrl =
 const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 
+  allowedDevOrigins: [
+    "127.0.0.1",
+  ],
+
   transpilePackages: [
     "@codeintex/design-tokens",
     "@codeintex/ui-primitives",
