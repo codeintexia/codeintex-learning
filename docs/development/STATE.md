@@ -13,9 +13,9 @@ Use this file together with the ADRs under `docs/architecture/adr/` and the curr
 
 ## Current Critical Path
 
-`monetization slice proof → stabilization/verification checkpoint → Build-vs-Adopt Architecture Gate → minimum production deploy/hardening`
+`monetization slice proven → Build-vs-Adopt Architecture Gate complete → minimum production deploy/hardening`
 
-The learner loop and real one-time-purchase fulfillment path are now functional. Do not expand major LMS-domain scope before the Build-vs-Adopt Architecture Gate. The immediate priority is to stabilize, fully verify, document, commit, and push the monetization slice before making the next architecture decision.
+The monetization slice and Build-vs-Adopt Architecture Gate are complete. CodeInteX will retain its canonical learning/runtime and commerce semantics while adopting standards and specialized capabilities at explicit integration boundaries. The immediate critical path is minimum production deploy/hardening rather than speculative LMS feature expansion.
 
 ## Verified State
 
@@ -55,7 +55,7 @@ The learner loop and real one-time-purchase fulfillment path are now functional.
 
 - `npm run build`: **passing** for the current monetization checkpoint on 2026-09-18. The production route manifest includes `/courses/backend-engineering`, `/checkout/backend-engineering`, `/checkout/backend-engineering/return`, `/login`, `/learn/backend-engineering`, and `/my-learning`.
 
-- The learner-facing course detail, login continuation, checkout page, and post-payment return page are implemented locally and must remain covered by the final verification checkpoint before commit.
+- The learner-facing course detail, login continuation, checkout page, and post-payment return page are implemented, verified, committed, and pushed as part of the monetization checkpoint.
 
 ## LOCKED
 
@@ -71,6 +71,17 @@ The learner loop and real one-time-purchase fulfillment path are now functional.
 - `learning/runtime_api.py` contains authenticated transactional/runtime endpoints.
 - `learning/auth_api.py` contains session authentication endpoints.
 - `learning-ui` must remain backend-agnostic.
+
+### Build-vs-Adopt Learning Platform Strategy
+
+- The Build-vs-Adopt Architecture Gate was completed on 2026-09-18 and is recorded in ADR-008.
+- CodeInteX retains canonical ownership of Course/CourseRelease, learner-facing runtime contracts, Enrollment/progress semantics, Entitlement/Commerce semantics, and the learner-facing Product Experience.
+- CodeInteX will not replatform its canonical learning core onto Open edX, Moodle, Canvas, or another full LMS without new material evidence.
+- This decision does not authorize rebuilding every LMS capability internally.
+- Complex non-differentiating capabilities must pass an Adopt/Integrate evaluation before custom implementation.
+- `CodeInteX semantics at the core; standards at the edges` is the governing platform strategy.
+- Wagtail remains a replaceable authoring implementation rather than the learner runtime contract.
+- Standards and specialized engines remain requirement-driven integration choices rather than automatic platform dependencies.
 
 ### Course Versioning
 
@@ -122,7 +133,7 @@ The learner loop and real one-time-purchase fulfillment path are now functional.
 - Prefer simple, reversible implementation choices that preserve stable architectural boundaries.
 - Docker files remain parked until production deployment assumptions are locked.
 
-- Before major LMS-domain expansion beyond the proven monetization slice, CodeInteX Learning must pass a Build-vs-Adopt Architecture Gate. Permanent full-custom Django/Wagtail LMS implementation remains PROVISIONAL until that gate is completed.
+- The Build-vs-Adopt Architecture Gate is complete. Major LMS-domain expansion must follow ADR-008: differentiated CodeInteX semantics may be owned internally, while complex non-differentiating capabilities require an Adopt/Integrate evaluation before custom implementation.
 
 ### Commercial Access Policy V1
 
@@ -255,7 +266,7 @@ The learner loop and real one-time-purchase fulfillment path are now functional.
 
 - The return page currently uses authenticated progress/access availability as the minimal provider-neutral fulfillment-ready signal. A dedicated purchase-status read model should be added only if richer post-payment UX or operational recovery requires it.
 
-- Permanent full-custom Django/Wagtail LMS implementation remains provisional pending the Build-vs-Adopt Architecture Gate.
+- Wagtail remains the current authoring implementation, but its long-term role remains provisional behind CodeInteX-owned learner/runtime contracts.
 
 ## OPEN
 
@@ -389,11 +400,11 @@ Verified behavior includes:
 
 ### Strategy
 
-Revenue-first monetization proof is now achieved for the one-time-purchase slice. Stabilize and checkpoint it before expanding scope. After the checkpoint, run the Build-vs-Adopt Architecture Gate before major LMS-domain expansion.
+Revenue-first monetization proof and the Build-vs-Adopt Architecture Gate are complete. The next strategic priority is minimum production deploy/hardening. Avoid feature expansion that does not contribute to production readiness or a demonstrated revenue requirement.
 
 ### Architecture
 
-Keep domain boundaries stable and implementation choices replaceable. `CodeInteX semantics at the core; standards at the edges` remains the guiding architecture posture. Do not introduce new LMS bounded contexts until required by invariants or the post-monetization architecture gate.
+Keep domain boundaries stable and implementation choices replaceable. ADR-008 locks `CodeInteX semantics at the core; standards at the edges` as the platform strategy. New LMS bounded contexts require concrete product invariants; complex non-differentiating capabilities require an Adopt/Integrate evaluation before custom implementation.
 
 ### Backend
 
@@ -409,13 +420,15 @@ The successful Sandbox proof exposed the importance of validating provider crede
 
 ## Next Milestone
 
-The monetization slice has passed its final verification checkpoint: real Midtrans Sandbox purchase fulfillment is proven, the full default backend suite passes, the PostgreSQL concurrency harness passes 7/7, and frontend typecheck plus production build pass.
+Begin minimum production deploy/hardening for the proven monetization slice.
 
-Complete the repository checkpoint by auditing the working tree, preserving the parked Docker files as untracked, staging only intended files, committing, and pushing branch `rebuild/learner-experience-v1`.
+The next workstream must establish a stable production-oriented topology before accepting production payments. It should resolve stable HTTPS routing for the learner web application and payment notifications, production secret/configuration handling, reverse-proxy and TLS trust, durable retry/reconciliation for ambiguous provider transactions, minimum observability/auditability, database backup/restore expectations, and the required security/deployment acceptance checks.
 
-After that clean checkpoint, run the Build-vs-Adopt Architecture Gate before major LMS-domain expansion. The gate must evaluate continued custom implementation versus adoption/integration alternatives using CodeInteX requirements, existing invariants, interoperability, reversibility, migration cost, maintainability, operational complexity, total cost of ownership, and revenue priorities rather than framework popularity.
+Do not use ephemeral Quick Tunnels as production infrastructure.
 
-Minimum production deploy/hardening follows the gate and must replace ephemeral Quick Tunnels with stable HTTPS infrastructure, establish durable reconciliation/retry scheduling, complete observability and audit requirements, harden secret/configuration handling, and satisfy the required security/deployment acceptance criteria before accepting production payments.
+Do not expand into assessments, credentials, analytics, AI features, or other LMS domains merely because the Build-vs-Adopt Gate is complete. Those capabilities remain requirement-driven and must follow ADR-008.
+
+Before implementation details are locked, define the minimum production topology and acceptance criteria, then choose the simplest hosting/deployment configuration that satisfies them with proportionate operational cost.
 
 ## Session Handoff Procedure
 
