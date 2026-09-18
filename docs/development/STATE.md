@@ -15,7 +15,7 @@ Use this file together with the ADRs under `docs/architecture/adr/` and the curr
 
 `monetization slice proven → Build-vs-Adopt Architecture Gate complete → minimum production deploy/hardening`
 
-The monetization slice and Build-vs-Adopt Architecture Gate are complete. CodeInteX will retain its canonical learning/runtime and commerce semantics while adopting standards and specialized capabilities at explicit integration boundaries. The immediate critical path is minimum production deploy/hardening rather than speculative LMS feature expansion.
+The monetization slice and Build-vs-Adopt Architecture Gate are complete. Production Readiness V1 requirements are now locked in `docs/development/PRODUCTION-READINESS-V1.md`. The immediate critical path is to select the minimum production topology against that contract, then prove it through staging before any production payment enablement.
 
 ## Verified State
 
@@ -420,15 +420,31 @@ The successful Sandbox proof exposed the importance of validating provider crede
 
 ## Next Milestone
 
-Begin minimum production deploy/hardening for the proven monetization slice.
+Production Readiness V1 requirements are locked in `docs/development/PRODUCTION-READINESS-V1.md`.
 
-The next workstream must establish a stable production-oriented topology before accepting production payments. It should resolve stable HTTPS routing for the learner web application and payment notifications, production secret/configuration handling, reverse-proxy and TLS trust, durable retry/reconciliation for ambiguous provider transactions, minimum observability/auditability, database backup/restore expectations, and the required security/deployment acceptance checks.
+The next milestone is the Production Topology Decision. Compare viable hosting and deployment options against the locked requirements rather than choosing a provider first.
+
+The comparison must include, at minimum:
+
+- stable same-origin HTTPS routing;
+- stable payment-notification delivery;
+- managed PostgreSQL suitability;
+- persistent media/storage;
+- secrets/configuration management;
+- staging/production isolation;
+- backup and restore;
+- deployment and rollback;
+- minimum observability;
+- reconciliation scheduling;
+- operational burden;
+- cost predictability;
+- vendor lock-in and migration cost.
 
 Do not use ephemeral Quick Tunnels as production infrastructure.
 
-Do not expand into assessments, credentials, analytics, AI features, or other LMS domains merely because the Build-vs-Adopt Gate is complete. Those capabilities remain requirement-driven and must follow ADR-008.
+Do not expand into assessments, credentials, analytics, AI features, or other LMS domains during this workstream.
 
-Before implementation details are locked, define the minimum production topology and acceptance criteria, then choose the simplest hosting/deployment configuration that satisfies them with proportionate operational cost.
+After the topology decision is locked, implement and verify it first in staging against Production Readiness Gates A–E. Production payment credentials remain disabled until those gates pass.
 
 ## Session Handoff Procedure
 
