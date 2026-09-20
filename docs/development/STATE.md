@@ -41,6 +41,34 @@ The monetization slice and Build-vs-Adopt Architecture Gate are complete. Produc
 
 - `manage.py check`: passing at the latest backend checkpoints.
 
+### Learner Dashboard Completion Semantics
+
+My Learning now distinguishes presentation state from progression context.
+
+LOCKED for the current learner slice:
+
+- backend `currentItemId` remains progression context and is not treated as a completion-status flag;
+- completion presentation is derived from authoritative `completedItems` and `totalItems`;
+- `totalItems > 0` and `completedItems == totalItems` maps to `completed`;
+- an incomplete course requires a valid current lesson and maps to `in-progress`;
+- a zero-lesson course maps explicitly to `no-content`;
+- completed courses do not expose `CURRENT LESSON` or `Resume learning`;
+- completed courses retain `Course details`.
+
+The learner-facing view model uses a discriminated union so completed, in-progress, and no-content presentation states cannot silently share incompatible actions.
+
+Verification for this milestone:
+
+- frontend TypeScript typecheck: PASS;
+- frontend Next.js production build: PASS;
+- CLI runtime acceptance through `http://localhost:3000/my-learning`: PASS;
+- completed fixture rendered `5 of 5 lessons complete`;
+- `Course complete`: PASS;
+- `All lessons completed`: PASS;
+- `CURRENT LESSON` absent: PASS;
+- `Resume learning` absent: PASS;
+- `Course details` present: PASS.
+
 ### Frontend
 
 - Next.js 16.3.3
@@ -480,23 +508,19 @@ remain PARKED and must not be staged implicitly.
 
 ## Next Milestone
 
-The next defect in the controlled learner slice is truthful Dashboard completion semantics.
+The next controlled learner-slice milestone is curriculum semantics and accessibility.
 
-Current evidence shows that a fully completed course can still expose the last lesson as `currentItemId`, which can cause My Learning to present a completed course as if it were still resumable.
+Immediate sequence:
 
-Resolve this without redefining backend progression semantics prematurely.
+1. verify and refine current/completed curriculum presentation;
+2. do not invent locked/unavailable behavior while that LMS policy remains OPEN;
+3. verify keyboard navigation, focus behavior, heading/landmark structure, responsive reflow, and non-color state communication in the Lesson Experience;
+4. add meaningful Storybook coverage for reusable components used by the slice;
+5. add Playwright coverage for `Dashboard → Resume Learning → Curriculum → Lesson`;
+6. add representative `@axe-core/playwright` checks while preserving manual accessibility validation;
+7. proceed to PES visual refinement only after behavioral correctness is stable.
 
-Then continue, in order:
-
-1. truthful Learner Dashboard completed vs resumable state;
-2. curriculum current/completed/availability semantics without inventing unresolved locking policy;
-3. Lesson Experience accessibility refinement;
-4. meaningful Storybook coverage for reusable slice components;
-5. Playwright coverage for `Dashboard → Resume Learning → Curriculum → Lesson`;
-6. representative `@axe-core/playwright` checks plus manual accessibility validation;
-7. PES visual refinement after behavioral correctness is stable.
-
-Do not expand into assessments, projects, credentials, hosted workspaces, analytics, AI features, or infrastructure work during this slice unless a concrete requirement changes the critical path.
+Do not expand into assessments, projects, credentials, hosted workspaces, analytics, AI features, or infrastructure work unless a concrete requirement changes the critical path.
 
 ## Session Handoff Procedure
 

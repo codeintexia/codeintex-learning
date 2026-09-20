@@ -1,4 +1,7 @@
-import type { MyLearningView } from "@codeintex/learning-ui";
+import type {
+  MyLearningCourseView,
+  MyLearningView,
+} from "@codeintex/learning-ui";
 import { cookies } from "next/headers";
 
 const learningApiBaseUrl =
@@ -29,6 +32,52 @@ type MyLearningApiCourse = {
 type MyLearningApiResponse = {
   courses: MyLearningApiCourse[];
 };
+
+function mapMyLearningCourse(
+  course: MyLearningApiCourse,
+): MyLearningCourseView {
+  const common = {
+    id: course.courseId,
+    kicker: course.subject,
+    title: course.title,
+    summary: course.summary,
+    progressPercent: course.progress.progressPercent,
+    completedItems: course.progress.completedItems,
+    totalItems: course.progress.totalItems,
+    detailHref: `/courses/${course.courseSlug}`,
+  };
+
+  if (course.progress.totalItems === 0) {
+    return {
+      ...common,
+      status: "no-content",
+    };
+  }
+
+  if (
+    course.progress.completedItems ===
+    course.progress.totalItems
+  ) {
+    return {
+      ...common,
+      status: "completed",
+    };
+  }
+
+  if (!course.current) {
+    throw new Error(
+      "My Learning response is missing a current lesson for an incomplete course.",
+    );
+  }
+
+  return {
+    ...common,
+    status: "in-progress",
+    currentItemTitle: course.current.itemTitle,
+    currentModuleTitle: course.current.moduleTitle,
+    resumeHref: `/learn/${course.courseSlug}`,
+  };
+}
 
 export type MyLearningResult =
   | {
@@ -73,21 +122,7 @@ export async function getMyLearning(): Promise<MyLearningResult> {
   return {
     status: "ok",
     learning: {
-      courses: payload.courses.map((course) => ({
-        id: course.courseId,
-        kicker: course.subject,
-        title: course.title,
-        summary: course.summary,
-        progressPercent: course.progress.progressPercent,
-        completedItems: course.progress.completedItems,
-        totalItems: course.progress.totalItems,
-        currentItemTitle:
-          course.current?.itemTitle ?? "Course complete",
-        currentModuleTitle:
-          course.current?.moduleTitle ?? "Completed",
-        resumeHref: `/learn/${course.courseSlug}`,
-        detailHref: `/courses/${course.courseSlug}`,
-      })),
+      courses: payload.courses.map(mapMyLearningCourse),
     },
   };
 }

@@ -1,4 +1,4 @@
-export type MyLearningCourseView = {
+type MyLearningCourseBaseView = {
   id: string;
   kicker: string;
   title: string;
@@ -6,11 +6,22 @@ export type MyLearningCourseView = {
   progressPercent: number;
   completedItems: number;
   totalItems: number;
-  currentItemTitle: string;
-  currentModuleTitle: string;
-  resumeHref: string;
   detailHref: string;
 };
+
+export type MyLearningCourseView =
+  | (MyLearningCourseBaseView & {
+      status: "in-progress";
+      currentItemTitle: string;
+      currentModuleTitle: string;
+      resumeHref: string;
+    })
+  | (MyLearningCourseBaseView & {
+      status: "completed";
+    })
+  | (MyLearningCourseBaseView & {
+      status: "no-content";
+    });
 
 export type MyLearningView = {
   courses: MyLearningCourseView[];
