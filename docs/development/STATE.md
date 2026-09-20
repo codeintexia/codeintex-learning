@@ -398,53 +398,105 @@ Verified behavior includes:
 
 ## Current Workstream Boundary
 
-### Strategy
+### Product Experience System
 
-Revenue-first monetization proof and the Build-vs-Adopt Architecture Gate are complete. The next strategic priority is minimum production deploy/hardening. Avoid feature expansion that does not contribute to production readiness or a demonstrated revenue requirement.
+The current PES normative baseline is canonical under `docs/pes/`.
 
-### Architecture
+Canonical artifacts:
 
-Keep domain boundaries stable and implementation choices replaceable. ADR-008 locks `CodeInteX semantics at the core; standards at the edges` as the platform strategy. New LMS bounded contexts require concrete product invariants; complex non-differentiating capabilities require an Adopt/Integrate evaluation before custom implementation.
+- `docs/pes/PES-FOUNDATION-DECISION-MODEL-v0.1.md`
+- `docs/pes/PES-CONSUMPTION-CONTRACT-v0.1.md`
+- `docs/pes/LMS-EXPERIENCE-PROFILE-v0.1.md`
+- `docs/pes/WEB-IMPLEMENTATION-PROFILE-v0.1.md`
+- `docs/pes/PES-DECISION-LOG.md`
 
-### Backend
+Supporting evidence remains under `docs/pes/benchmarks/`.
 
-Real learner-facing Midtrans Sandbox checkout, signed notification authentication, durable ProviderEvent ingestion, synchronous notification processing, idempotent fulfillment, retry reuse, and canonical entitlement/enrollment provisioning are proven. The immediate backend task is verification and stabilization: full default test suite, PostgreSQL race-sensitive harness, diff audit, and clean commit/push. Production-oriented webhook stability, reconciliation scheduling, observability, and secret management belong to the subsequent deploy/hardening workstream.
+Do not create a parallel LMS design foundation. The LMS consumes the PES contracts and profiles.
+
+### Active Learner Experience Slice
+
+The active reference implementation slice is:
+
+`Learner Dashboard → Resume Learning → Curriculum Navigation → Lesson Experience`
+
+The purpose is to validate the existing architecture against the canonical PES/LMS contracts without broad redesign or feature expansion.
+
+Stable dependency direction:
+
+`backend/domain authority → API/service contract → web data-access boundary → adapter/view model → CodeInteX-owned UI`
+
+Physical package topology remains OPEN and should not be refactored merely for cleanliness during this slice.
+
+### Learner Progression
+
+Lesson-completion transitions now consume authoritative progress returned by the backend.
+
+The client no longer independently decides consequential completion/progression state by marking the current item complete and advancing to the next array item.
+
+Current flow:
+
+`POST lesson completion → backend authoritative progress snapshot → web response validation → LearningProgressView → learner UI state`
+
+The learner UI may continue to own ordinary display/navigation state, but completion state, progress percentage, and post-completion current item are derived from the authoritative server result.
+
+Focused verification for this milestone:
+
+- frontend TypeScript typecheck: PASS;
+- frontend Next.js production build: PASS;
+- `learning.test_progress_api`: 11/11 PASS;
+- `git diff --check`: PASS.
 
 ### Frontend
 
-The minimum paid-course acquisition path is implemented: public offer read, commercial CTA, safe login continuation, checkout orchestration page, and provider-neutral return/polling page. Avoid further polish until final typecheck/build and UX acceptance evidence are complete.
+Existing `apps/learner-web` remains the active learner application.
 
-### Security
+Existing `@codeintex/learning-ui` remains the CodeInteX-owned learner UI layer.
 
-The successful Sandbox proof exposed the importance of validating provider credentials against the provider rather than merely checking that a secret string is non-empty. No secrets should be printed or committed. Ephemeral Quick Tunnel origins remain development-only. Production payment acceptance still requires stable HTTPS endpoints, hardened secret/configuration management, observability, and the broader pre-production security gates.
+Next.js 16.x, App Router, React 19.x, TypeScript, Tailwind CSS 4.x, Base UI where appropriate, Storybook, Playwright, and `@axe-core/playwright` follow the canonical Web Implementation Profile.
+
+Do not invent a second LMS token system while canonical PES token serialization remains unresolved.
+
+### Backend
+
+Existing Course/CourseRelease, enrollment, learner progress, authentication, entitlement, commerce, and payment correctness remain authoritative.
+
+Wagtail remains an authoring implementation rather than the learner-facing runtime contract.
+
+Curriculum locked/unavailable behavior remains an OPEN LMS policy and must not be fabricated in frontend code.
+
+### Infrastructure
+
+Production Readiness V1 remains LOCKED and valid.
+
+Hosting topology, Docker/containerization, CI/CD deployment design, managed PostgreSQL selection, object storage, and scaling work are currently PARKED from the active learner-experience critical path.
+
+The untracked files:
+
+- `apps/learning-backend/Dockerfile`
+- `apps/learning-backend/.dockerignore`
+
+remain PARKED and must not be staged implicitly.
 
 ## Next Milestone
 
-Production Readiness V1 requirements are locked in `docs/development/PRODUCTION-READINESS-V1.md`.
+The next defect in the controlled learner slice is truthful Dashboard completion semantics.
 
-The next milestone is the Production Topology Decision. Compare viable hosting and deployment options against the locked requirements rather than choosing a provider first.
+Current evidence shows that a fully completed course can still expose the last lesson as `currentItemId`, which can cause My Learning to present a completed course as if it were still resumable.
 
-The comparison must include, at minimum:
+Resolve this without redefining backend progression semantics prematurely.
 
-- stable same-origin HTTPS routing;
-- stable payment-notification delivery;
-- managed PostgreSQL suitability;
-- persistent media/storage;
-- secrets/configuration management;
-- staging/production isolation;
-- backup and restore;
-- deployment and rollback;
-- minimum observability;
-- reconciliation scheduling;
-- operational burden;
-- cost predictability;
-- vendor lock-in and migration cost.
+Then continue, in order:
 
-Do not use ephemeral Quick Tunnels as production infrastructure.
+1. truthful Learner Dashboard completed vs resumable state;
+2. curriculum current/completed/availability semantics without inventing unresolved locking policy;
+3. Lesson Experience accessibility refinement;
+4. meaningful Storybook coverage for reusable slice components;
+5. Playwright coverage for `Dashboard → Resume Learning → Curriculum → Lesson`;
+6. representative `@axe-core/playwright` checks plus manual accessibility validation;
+7. PES visual refinement after behavioral correctness is stable.
 
-Do not expand into assessments, credentials, analytics, AI features, or other LMS domains during this workstream.
-
-After the topology decision is locked, implement and verify it first in staging against Production Readiness Gates A–E. Production payment credentials remain disabled until those gates pass.
+Do not expand into assessments, projects, credentials, hosted workspaces, analytics, AI features, or infrastructure work during this slice unless a concrete requirement changes the critical path.
 
 ## Session Handoff Procedure
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { LearningPlayer } from "@codeintex/learning-ui";
+import type { LearningProgressView } from "@codeintex/learning-ui";
 import type { ComponentProps } from "react";
 
 type LearningPlayerProps = ComponentProps<typeof LearningPlayer>;
@@ -15,6 +16,52 @@ type PersistentLearningPlayerProps = Omit<
 type CsrfResponse = {
   csrfToken: string;
 };
+
+function isRecord(
+  value: unknown,
+): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function parseCompletionProgress(
+  payload: unknown,
+): LearningProgressView {
+  if (!isRecord(payload) || !isRecord(payload.progress)) {
+    throw new Error(
+      "Progress update returned an invalid response.",
+    );
+  }
+
+  const progress = payload.progress;
+  const completedItemIds = progress.completedItemIds;
+  const progressPercent = progress.progressPercent;
+  const currentItemId = progress.currentItemId;
+
+  if (
+    !Array.isArray(completedItemIds) ||
+    !completedItemIds.every(
+      (itemId) => typeof itemId === "string",
+    ) ||
+    typeof progressPercent !== "number" ||
+    !Number.isFinite(progressPercent) ||
+    progressPercent < 0 ||
+    progressPercent > 100 ||
+    (
+      currentItemId !== null &&
+      typeof currentItemId !== "string"
+    )
+  ) {
+    throw new Error(
+      "Progress update returned an invalid response.",
+    );
+  }
+
+  return {
+    completedItemIds,
+    progressPercent,
+    currentItemId,
+  };
+}
 
 export function PersistentLearningPlayer({
   courseSlug,
@@ -54,6 +101,10 @@ export function PersistentLearningPlayer({
         `Progress update failed: ${response.status}`,
       );
     }
+
+    const payload: unknown = await response.json();
+
+    return parseCompletionProgress(payload);
   }
 
   return (

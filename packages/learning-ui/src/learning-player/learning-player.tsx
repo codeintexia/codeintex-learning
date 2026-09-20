@@ -6,14 +6,18 @@ import type {
   CourseReleaseView,
   CurriculumItemView,
   LearningPlayerState,
+  LearningProgressView,
   LessonContentView,
 } from "./types";
 
 type LearningPlayerProps = {
   release: CourseReleaseView;
   initialState: LearningPlayerState;
+  initialProgressPercent: number;
   lessonByItemId: Record<string, LessonContentView>;
-  onComplete?: (itemId: string) => Promise<void> | void;
+  onComplete: (
+    itemId: string,
+  ) => Promise<LearningProgressView>;
 };
 
 function flattenItems(release: CourseReleaseView) {
@@ -53,6 +57,7 @@ function ItemStatus({
 export function LearningPlayer({
   release,
   initialState,
+  initialProgressPercent,
   lessonByItemId,
   onComplete,
 }: LearningPlayerProps) {
@@ -61,6 +66,8 @@ export function LearningPlayer({
   const [completedIds, setCompletedIds] = useState(
     new Set(allItems.filter((item) => item.completed).map((item) => item.id)),
   );
+  const [progressPercent, setProgressPercent] =
+    useState(initialProgressPercent);
   const [completionPending, setCompletionPending] = useState(false);
   const [completionError, setCompletionError] = useState<string | null>(null);
   const mobileCurriculumRef = useRef<HTMLDetailsElement>(null);
@@ -71,8 +78,6 @@ export function LearningPlayer({
   );
   const current = allItems[currentIndex];
   const lesson = lessonByItemId[currentItemId] ?? lessonByItemId[allItems[0].id];
-
-  const progressPercent = Math.round((completedIds.size / allItems.length) * 100);
 
   function selectItem(itemId: string) {
     setCurrentItemId(itemId);
@@ -98,16 +103,21 @@ export function LearningPlayer({
     setCompletionError(null);
 
     try {
-      await onComplete?.(currentItemId);
+      const progress = await onComplete(currentItemId);
 
-      setCompletedIds((previous) => {
-        const next = new Set(previous);
-        next.add(currentItemId);
-        return next;
-      });
+      setCompletedIds(
+        new Set(progress.completedItemIds),
+      );
+      setProgressPercent(progress.progressPercent);
 
-      if (currentIndex < allItems.length - 1) {
-        goTo(currentIndex + 1);
+      if (progress.currentItemId) {
+        const targetExists = allItems.some(
+          (item) => item.id === progress.currentItemId,
+        );
+
+        if (targetExists) {
+          selectItem(progress.currentItemId);
+        }
       }
     } catch {
       setCompletionError("Progress could not be saved. Try again.");

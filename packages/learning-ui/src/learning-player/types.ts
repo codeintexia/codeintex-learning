@@ -38,3 +38,9 @@ export type LessonContentView = {
 export type LearningPlayerState = {
   currentItemId: string;
 };
+
+export type LearningProgressView = {
+  completedItemIds: string[];
+  progressPercent: number;
+  currentItemId: string | null;
+};

@@ -15,5 +15,6 @@ export type {
   CourseReleaseView,
   CurriculumItemView,
   LearningPlayerState,
+  LearningProgressView,
   LessonContentView,
 } from "./learning-player/types";

@@ -58,6 +58,7 @@ export default async function BackendEngineeringPlayerPage() {
           progress.currentItemId ??
           player.initialState.currentItemId,
       }}
+      initialProgressPercent={progress.progressPercent}
       lessonByItemId={player.lessonByItemId}
     />
   );
