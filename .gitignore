@@ -20,3 +20,6 @@ apps/learning-backend/**/__pycache__/
 apps/learning-backend/**/*.py[cod]
 apps/learning-backend/media/
 apps/learning-backend/staticfiles/
+
+# Storybook generated output
+apps/learner-web/storybook-static/

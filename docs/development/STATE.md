@@ -98,6 +98,37 @@ Focused verification:
 
 This milestone does not claim complete WCAG conformance. Broader keyboard, zoom/reflow, screen-reader, responsive, and automated accessibility coverage remains part of subsequent slice validation.
 
+### Storybook Verification Layer
+
+The Storybook verification layer is established for the controlled learner reference slice.
+
+Current implementation choices:
+
+- Storybook is hosted by `apps/learner-web`; no separate Storybook workspace/app was created;
+- Storybook uses `@storybook/nextjs-vite`;
+- Storybook and `@storybook/nextjs-vite` are pinned to `10.6.0`;
+- Vite is provisionally pinned to `7.3.6` for the current compatibility baseline;
+- Storybook consumes the same style chain as the learner application:
+  `design-tokens → ui-primitives → learning-ui → learner-web/globals.css`;
+- no custom `viteFinal`, additional addon suite, visual-regression service, or topology refactor was introduced;
+- generated `apps/learner-web/storybook-static/` output is ignored by Git.
+
+Current reference-slice stories:
+
+- Progress: empty, in-progress, complete;
+- My Learning: in-progress, completed, mixed, no-content;
+- Learning Player: initial, partially completed, deterministic authoritative-style completion transition.
+
+Verification for this milestone:
+
+- existing frontend direct dependency versions did not drift during Storybook installation;
+- frontend TypeScript typecheck: PASS;
+- Storybook static production build: PASS;
+- Next.js production build after Storybook integration: PASS;
+- `git diff --check`: PASS.
+
+The Storybook build currently emits non-blocking Vite warnings for the client module directive and bundle chunk size. No workaround or bundler optimization is introduced because the workbench builds successfully and these warnings do not justify additional configuration at the current scope.
+
 ### Frontend
 
 - Next.js 16.3.3
@@ -537,18 +568,20 @@ remain PARKED and must not be staged implicitly.
 
 ## Next Milestone
 
-The behavioral reference slice is now stable enough to add repeatable component and end-to-end verification.
+The next controlled learner-slice milestone is repeatable end-to-end verification with Playwright and representative automated accessibility checks.
 
 Immediate sequence:
 
-1. add meaningful Storybook coverage for reusable components and learner states used by the reference slice;
-2. add Playwright coverage for `Dashboard → Resume Learning → Curriculum → Lesson`;
-3. include recovery or invalid-state coverage where the existing domain contract supports it;
-4. add representative `@axe-core/playwright` checks;
-5. preserve manual keyboard, focus, zoom/reflow, reduced-motion, and assistive-technology validation where automation is insufficient;
-6. proceed to broader PES visual refinement only after these verification layers are established.
+1. establish Playwright in the existing learner-web tooling boundary without creating a new application/workspace;
+2. cover the critical flow:
+   `Dashboard → Resume Learning → Curriculum → Lesson`;
+3. use role/name-oriented locators rather than brittle implementation selectors where practical;
+4. include a recovery or invalid-state case where the current domain contract already supports one;
+5. integrate representative `@axe-core/playwright` checks into the critical learner states;
+6. preserve manual keyboard, focus, zoom/reflow, reduced-motion, and assistive-technology validation where automation is insufficient;
+7. proceed to broader PES visual refinement only after these verification layers are stable.
 
-Do not invent unresolved LMS policy, build a parallel design system, expand into assessments/projects/credentials, or resume infrastructure work unless a concrete requirement changes the critical path.
+Do not introduce unresolved curriculum locking policy, assessment/project domains, hosted workspaces, analytics, AI features, visual-regression infrastructure, or deployment work unless a concrete requirement changes the critical path.
 
 ## Session Handoff Procedure
 
