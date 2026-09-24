@@ -69,6 +69,35 @@ Verification for this milestone:
 - `Resume learning` absent: PASS;
 - `Course details` present: PASS.
 
+### Curriculum Navigation and Accessibility
+
+The controlled Curriculum Navigation accessibility refinement is complete for the current learner slice.
+
+LOCKED for the current implementation:
+
+- curriculum items remain native buttons;
+- the current curriculum item uses `aria-current="step"`;
+- no locked/unavailable curriculum policy is fabricated while that LMS policy remains OPEN;
+- curriculum buttons explicitly use `type="button"`;
+- lesson navigation moves programmatic focus to `#lesson-content` after a real item change;
+- the lesson content region remains programmatically focusable with `tabIndex={-1}`;
+- lesson navigation respects `prefers-reduced-motion`;
+- generic Button and Progress transitions suppress perceptible motion under reduced-motion preference;
+- the generic Progress primitive exposes `role="progressbar"` plus `aria-valuemin`, `aria-valuemax`, and `aria-valuenow`.
+
+Focused verification:
+
+- frontend TypeScript typecheck: PASS;
+- frontend Next.js production build: PASS;
+- runtime progressbar semantics: PASS;
+- runtime focus transfer to `#lesson-content`: PASS;
+- runtime `prefers-reduced-motion` detection: PASS;
+- navigation scroll behavior under reduced motion resolved to `auto`: PASS;
+- progress transition under reduced-motion emulation was effectively zero (`1e-05s` reported by browser tooling);
+- temporary accessibility acceptance account was deleted after verification.
+
+This milestone does not claim complete WCAG conformance. Broader keyboard, zoom/reflow, screen-reader, responsive, and automated accessibility coverage remains part of subsequent slice validation.
+
 ### Frontend
 
 - Next.js 16.3.3
@@ -508,19 +537,18 @@ remain PARKED and must not be staged implicitly.
 
 ## Next Milestone
 
-The next controlled learner-slice milestone is curriculum semantics and accessibility.
+The behavioral reference slice is now stable enough to add repeatable component and end-to-end verification.
 
 Immediate sequence:
 
-1. verify and refine current/completed curriculum presentation;
-2. do not invent locked/unavailable behavior while that LMS policy remains OPEN;
-3. verify keyboard navigation, focus behavior, heading/landmark structure, responsive reflow, and non-color state communication in the Lesson Experience;
-4. add meaningful Storybook coverage for reusable components used by the slice;
-5. add Playwright coverage for `Dashboard → Resume Learning → Curriculum → Lesson`;
-6. add representative `@axe-core/playwright` checks while preserving manual accessibility validation;
-7. proceed to PES visual refinement only after behavioral correctness is stable.
+1. add meaningful Storybook coverage for reusable components and learner states used by the reference slice;
+2. add Playwright coverage for `Dashboard → Resume Learning → Curriculum → Lesson`;
+3. include recovery or invalid-state coverage where the existing domain contract supports it;
+4. add representative `@axe-core/playwright` checks;
+5. preserve manual keyboard, focus, zoom/reflow, reduced-motion, and assistive-technology validation where automation is insufficient;
+6. proceed to broader PES visual refinement only after these verification layers are established.
 
-Do not expand into assessments, projects, credentials, hosted workspaces, analytics, AI features, or infrastructure work unless a concrete requirement changes the critical path.
+Do not invent unresolved LMS policy, build a parallel design system, expand into assessments/projects/credentials, or resume infrastructure work unless a concrete requirement changes the critical path.
 
 ## Session Handoff Procedure
 

@@ -70,6 +70,7 @@ export function LearningPlayer({
     useState(initialProgressPercent);
   const [completionPending, setCompletionPending] = useState(false);
   const [completionError, setCompletionError] = useState<string | null>(null);
+  const lessonContentRef = useRef<HTMLElement>(null);
   const mobileCurriculumRef = useRef<HTMLDetailsElement>(null);
 
   const currentIndex = Math.max(
@@ -80,13 +81,32 @@ export function LearningPlayer({
   const lesson = lessonByItemId[currentItemId] ?? lessonByItemId[allItems[0].id];
 
   function selectItem(itemId: string) {
+    const itemChanged = itemId !== currentItemId;
+
     setCurrentItemId(itemId);
 
     if (mobileCurriculumRef.current?.open) {
       mobileCurriculumRef.current.open = false;
     }
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!itemChanged) {
+      return;
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    window.requestAnimationFrame(() => {
+      lessonContentRef.current?.focus({
+        preventScroll: true,
+      });
+
+      window.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
+    });
   }
 
   function goTo(index: number) {
@@ -179,6 +199,7 @@ export function LearningPlayer({
         </aside>
 
         <main
+          ref={lessonContentRef}
           id="lesson-content"
           className="lp-main"
           tabIndex={-1}
@@ -295,6 +316,7 @@ function Curriculum({
               return (
                 <li key={item.id}>
                   <button
+                    type="button"
                     aria-current={active ? "step" : undefined}
                     className={`lp-item ${active ? "lp-item--active" : ""}`}
                     onClick={() => onSelect(item.id)}

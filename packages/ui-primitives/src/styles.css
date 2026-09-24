@@ -86,3 +86,16 @@
   text-align: right;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .cx-button,
+  .cx-button:hover,
+  .cx-button:active,
+  .cx-progress__value {
+    transition: none;
+  }
+
+  .cx-button:hover,
+  .cx-button:active {
+    transform: none;
+  }
+}
