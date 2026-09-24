@@ -92,7 +92,7 @@ Focused verification:
 - runtime progressbar semantics: PASS;
 - runtime focus transfer to `#lesson-content`: PASS;
 - runtime `prefers-reduced-motion` detection: PASS;
-- navigation scroll behavior under reduced motion resolved to `auto`: PASS;
+- navigation scroll behavior under reduced motion is explicitly `instant`: PASS;
 - progress transition under reduced-motion emulation was effectively zero (`1e-05s` reported by browser tooling);
 - temporary accessibility acceptance account was deleted after verification.
 

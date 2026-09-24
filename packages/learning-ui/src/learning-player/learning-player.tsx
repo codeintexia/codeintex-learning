@@ -104,7 +104,7 @@ export function LearningPlayer({
 
       window.scrollTo({
         top: 0,
-        behavior: prefersReducedMotion ? "auto" : "smooth",
+        behavior: prefersReducedMotion ? "instant" : "smooth",
       });
     });
   }
