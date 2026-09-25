@@ -23,3 +23,6 @@ apps/learning-backend/staticfiles/
 
 # Storybook generated output
 apps/learner-web/storybook-static/
+
+# Playwright generated output and ephemeral auth state
+apps/learner-web/test-results/

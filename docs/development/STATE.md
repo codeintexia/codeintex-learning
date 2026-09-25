@@ -1,6 +1,6 @@
 # CodeInteX Learning — Development State
 
-Last updated: 2026-09-18
+Last updated: 2026-09-25
 Project: [Yudi] CodeInteX
 Repository: codeintexia/codeintex-learning
 Branch: rebuild/learner-experience-v1
@@ -13,9 +13,15 @@ Use this file together with the ADRs under `docs/architecture/adr/` and the curr
 
 ## Current Critical Path
 
-`monetization slice proven → Build-vs-Adopt Architecture Gate complete → minimum production deploy/hardening`
+`learner reference-slice verification complete → controlled PES visual refinement`
 
-The monetization slice and Build-vs-Adopt Architecture Gate are complete. Production Readiness V1 requirements are now locked in `docs/development/PRODUCTION-READINESS-V1.md`. The immediate critical path is to select the minimum production topology against that contract, then prove it through staging before any production payment enablement.
+The controlled learner reference slice:
+
+`Learner Dashboard → Resume Learning → Curriculum Navigation → Lesson Experience`
+
+now has repeatable Storybook coverage, browser-level Playwright verification, representative automated accessibility checks, real Django session/CSRF integration, authoritative progress-transition proof, and an unauthenticated recovery case.
+
+The next active learner-experience step is controlled PES visual refinement against the canonical PES contracts. Production topology, Docker/containerization, CI/CD deployment design, and other Production Readiness implementation remain PARKED until that workstream is explicitly reactivated.
 
 ## Verified State
 
@@ -96,7 +102,7 @@ Focused verification:
 - progress transition under reduced-motion emulation was effectively zero (`1e-05s` reported by browser tooling);
 - temporary accessibility acceptance account was deleted after verification.
 
-This milestone does not claim complete WCAG conformance. Broader keyboard, zoom/reflow, screen-reader, responsive, and automated accessibility coverage remains part of subsequent slice validation.
+This milestone does not claim complete WCAG conformance. Representative automated accessibility coverage is now provided by the Playwright/axe learner-flow milestone below. Broader keyboard, zoom/reflow, screen-reader/assistive-technology, and responsive validation remains open where automation is insufficient.
 
 ### Storybook Verification Layer
 
@@ -128,6 +134,63 @@ Verification for this milestone:
 - `git diff --check`: PASS.
 
 The Storybook build currently emits non-blocking Vite warnings for the client module directive and bundle chunk size. No workaround or bundler optimization is introduced because the workbench builds successfully and these warnings do not justify additional configuration at the current scope.
+
+### Playwright and Automated Accessibility Verification
+
+The repeatable browser-level verification layer for the controlled learner reference slice is established.
+
+LOCKED for the current milestone:
+
+- Playwright lives in the existing `apps/learner-web` tooling boundary; no separate E2E application/workspace was created;
+- `@playwright/test` is pinned to `1.63.0`;
+- `@axe-core/playwright` is pinned to `4.13.0`;
+- the initial browser execution matrix uses Chromium only;
+- Django and Next.js are orchestrated through Playwright `webServer`, while existing local servers may be reused outside CI;
+- deterministic learner state is prepared by a dedicated backend fixture command under `commerce`, preserving the `learning` → commerce dependency boundary;
+- the dedicated learner uses an `ADMIN_GRANT` entitlement and a real Enrollment, not fake Order/Payment records;
+- authentication setup obtains a real CSRF token and establishes a real Django session through the same-origin Next.js API bridge;
+- authenticated browser state is ephemeral under ignored `apps/learner-web/test-results/`;
+- the critical learner test uses role/name-oriented locators where practical and does not mock the learner API;
+- lesson completion asserts the real backend response and verifies that the UI consumes authoritative progress instead of independently deriving consequential progression state;
+- a missing-session recovery case verifies redirects from `/my-learning` and `/learn/backend-engineering` to `/login`;
+- representative axe scans are integrated into the same critical flow for My Learning and the post-completion Learning Player state.
+
+Accessibility finding and correction:
+
+- the initial axe run found a serious `color-contrast` violation across multiple small muted-text elements;
+- the common cause was the PES semantic token `--text-muted: #758292`;
+- per-selector overrides and axe exclusions were rejected;
+- the semantic token was corrected to `--text-muted: #647180`;
+- after the token correction, both representative automated accessibility scans pass.
+
+Latest verification:
+
+- Playwright setup/auth project: PASS;
+- critical learner behavioral flow: PASS;
+- unauthenticated recovery case: PASS;
+- integrated Chromium run: **3/3 PASS**;
+- representative My Learning WCAG 2.2 AA automated subset: PASS;
+- representative Learning Player WCAG 2.2 AA automated subset: PASS;
+- frontend TypeScript typecheck: PASS;
+- Next.js production build: PASS;
+- Storybook static production build: PASS;
+- Django `manage.py check`: PASS;
+- focused authentication + progress backend regression: **16/16 PASS**;
+- `git diff --check`: PASS.
+
+The automated checks do not establish complete WCAG conformance. Manual zoom/reflow and assistive-technology validation remain OPEN, together with any broader responsive/manual accessibility evidence required by later acceptance gates.
+
+Decision state:
+
+- Playwright orchestration for the reference slice: LOCKED;
+- deterministic E2E learner fixture: LOCKED;
+- critical learner-flow E2E: LOCKED;
+- representative axe integration: LOCKED;
+- unauthenticated recovery coverage: LOCKED;
+- corrected muted-text semantic token for the current PES baseline: LOCKED;
+- Chromium-only initial execution matrix: PROVISIONAL;
+- cross-browser expansion: OPEN;
+- manual zoom/reflow and assistive-technology validation: OPEN.
 
 ### Frontend
 
@@ -568,20 +631,21 @@ remain PARKED and must not be staged implicitly.
 
 ## Next Milestone
 
-The next controlled learner-slice milestone is repeatable end-to-end verification with Playwright and representative automated accessibility checks.
+The Playwright/axe verification milestone for the controlled learner reference slice is complete.
 
-Immediate sequence:
+The next active learner-experience milestone is controlled PES visual refinement against the canonical artifacts under `docs/pes/`.
 
-1. establish Playwright in the existing learner-web tooling boundary without creating a new application/workspace;
-2. cover the critical flow:
-   `Dashboard → Resume Learning → Curriculum → Lesson`;
-3. use role/name-oriented locators rather than brittle implementation selectors where practical;
-4. include a recovery or invalid-state case where the current domain contract already supports one;
-5. integrate representative `@axe-core/playwright` checks into the critical learner states;
-6. preserve manual keyboard, focus, zoom/reflow, reduced-motion, and assistive-technology validation where automation is insufficient;
-7. proceed to broader PES visual refinement only after these verification layers are stable.
+Immediate constraints:
 
-Do not introduce unresolved curriculum locking policy, assessment/project domains, hosted workspaces, analytics, AI features, visual-regression infrastructure, or deployment work unless a concrete requirement changes the critical path.
+1. preserve the proven learner flow and authoritative backend/domain boundaries;
+2. use Storybook and the Playwright learner flow as regression gates while refining presentation;
+3. keep PES semantic tokens and contracts authoritative rather than introducing local design systems or one-off styling conventions;
+4. do not fabricate unresolved curriculum locking/unavailable behavior;
+5. do not expand into assessments, projects, analytics, AI/agents, hosted workspaces, or deployment work without a concrete requirement;
+6. keep Chromium-only Playwright coverage PROVISIONAL rather than treating it as the final browser-support policy;
+7. retain manual zoom/reflow and assistive-technology validation as OPEN accessibility work rather than claiming complete WCAG conformance.
+
+Infrastructure/Docker and Production Readiness implementation remain PARKED until explicitly reactivated.
 
 ## Session Handoff Procedure
 
