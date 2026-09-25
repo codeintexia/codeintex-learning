@@ -13,7 +13,7 @@ Use this file together with the ADRs under `docs/architecture/adr/` and the curr
 
 ## Current Critical Path
 
-`controlled PES visual refinement complete → manual responsive/accessibility acceptance closure`
+`learner reference slice frozen → select next product/revenue workstream`
 
 The controlled learner reference slice:
 
@@ -21,7 +21,7 @@ The controlled learner reference slice:
 
 now has repeatable Storybook coverage, Playwright browser verification, representative automated accessibility checks, controlled desktop/mobile visual review, real Django session/CSRF integration, authoritative progress-transition proof, and an unauthenticated recovery case.
 
-The next active learner-experience step is a narrow manual acceptance closure for responsive/reflow and assistive-technology behavior. This is not a new visual-redesign phase. Production topology, Docker/containerization, CI/CD deployment design, and other Production Readiness implementation remain PARKED until explicitly reactivated.
+The controlled learner reference slice is now frozen as the current engineering baseline. Automated responsive/reflow and keyboard/focus acceptance are complete. Representative real screen-reader validation remains OPEN as a later accessibility/release acceptance item; complete WCAG conformance is not claimed. The active critical path now returns to selecting the next product/revenue workstream from concrete requirements. Production topology, Docker/containerization, CI/CD deployment design, and other Production Readiness implementation remain PARKED until explicitly reactivated.
 
 ## Verified State
 
@@ -224,6 +224,35 @@ Final regression verification after refinement:
 - `git diff --check`: PASS.
 
 This milestone does not claim complete WCAG conformance. Manual zoom/reflow and assistive-technology validation remain OPEN and form the next narrow acceptance step.
+
+### Responsive and Keyboard Acceptance Closure
+
+The automated acceptance closure for the controlled learner reference slice is complete.
+
+Verified evidence:
+
+- a `320px` CSS viewport was used as a high-reflow proxy for the critical learner flow;
+- My Learning and Learning Player showed no page-level horizontal overflow;
+- required progress/current-state information remained available;
+- primary learner actions remained visible and operable;
+- My Learning primary and secondary actions were reachable by keyboard;
+- curriculum lesson controls were reachable and operable by keyboard;
+- lesson navigation preserved the expected programmatic focus transition into `#lesson-content`;
+- footer navigation/completion controls were reachable by keyboard with visible focus;
+- the complete Playwright acceptance run passed **3/3** including authenticated setup;
+- frontend TypeScript typecheck passed;
+- `git diff --check` passed.
+
+Decision state:
+
+- responsive/reflow automated acceptance: LOCKED / PASS;
+- keyboard/focus automated acceptance: LOCKED / PASS;
+- current learner reference slice: FROZEN;
+- representative real screen-reader validation: OPEN;
+- complete WCAG conformance: NOT CLAIMED;
+- further learner visual/accessibility tooling expansion: STOPPED unless activated by a concrete requirement.
+
+The temporary acceptance Playwright spec was used only as verification evidence and is not retained as permanent test infrastructure because the current production E2E suite already protects the critical learner behavior and expanding one-off acceptance tooling would add maintenance cost without a demonstrated requirement.
 
 ### Frontend
 
@@ -664,22 +693,19 @@ remain PARKED and must not be staged implicitly.
 
 ## Next Milestone
 
-The controlled PES visual refinement milestone for the learner reference slice is complete.
+The controlled learner reference slice is frozen.
 
-The next milestone is a narrow manual responsive/accessibility acceptance closure before freezing the current reference slice.
+The next step is to select the next product/revenue workstream from concrete requirements rather than continuing learner-shell refinement.
 
-Scope:
+Constraints:
 
-1. verify critical learner flows under browser zoom/reflow conditions without page-level horizontal scrolling or loss of required actions/state;
-2. verify keyboard navigation and visible focus across My Learning, curriculum navigation, lesson navigation, and completion actions;
-3. perform representative assistive-technology validation for the same critical flow;
-4. record defects only when observable behavior violates the existing PES/LMS contracts;
-5. do not reopen visual redesign, introduce new LMS features, or expand into analytics, assessments, AI/agents, hosted workspaces, or deployment work during this closure;
-6. keep Chromium-only Playwright coverage PROVISIONAL; cross-browser expansion remains OPEN and should be activated only by an explicit browser-support requirement.
-
-After this acceptance closure, freeze the current reference slice and select the next product workstream from concrete product/revenue requirements rather than continuing incremental visual polish.
-
-Infrastructure/Docker and Production Readiness implementation remain PARKED until explicitly reactivated.
+1. do not reopen Dashboard, Curriculum, or Lesson visual refinement without a demonstrated usability, accessibility, or product defect;
+2. keep representative real screen-reader validation OPEN as a release/accessibility acceptance item;
+3. do not claim complete WCAG conformance from axe, Playwright, or reflow proxies alone;
+4. do not expand the browser matrix without an explicit browser-support requirement;
+5. do not introduce new accessibility tooling solely to close documentation gaps;
+6. Production Readiness infrastructure remains PARKED until explicitly reactivated;
+7. prioritize the next workstream by product value, revenue leverage, dependency order, and evidence rather than novelty.
 
 ## Session Handoff Procedure
 
