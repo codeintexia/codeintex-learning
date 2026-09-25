@@ -26,8 +26,9 @@ export type CourseDetailView = {
   level: string;
   outcomes: string[];
   audience: string;
-  primaryAction: {
+  primaryAction?: {
     label: string;
     href: string;
   };
+  availabilityMessage?: string;
 };

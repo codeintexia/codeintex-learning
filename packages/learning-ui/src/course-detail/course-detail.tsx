@@ -37,9 +37,14 @@ export function CourseDetail({ course }: CourseDetailProps) {
           <span>CodeInteX Learning</span>
         </a>
 
-        <a className="cd-topbar__player" href={course.primaryAction.href}>
-          {course.primaryAction.label} →
-        </a>
+        {course.primaryAction ? (
+          <a
+            className="cd-topbar__player"
+            href={course.primaryAction.href}
+          >
+            {course.primaryAction.label} →
+          </a>
+        ) : null}
       </header>
 
       <main className="cd-shell">
@@ -74,14 +79,23 @@ export function CourseDetail({ course }: CourseDetailProps) {
             </dl>
 
             <div className="cd-actions">
-              <a
-                className="cd-action cd-action--primary"
-                href={course.primaryAction.href}
-              >
-                {course.primaryAction.label} →
-              </a>
+              {course.primaryAction ? (
+                <a
+                  className="cd-action cd-action--primary"
+                  href={course.primaryAction.href}
+                >
+                  {course.primaryAction.label} →
+                </a>
+              ) : course.availabilityMessage ? (
+                <p className="cd-availability">
+                  {course.availabilityMessage}
+                </p>
+              ) : null}
 
-              <a className="cd-action cd-action--secondary" href="#curriculum">
+              <a
+                className="cd-action cd-action--secondary"
+                href="#curriculum"
+              >
                 View curriculum
               </a>
             </div>
@@ -91,7 +105,7 @@ export function CourseDetail({ course }: CourseDetailProps) {
             <div className="cd-panel-label">WHAT YOU'LL LEARN</div>
 
             <h2 id="outcomes-title">
-              Build the mental models behind production backends.
+              What you’ll be able to do.
             </h2>
 
             <ul>
@@ -110,7 +124,7 @@ export function CourseDetail({ course }: CourseDetailProps) {
           <div className="cd-section__heading">
             <div>
               <div className="cd-kicker">CURRICULUM</div>
-              <h2 id="curriculum-title">From protocol to production discipline.</h2>
+              <h2 id="curriculum-title">Course curriculum.</h2>
             </div>
 
             <p>

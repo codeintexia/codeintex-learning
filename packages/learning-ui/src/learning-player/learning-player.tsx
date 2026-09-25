@@ -11,6 +11,7 @@ import type {
 } from "./types";
 
 type LearningPlayerProps = {
+  courseHref: string;
   release: CourseReleaseView;
   initialState: LearningPlayerState;
   initialProgressPercent: number;
@@ -55,6 +56,7 @@ function ItemStatus({
 }
 
 export function LearningPlayer({
+  courseHref,
   release,
   initialState,
   initialProgressPercent,
@@ -152,7 +154,7 @@ export function LearningPlayer({
         <div className="lp-header__course">
           <a
             className="lp-back"
-            href="/courses/backend-engineering"
+            href={courseHref}
             aria-label="Back to course details"
           >
             ←

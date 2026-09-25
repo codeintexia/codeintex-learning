@@ -3,6 +3,13 @@ import type { CourseDetailView } from "@codeintex/learning-ui";
 const DEFAULT_API_BASE_URL =
   "http" + "://" + "127.0.0.1:8000";
 
+export class CourseNotFoundError extends Error {
+  constructor(slug: string) {
+    super(`Course not found: ${slug}`);
+    this.name = "CourseNotFoundError";
+  }
+}
+
 export async function getCourseDetail(
   slug: string,
 ): Promise<CourseDetailView> {
@@ -10,11 +17,17 @@ export async function getCourseDetail(
     process.env.LEARNING_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 
   const response = await fetch(
-    `${apiBaseUrl}/api/v1/courses/${slug}/`,
+    `${apiBaseUrl}/api/v1/courses/${encodeURIComponent(
+      slug,
+    )}/`,
     {
       cache: "no-store",
     },
   );
+
+  if (response.status === 404) {
+    throw new CourseNotFoundError(slug);
+  }
 
   if (!response.ok) {
     throw new Error(

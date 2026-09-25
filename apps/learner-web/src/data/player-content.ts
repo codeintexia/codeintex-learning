@@ -31,7 +31,10 @@ type PlayerContentPayload = {
 type LearningPlayerData = {
   release: CourseReleaseView;
   initialState: LearningPlayerState;
-  lessonByItemId: Record<string, LessonContentView>;
+  lessonByItemId: Record<
+    string,
+    LessonContentView
+  >;
 };
 
 const DEFAULT_API_BASE_URL =
@@ -42,14 +45,19 @@ export async function getPlayerContent(
   releaseId?: string,
 ): Promise<LearningPlayerData> {
   const apiBaseUrl =
-    process.env.LEARNING_API_BASE_URL ?? DEFAULT_API_BASE_URL;
+    process.env.LEARNING_API_BASE_URL ??
+    DEFAULT_API_BASE_URL;
 
   const releaseQuery = releaseId
-    ? `?releaseId=${encodeURIComponent(releaseId)}`
+    ? `?releaseId=${encodeURIComponent(
+        releaseId,
+      )}`
     : "";
 
   const response = await fetch(
-    `${apiBaseUrl}/api/v1/courses/${slug}/player/${releaseQuery}`,
+    `${apiBaseUrl}/api/v1/courses/${encodeURIComponent(
+      slug,
+    )}/player/${releaseQuery}`,
     {
       cache: "no-store",
     },
@@ -61,7 +69,8 @@ export async function getPlayerContent(
     );
   }
 
-  const data: unknown = await response.json();
+  const data: unknown =
+    await response.json();
 
   if (
     !data ||
@@ -74,22 +83,31 @@ export async function getPlayerContent(
     );
   }
 
-  const payload = data as PlayerContentPayload;
+  const payload =
+    data as PlayerContentPayload;
 
   const release: CourseReleaseView = {
     ...payload.release,
-    modules: payload.release.modules.map((module) => ({
-      ...module,
-      items: module.items.map((item) => ({
-        ...item,
-        completed: false,
-      })),
-    })),
+    modules:
+      payload.release.modules.map(
+        (module) => ({
+          ...module,
+          items: module.items.map(
+            (item) => ({
+              ...item,
+              completed: false,
+            }),
+          ),
+        }),
+      ),
   };
 
-  const firstItem = release.modules
-    .flatMap((module) => module.items)
-    .at(0);
+  const firstItem =
+    release.modules
+      .flatMap(
+        (module) => module.items,
+      )
+      .at(0);
 
   if (!firstItem) {
     throw new Error(
@@ -102,6 +120,7 @@ export async function getPlayerContent(
     initialState: {
       currentItemId: firstItem.id,
     },
-    lessonByItemId: payload.lessons,
+    lessonByItemId:
+      payload.lessons,
   };
 }

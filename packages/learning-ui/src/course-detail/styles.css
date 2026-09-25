@@ -122,6 +122,15 @@
   margin-top: var(--space-8);
 }
 
+.cd-availability {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--type-sm);
+}
+
 .cd-action {
   min-height: 2.75rem;
   display: inline-flex;

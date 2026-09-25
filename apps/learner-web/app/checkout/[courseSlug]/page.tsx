@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  useParams,
+  useRouter,
+} from "next/navigation";
 
 type CsrfResponse = {
   csrfToken: string;
@@ -20,16 +23,27 @@ type CheckoutResponse = {
   detail?: string;
 };
 
-const COURSE_SLUG = "backend-engineering";
-
 export default function CheckoutPage() {
+  const { courseSlug } = useParams<{
+    courseSlug: string;
+  }>();
+
   const router = useRouter();
-  const started = useRef(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const startedForCourse =
+    useRef<string | null>(null);
+
+  const [error, setError] =
+    useState<string | null>(null);
 
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
+    if (
+      startedForCourse.current === courseSlug
+    ) {
+      return;
+    }
+
+    startedForCourse.current = courseSlug;
 
     async function startCheckout() {
       try {
@@ -51,7 +65,9 @@ export default function CheckoutPage() {
           (await csrfResponse.json()) as CsrfResponse;
 
         const checkoutResponse = await fetch(
-          `/api/v1/commerce/courses/${COURSE_SLUG}/checkout/`,
+          `/api/v1/commerce/courses/${encodeURIComponent(
+            courseSlug,
+          )}/checkout/`,
           {
             method: "POST",
             credentials: "same-origin",
@@ -67,7 +83,7 @@ export default function CheckoutPage() {
         if (checkoutResponse.status === 401) {
           router.replace(
             `/login?next=${encodeURIComponent(
-              `/checkout/${COURSE_SLUG}`,
+              `/checkout/${courseSlug}`,
             )}`,
           );
           return;
@@ -77,10 +93,13 @@ export default function CheckoutPage() {
           checkoutResponse.status === 409 &&
           (
             payload.error === "already_entitled" ||
-            payload.error === "payment_already_succeeded"
+            payload.error ===
+              "payment_already_succeeded"
           )
         ) {
-          router.replace(`/learn/${COURSE_SLUG}`);
+          router.replace(
+            `/learn/${courseSlug}`,
+          );
           return;
         }
 
@@ -104,7 +123,9 @@ export default function CheckoutPage() {
           );
         }
 
-        window.location.assign(destination.toString());
+        window.location.assign(
+          destination.toString(),
+        );
       } catch {
         setError(
           "Checkout could not be started. Please return to the course page and try again.",
@@ -113,7 +134,7 @@ export default function CheckoutPage() {
     }
 
     void startCheckout();
-  }, [router]);
+  }, [courseSlug, router]);
 
   return (
     <main
@@ -142,7 +163,9 @@ export default function CheckoutPage() {
           <>
             <p role="alert">{error}</p>
             <p>
-              <a href={`/courses/${COURSE_SLUG}`}>
+              <a
+                href={`/courses/${courseSlug}`}
+              >
                 Return to course
               </a>
             </p>

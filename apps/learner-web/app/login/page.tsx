@@ -71,7 +71,7 @@ export default function LoginPage() {
         window.location.search,
       ).get("next");
 
-      let destination = "/learn/backend-engineering";
+      let destination = "/my-learning";
 
       if (requestedNext) {
         try {

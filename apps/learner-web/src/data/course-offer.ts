@@ -6,9 +6,18 @@ export type CourseOfferView = {
   currency: string;
 };
 
+export type CourseOfferResult =
+  | {
+      status: "available";
+      offer: CourseOfferView;
+    }
+  | {
+      status: "unavailable";
+    };
+
 export async function getCourseOffer(
   slug: string,
-): Promise<CourseOfferView> {
+): Promise<CourseOfferResult> {
   const apiBaseUrl =
     process.env.LEARNING_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 
@@ -20,6 +29,12 @@ export async function getCourseOffer(
       cache: "no-store",
     },
   );
+
+  if (response.status === 404) {
+    return {
+      status: "unavailable",
+    };
+  }
 
   if (!response.ok) {
     throw new Error(
@@ -46,7 +61,10 @@ export async function getCourseOffer(
   }
 
   return {
-    amountMinor: payload.offer.amountMinor,
-    currency: payload.offer.currency,
+    status: "available",
+    offer: {
+      amountMinor: payload.offer.amountMinor,
+      currency: payload.offer.currency,
+    },
   };
 }

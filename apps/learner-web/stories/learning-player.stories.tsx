@@ -124,6 +124,7 @@ const noOpCompletion = async (
 
 export const Initial = {
   args: {
+    courseHref: "/courses/backend-engineering",
     release,
     initialState: {
       currentItemId: "lesson-runtime-boundaries",
@@ -136,6 +137,7 @@ export const Initial = {
 
 export const PartiallyCompleted = {
   args: {
+    courseHref: "/courses/backend-engineering",
     release: partiallyCompletedRelease,
     initialState: {
       currentItemId: "lesson-durable-state",
@@ -155,6 +157,7 @@ export const PartiallyCompleted = {
 
 export const CompletionTransition = {
   args: {
+    courseHref: "/courses/backend-engineering",
     release,
     initialState: {
       currentItemId: "lesson-runtime-boundaries",

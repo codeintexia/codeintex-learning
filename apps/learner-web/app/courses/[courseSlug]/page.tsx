@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { CourseDetail } from "@codeintex/learning-ui";
 
-import { getCourseDetail } from "../../../src/data/course-detail";
+import {
+  CourseNotFoundError,
+  getCourseDetail,
+} from "../../../src/data/course-detail";
 import { getCourseOffer } from "../../../src/data/course-offer";
 import { getLearnerProgress } from "../../../src/data/learner-progress";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Backend Engineering Foundations | CodeInteX Learning",
-  description:
-    "Learn HTTP, API contracts, authentication, sessions, and production testing through first-principles backend engineering.",
+type CoursePageProps = {
+  params: Promise<{
+    courseSlug: string;
+  }>;
 };
 
 function formatPrice(
@@ -24,11 +28,41 @@ function formatPrice(
   }).format(amountMinor);
 }
 
-export default async function BackendEngineeringCoursePage() {
-  const courseSlug = "backend-engineering";
+async function getCourseOrNotFound(
+  courseSlug: string,
+) {
+  try {
+    return await getCourseDetail(courseSlug);
+  } catch (error) {
+    if (error instanceof CourseNotFoundError) {
+      notFound();
+    }
+
+    throw error;
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: CoursePageProps): Promise<Metadata> {
+  const { courseSlug } = await params;
+  const course = await getCourseOrNotFound(
+    courseSlug,
+  );
+
+  return {
+    title: `${course.release.title} | CodeInteX Learning`,
+    description: course.summary,
+  };
+}
+
+export default async function CoursePage({
+  params,
+}: CoursePageProps) {
+  const { courseSlug } = await params;
 
   const [course, progressResult] = await Promise.all([
-    getCourseDetail(courseSlug),
+    getCourseOrNotFound(courseSlug),
     getLearnerProgress(courseSlug),
   ]);
 
@@ -46,7 +80,23 @@ export default async function BackendEngineeringCoursePage() {
     );
   }
 
-  const offer = await getCourseOffer(courseSlug);
+  const offerResult =
+    await getCourseOffer(courseSlug);
+
+  if (offerResult.status === "unavailable") {
+    return (
+      <CourseDetail
+        course={{
+          ...course,
+          primaryAction: undefined,
+          availabilityMessage:
+            "Enrollment is not currently available.",
+        }}
+      />
+    );
+  }
+
+  const offer = offerResult.offer;
   const checkoutPath = `/checkout/${courseSlug}`;
 
   const primaryAction =

@@ -13,7 +13,7 @@ Use this file together with the ADRs under `docs/architecture/adr/` and the curr
 
 ## Current Critical Path
 
-`learner reference slice frozen → select next product/revenue workstream`
+`learner reference slice frozen → multi-course routing locked → activate course #2 as a platform stress test`
 
 The controlled learner reference slice:
 
@@ -21,7 +21,7 @@ The controlled learner reference slice:
 
 now has repeatable Storybook coverage, Playwright browser verification, representative automated accessibility checks, controlled desktop/mobile visual review, real Django session/CSRF integration, authoritative progress-transition proof, and an unauthenticated recovery case.
 
-The controlled learner reference slice is now frozen as the current engineering baseline. Automated responsive/reflow and keyboard/focus acceptance are complete. Representative real screen-reader validation remains OPEN as a later accessibility/release acceptance item; complete WCAG conformance is not claimed. The active critical path now returns to selecting the next product/revenue workstream from concrete requirements. Production topology, Docker/containerization, CI/CD deployment design, and other Production Readiness implementation remain PARKED until explicitly reactivated.
+The controlled learner reference slice remains frozen as the current engineering baseline. Automated responsive/reflow and keyboard/focus acceptance are complete. Representative real screen-reader validation remains OPEN as a later accessibility/release acceptance item; complete WCAG conformance is not claimed. The single-course frontend routing constraint has now been removed, so the active critical path is to activate a second concrete course as a platform stress test rather than continue learner-shell refinement. Production topology, Docker/containerization, CI/CD deployment design, and other Production Readiness implementation remain PARKED until explicitly reactivated.
 
 ## Verified State
 
@@ -81,6 +81,48 @@ Verification for the corrective milestone:
 - `git diff --check`: PASS.
 
 This was a narrow semantic correction to align implementation with the canonical PES completion contract. It does not reopen visual/layout refinement or introduce completion-policy, assessment, credential, or other new LMS architecture.
+
+### Multi-Course Routing and Course Availability
+
+The learner-facing application is no longer structurally tied to `backend-engineering` for production routing.
+
+LOCKED for the current multi-course baseline:
+
+- course detail uses `/courses/[courseSlug]`;
+- learner runtime uses `/learn/[courseSlug]`;
+- checkout uses `/checkout/[courseSlug]`;
+- checkout return uses `/checkout/[courseSlug]/return`;
+- existing `backend-engineering` URLs remain valid through the dynamic routes;
+- the shared Learning Player receives its course-detail destination from application composition rather than embedding a course slug;
+- learner routes preserve their requested destination through authentication;
+- login without an explicit `next` target defaults to `/my-learning` rather than selecting an arbitrary course;
+- unknown public course slugs resolve to a real HTTP 404;
+- course metadata is derived from runtime course data rather than Backend Engineering literals;
+- shared Course Detail copy is course-neutral;
+- `backend-engineering` remains intentionally present in deterministic E2E, Storybook, seed, and sample-content fixtures and is not production routing authority.
+
+Course publication and commercial availability remain separate concerns:
+
+- an active course with a published release may be discoverable without being currently purchasable;
+- `published course` does not imply `active commerce offer`;
+- absence of an active offer is a valid state rather than an application error;
+- a non-enrolled course without an active offer remains renderable and presents `Enrollment is not currently available.`;
+- the Learning catalog remains owned by Learning and is not filtered through Commerce;
+- exact future discoverability policy for invite-only, scholarship-only, prelaunch, or other non-purchasable courses remains OPEN and should be driven by a concrete product requirement.
+
+Verification for this milestone:
+
+- frontend TypeScript typecheck: PASS;
+- frontend Next.js production build: PASS;
+- Storybook static production build: PASS;
+- production `backend-engineering` coupling check across application routes, frontend data adapters, and shared learning UI: empty;
+- dynamic route manifest exposes `/courses/[courseSlug]`, `/learn/[courseSlug]`, `/checkout/[courseSlug]`, and `/checkout/[courseSlug]/return`;
+- browser acceptance covering existing learner flow, dynamic course detail, purchasable-course action, and unknown-course 404: **6/6 PASS** including authenticated setup;
+- earlier dynamic-routing acceptance covering login and checkout continuation behavior: **8/8 PASS** including authenticated setup;
+- backend `offer_unavailable` contract targeted test: **1/1 PASS**;
+- `git diff --check`: PASS.
+
+The temporary multi-course acceptance specs were verification-only and were removed after execution. No permanent second-course fixture or no-offer browser fixture was introduced solely to close this milestone. The first real second course should serve as the next end-to-end stress test of these contracts.
 
 ### Curriculum Navigation and Accessibility
 
@@ -700,19 +742,20 @@ remain PARKED and must not be staged implicitly.
 
 ## Next Milestone
 
-The controlled learner reference slice is frozen.
+The controlled learner reference slice remains frozen, and multi-course frontend routing is now established.
 
-The next step is to select the next product/revenue workstream from concrete requirements rather than continuing learner-shell refinement.
+The next bounded milestone is to activate a second concrete course as a platform stress test. Course authoring may proceed without reopening the learner shell. The second course should validate the generic catalog → detail → entitlement/purchase state → My Learning → learner runtime path and reveal only requirements that arise from real content or commercial needs.
 
 Constraints:
 
-1. do not reopen Dashboard, Curriculum, or Lesson visual refinement without a demonstrated usability, accessibility, or product defect;
-2. keep representative real screen-reader validation OPEN as a release/accessibility acceptance item;
-3. do not claim complete WCAG conformance from axe, Playwright, or reflow proxies alone;
-4. do not expand the browser matrix without an explicit browser-support requirement;
-5. do not introduce new accessibility tooling solely to close documentation gaps;
-6. Production Readiness infrastructure remains PARKED until explicitly reactivated;
-7. prioritize the next workstream by product value, revenue leverage, dependency order, and evidence rather than novelty.
+1. do not reopen Dashboard, Curriculum, Lesson, or general visual refinement without a demonstrated usability, accessibility, or product defect;
+2. do not redesign backend Course/CourseRelease, enrollment, progress, entitlement, or commerce models merely because routing is now generic;
+3. do not assume every published course is purchasable; commercial availability remains a separate capability;
+4. keep exact discoverability policy for non-purchasable courses OPEN until required by a real course or business model;
+5. keep authoritative course-completion policy OPEN; all-lessons-complete remains only a lesson-completion presentation state;
+6. keep representative real screen-reader validation OPEN as a release/accessibility acceptance item and do not claim complete WCAG conformance;
+7. Production Readiness infrastructure remains PARKED until explicitly reactivated;
+8. use the second course to expose genuine reusable-contract gaps before adding new abstractions or learning primitives.
 
 ## Session Handoff Procedure
 

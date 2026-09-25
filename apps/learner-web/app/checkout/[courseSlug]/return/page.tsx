@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
-const COURSE_SLUG = "backend-engineering";
-const LEARN_PATH = `/learn/${COURSE_SLUG}`;
-const RETURN_PATH = `/checkout/${COURSE_SLUG}/return`;
+import { useParams } from "next/navigation";
 
 type ReturnState =
   | "checking"
@@ -13,7 +10,15 @@ type ReturnState =
   | "error";
 
 export default function CheckoutReturnPage() {
-  const [state, setState] = useState<ReturnState>("checking");
+  const { courseSlug } = useParams<{
+    courseSlug: string;
+  }>();
+
+  const [state, setState] =
+    useState<ReturnState>("checking");
+
+  const returnPath =
+    `/checkout/${courseSlug}/return`;
 
   useEffect(() => {
     let cancelled = false;
@@ -21,6 +26,12 @@ export default function CheckoutReturnPage() {
 
     const maxAttempts = 20;
     const retryDelayMs = 1500;
+
+    const learnPath =
+      `/learn/${courseSlug}`;
+
+    const currentReturnPath =
+      `/checkout/${courseSlug}/return`;
 
     async function checkAccess() {
       if (cancelled) {
@@ -31,7 +42,9 @@ export default function CheckoutReturnPage() {
 
       try {
         const response = await fetch(
-          `/api/v1/courses/${COURSE_SLUG}/progress/`,
+          `/api/v1/courses/${encodeURIComponent(
+            courseSlug,
+          )}/progress/`,
           {
             credentials: "same-origin",
             cache: "no-store",
@@ -39,13 +52,17 @@ export default function CheckoutReturnPage() {
         );
 
         if (response.status === 200) {
-          window.location.replace(LEARN_PATH);
+          window.location.replace(
+            learnPath,
+          );
           return;
         }
 
         if (response.status === 401) {
           window.location.replace(
-            `/login?next=${encodeURIComponent(RETURN_PATH)}`,
+            `/login?next=${encodeURIComponent(
+              currentReturnPath,
+            )}`,
           );
           return;
         }
@@ -64,7 +81,10 @@ export default function CheckoutReturnPage() {
         return;
       }
 
-      window.setTimeout(checkAccess, retryDelayMs);
+      window.setTimeout(
+        checkAccess,
+        retryDelayMs,
+      );
     }
 
     void checkAccess();
@@ -72,7 +92,7 @@ export default function CheckoutReturnPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [courseSlug]);
 
   return (
     <main
@@ -100,7 +120,9 @@ export default function CheckoutReturnPage() {
             You can check again without making another payment.
           </p>
           <p>
-            <Link href={RETURN_PATH}>Check again</Link>
+            <Link href={returnPath}>
+              Check again
+            </Link>
           </p>
         </>
       )}
@@ -112,7 +134,9 @@ export default function CheckoutReturnPage() {
             Do not make another payment. Return here and try again shortly.
           </p>
           <p>
-            <Link href={RETURN_PATH}>Try again</Link>
+            <Link href={returnPath}>
+              Try again
+            </Link>
           </p>
         </>
       )}

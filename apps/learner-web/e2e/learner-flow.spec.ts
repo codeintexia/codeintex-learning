@@ -291,7 +291,15 @@ test("missing learner session redirects protected routes to login", async ({
   await page.goto("/learn/backend-engineering");
 
   await expect(page).toHaveURL(
-    /\/login$/,
+    /\/login\?/,
+  );
+
+  expect(
+    new URL(page.url()).searchParams.get(
+      "next",
+    ),
+  ).toBe(
+    "/learn/backend-engineering",
   );
 
   await expect(
