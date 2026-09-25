@@ -126,7 +126,7 @@ test(
     const progress = page.getByRole(
       "progressbar",
       {
-        name: "Course progress",
+        name: "Backend Engineering Foundations lesson progress",
       },
     );
 
@@ -261,6 +261,47 @@ test(
     ).toBeVisible();
 
     await expect(lessonContent).toBeFocused();
+
+    // A completed lesson uses Continue as navigation only.
+    // It must not submit the completion mutation again.
+    await firstLesson.click();
+
+    await expect(lessonHeading).toHaveText(
+      "How HTTP actually moves",
+    );
+
+    const continueButton = page.getByRole(
+      "button",
+      {
+        name: "Continue →",
+      },
+    );
+
+    await expect(continueButton).toBeVisible();
+
+    let repeatCompletionPosts = 0;
+
+    page.on("request", (request) => {
+      if (
+        request.method() === "POST" &&
+        request
+          .url()
+          .includes(
+            "/api/v1/courses/backend-engineering/lessons/",
+          ) &&
+        request.url().endsWith("/complete/")
+      ) {
+        repeatCompletionPosts += 1;
+      }
+    });
+
+    await continueButton.click();
+
+    await expect(lessonHeading).toHaveText(
+      "Designing resource-oriented APIs",
+    );
+
+    expect(repeatCompletionPosts).toBe(0);
 
     await expectNoAutomatedA11yViolations(
       page,

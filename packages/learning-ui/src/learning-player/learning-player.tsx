@@ -121,6 +121,11 @@ export function LearningPlayer({
   async function completeAndContinue() {
     if (completionPending) return;
 
+    if (completedIds.has(current.id)) {
+      goTo(currentIndex + 1);
+      return;
+    }
+
     setCompletionPending(true);
     setCompletionError(null);
 
@@ -166,7 +171,10 @@ export function LearningPlayer({
         </div>
 
         <div className="lp-header__progress">
-          <Progress value={progressPercent} label="Course progress" />
+          <Progress
+            value={progressPercent}
+            label={`${release.title} lesson progress`}
+          />
         </div>
       </header>
 
@@ -179,7 +187,7 @@ export function LearningPlayer({
             Curriculum
           </span>
           <span className="lp-mobile-curriculum__progress">
-            {progressPercent}% complete
+            {progressPercent}% of lessons completed
           </span>
         </summary>
         <Curriculum
@@ -269,15 +277,21 @@ export function LearningPlayer({
             </div>
 
             <Button
-              disabled={completionPending}
+              disabled={
+                completionPending ||
+                (completedIds.has(current.id) &&
+                  currentIndex === allItems.length - 1)
+              }
               onClick={completeAndContinue}
             >
               {completionPending
                 ? "Saving…"
-                : currentIndex === allItems.length - 1
-                  ? "Complete lesson"
-                  : completedIds.has(current.id)
-                    ? "Continue →"
+                : completedIds.has(current.id)
+                  ? currentIndex === allItems.length - 1
+                    ? "Lesson completed"
+                    : "Continue →"
+                  : currentIndex === allItems.length - 1
+                    ? "Complete lesson"
                     : "Complete & continue →"}
             </Button>
           </footer>
