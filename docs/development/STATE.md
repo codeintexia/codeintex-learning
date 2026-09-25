@@ -13,15 +13,15 @@ Use this file together with the ADRs under `docs/architecture/adr/` and the curr
 
 ## Current Critical Path
 
-`learner reference-slice verification complete → controlled PES visual refinement`
+`controlled PES visual refinement complete → manual responsive/accessibility acceptance closure`
 
 The controlled learner reference slice:
 
 `Learner Dashboard → Resume Learning → Curriculum Navigation → Lesson Experience`
 
-now has repeatable Storybook coverage, browser-level Playwright verification, representative automated accessibility checks, real Django session/CSRF integration, authoritative progress-transition proof, and an unauthenticated recovery case.
+now has repeatable Storybook coverage, Playwright browser verification, representative automated accessibility checks, controlled desktop/mobile visual review, real Django session/CSRF integration, authoritative progress-transition proof, and an unauthenticated recovery case.
 
-The next active learner-experience step is controlled PES visual refinement against the canonical PES contracts. Production topology, Docker/containerization, CI/CD deployment design, and other Production Readiness implementation remain PARKED until that workstream is explicitly reactivated.
+The next active learner-experience step is a narrow manual acceptance closure for responsive/reflow and assistive-technology behavior. This is not a new visual-redesign phase. Production topology, Docker/containerization, CI/CD deployment design, and other Production Readiness implementation remain PARKED until explicitly reactivated.
 
 ## Verified State
 
@@ -191,6 +191,39 @@ Decision state:
 - Chromium-only initial execution matrix: PROVISIONAL;
 - cross-browser expansion: OPEN;
 - manual zoom/reflow and assistive-technology validation: OPEN.
+
+### Controlled PES Visual Refinement
+
+The controlled visual refinement pass for the proven learner reference slice is complete.
+
+Evidence and scope:
+
+- visual review used rendered My Learning and Learning Player states at desktop (`1440×1000`) and mobile (`390px` viewport width);
+- the existing information architecture and Learning Player composition were retained rather than redesigned;
+- My Learning intro vertical spacing was reduced so active learning and the resume action appear earlier while preserving hierarchy and readable whitespace;
+- the desktop Learning Player footer now allows the disabled `Previous` control to use intrinsic width rather than visually occupying a large portion of the footer;
+- mobile curriculum disclosure, lesson typography, reading measure, curriculum grouping, active/completed state presentation, and primary action hierarchy were reviewed and intentionally left unchanged;
+- the apparent mobile sticky-footer/content overlap was tested explicitly and found not to be a product defect: final lesson content retained approximately 64px clearance above the sticky footer at the tested viewport;
+- temporary visual-audit Playwright specs and screenshots were not promoted into permanent visual-regression infrastructure.
+
+Decision state:
+
+- My Learning vertical hierarchy refinement: LOCKED;
+- desktop Learning Player footer balance: LOCKED;
+- Learning Player information architecture/layout: NO-CHANGE;
+- mobile curriculum presentation: NO-CHANGE;
+- sticky-footer occlusion concern: CLOSED / NO DEFECT;
+- further visual tweaking in this slice: STOPPED to avoid diminishing-return polish.
+
+Final regression verification after refinement:
+
+- frontend TypeScript typecheck: PASS;
+- critical Playwright learner flow + representative axe checks: **3/3 PASS**;
+- Next.js production build: PASS;
+- Storybook static production build: PASS;
+- `git diff --check`: PASS.
+
+This milestone does not claim complete WCAG conformance. Manual zoom/reflow and assistive-technology validation remain OPEN and form the next narrow acceptance step.
 
 ### Frontend
 
@@ -631,19 +664,20 @@ remain PARKED and must not be staged implicitly.
 
 ## Next Milestone
 
-The Playwright/axe verification milestone for the controlled learner reference slice is complete.
+The controlled PES visual refinement milestone for the learner reference slice is complete.
 
-The next active learner-experience milestone is controlled PES visual refinement against the canonical artifacts under `docs/pes/`.
+The next milestone is a narrow manual responsive/accessibility acceptance closure before freezing the current reference slice.
 
-Immediate constraints:
+Scope:
 
-1. preserve the proven learner flow and authoritative backend/domain boundaries;
-2. use Storybook and the Playwright learner flow as regression gates while refining presentation;
-3. keep PES semantic tokens and contracts authoritative rather than introducing local design systems or one-off styling conventions;
-4. do not fabricate unresolved curriculum locking/unavailable behavior;
-5. do not expand into assessments, projects, analytics, AI/agents, hosted workspaces, or deployment work without a concrete requirement;
-6. keep Chromium-only Playwright coverage PROVISIONAL rather than treating it as the final browser-support policy;
-7. retain manual zoom/reflow and assistive-technology validation as OPEN accessibility work rather than claiming complete WCAG conformance.
+1. verify critical learner flows under browser zoom/reflow conditions without page-level horizontal scrolling or loss of required actions/state;
+2. verify keyboard navigation and visible focus across My Learning, curriculum navigation, lesson navigation, and completion actions;
+3. perform representative assistive-technology validation for the same critical flow;
+4. record defects only when observable behavior violates the existing PES/LMS contracts;
+5. do not reopen visual redesign, introduce new LMS features, or expand into analytics, assessments, AI/agents, hosted workspaces, or deployment work during this closure;
+6. keep Chromium-only Playwright coverage PROVISIONAL; cross-browser expansion remains OPEN and should be activated only by an explicit browser-support requirement.
+
+After this acceptance closure, freeze the current reference slice and select the next product workstream from concrete product/revenue requirements rather than continuing incremental visual polish.
 
 Infrastructure/Docker and Production Readiness implementation remain PARKED until explicitly reactivated.
 
