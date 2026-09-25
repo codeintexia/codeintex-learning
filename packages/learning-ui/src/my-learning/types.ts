@@ -17,7 +17,7 @@ export type MyLearningCourseView =
       resumeHref: string;
     })
   | (MyLearningCourseBaseView & {
-      status: "completed";
+      status: "all-lessons-complete";
     })
   | (MyLearningCourseBaseView & {
       status: "no-content";

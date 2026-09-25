@@ -60,7 +60,7 @@ function mapMyLearningCourse(
   ) {
     return {
       ...common,
-      status: "completed",
+      status: "all-lessons-complete",
     };
   }
 

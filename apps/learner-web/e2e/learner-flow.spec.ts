@@ -86,6 +86,15 @@ test(
       ),
     ).toBeVisible();
 
+    await expect(
+      courseCard.getByRole("progressbar", {
+        name: "Backend Engineering Foundations lesson progress",
+      }),
+    ).toHaveAttribute(
+      "aria-valuenow",
+      "0",
+    );
+
     await expectNoAutomatedA11yViolations(
       page,
       testInfo,

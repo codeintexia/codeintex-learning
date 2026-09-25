@@ -28,9 +28,9 @@ const inProgressCourse = {
   detailHref: "/courses/backend-engineering",
 } satisfies MyLearningCourseView;
 
-const completedCourse = {
+const allLessonsCompleteCourse = {
   id: "backend-engineering-completed",
-  status: "completed",
+  status: "all-lessons-complete",
   kicker: "Software Engineering",
   title: "Backend Engineering",
   summary:
@@ -75,9 +75,9 @@ export const InProgress = {
   },
 } satisfies Story;
 
-export const Completed = {
+export const AllLessonsComplete = {
   args: {
-    learning: view([completedCourse]),
+    learning: view([allLessonsCompleteCourse]),
   },
 } satisfies Story;
 
@@ -85,7 +85,7 @@ export const Mixed = {
   args: {
     learning: view([
       inProgressCourse,
-      completedCourse,
+      allLessonsCompleteCourse,
       noContentCourse,
     ]),
   },

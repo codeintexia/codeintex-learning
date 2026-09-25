@@ -49,31 +49,38 @@ The controlled learner reference slice is now frozen as the current engineering 
 
 ### Learner Dashboard Completion Semantics
 
-My Learning now distinguishes presentation state from progression context.
+My Learning distinguishes presentation state from progression context and does not infer authoritative course completion from lesson progress.
 
 LOCKED for the current learner slice:
 
 - backend `currentItemId` remains progression context and is not treated as a completion-status flag;
-- completion presentation is derived from authoritative `completedItems` and `totalItems`;
-- `totalItems > 0` and `completedItems == totalItems` maps to `completed`;
-- an incomplete course requires a valid current lesson and maps to `in-progress`;
+- lesson-completion presentation is derived from authoritative `completedItems` and `totalItems`;
+- `totalItems > 0` and `completedItems == totalItems` maps to the presentation state `all-lessons-complete`;
+- `all-lessons-complete` means only that every lesson in the enrolled release is complete; it does not establish authoritative course completion;
+- an incomplete lesson set requires a valid current lesson and maps to `in-progress`;
 - a zero-lesson course maps explicitly to `no-content`;
-- completed courses do not expose `CURRENT LESSON` or `Resume learning`;
-- completed courses retain `Course details`.
+- courses with all lessons complete do not expose `CURRENT LESSON` or `Resume learning`;
+- courses with all lessons complete retain `Course details`;
+- My Learning progressbars include the course title and explicitly describe lesson progress in their accessible name.
 
-The learner-facing view model uses a discriminated union so completed, in-progress, and no-content presentation states cannot silently share incompatible actions.
+Authoritative course completion remains an OPEN LMS domain policy. The frontend must not derive `course completed` merely from lesson counts or progress percentage.
 
-Verification for this milestone:
+The learner-facing view model uses a discriminated union so `all-lessons-complete`, `in-progress`, and `no-content` presentation states cannot silently share incompatible actions or imply stronger domain semantics.
+
+Verification for the corrective milestone:
 
 - frontend TypeScript typecheck: PASS;
+- critical Playwright learner flow + representative axe checks: **3/3 PASS**;
 - frontend Next.js production build: PASS;
-- CLI runtime acceptance through `http://localhost:3000/my-learning`: PASS;
-- completed fixture rendered `5 of 5 lessons complete`;
-- `Course complete`: PASS;
-- `All lessons completed`: PASS;
-- `CURRENT LESSON` absent: PASS;
-- `Resume learning` absent: PASS;
-- `Course details` present: PASS.
+- Storybook static production build: PASS;
+- all-lessons-complete presentation renders `All lessons completed`;
+- the learner UI no longer renders `Course complete` from lesson-count equality;
+- `CURRENT LESSON` absent when all lessons are complete: PASS;
+- `Resume learning` absent when all lessons are complete: PASS;
+- `Course details` retained: PASS;
+- `git diff --check`: PASS.
+
+This was a narrow semantic correction to align implementation with the canonical PES completion contract. It does not reopen visual/layout refinement or introduce completion-policy, assessment, credential, or other new LMS architecture.
 
 ### Curriculum Navigation and Accessibility
 
@@ -122,7 +129,7 @@ Current implementation choices:
 Current reference-slice stories:
 
 - Progress: empty, in-progress, complete;
-- My Learning: in-progress, completed, mixed, no-content;
+- My Learning: in-progress, all-lessons-complete, mixed, no-content;
 - Learning Player: initial, partially completed, deterministic authoritative-style completion transition.
 
 Verification for this milestone:

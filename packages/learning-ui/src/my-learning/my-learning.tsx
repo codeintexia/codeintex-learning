@@ -31,7 +31,7 @@ function CourseCard({
         <div className="ml-course__progress">
           <Progress
             value={course.progressPercent}
-            label="Course progress"
+            label={`${course.title} lesson progress`}
           />
           <span className="ml-course__progress-meta">
             {course.completedItems} of {course.totalItems} lessons complete
@@ -50,14 +50,14 @@ function CourseCard({
               {course.currentModuleTitle}
             </span>
           </>
-        ) : course.status === "completed" ? (
+        ) : course.status === "all-lessons-complete" ? (
           <>
             <div className="ml-resume-label">
               STATUS
             </div>
-            <strong>Course complete</strong>
+            <strong>All lessons completed</strong>
             <span className="ml-resume-module">
-              All lessons completed
+              No remaining lessons.
             </span>
           </>
         ) : (
@@ -130,8 +130,8 @@ export function MyLearning({
   const inProgressCourses = learning.courses.filter(
     (course) => course.status === "in-progress",
   );
-  const completedCourses = learning.courses.filter(
-    (course) => course.status === "completed",
+  const allLessonsCompleteCourses = learning.courses.filter(
+    (course) => course.status === "all-lessons-complete",
   );
   const noContentCourses = learning.courses.filter(
     (course) => course.status === "no-content",
@@ -174,11 +174,11 @@ export function MyLearning({
           />
         ) : null}
 
-        {completedCourses.length > 0 ? (
+        {allLessonsCompleteCourses.length > 0 ? (
           <CourseSection
-            id="completed-title"
-            title="Completed"
-            courses={completedCourses}
+            id="all-lessons-complete-title"
+            title="All lessons completed"
+            courses={allLessonsCompleteCourses}
           />
         ) : null}
 
